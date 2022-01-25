@@ -964,52 +964,57 @@ class FolderPrintController
             $status = _EMAIL_ERROR_SENT;
         }
 
-        $pdf = new Fpdi('P', 'pt');
-        $pdf->setPrintHeader(false);
-        $pdf->AddPage();
+        #region JL
+        $widthNoMargins_px = "950px";
+        $cellPaddingBottom_px = "30px";
 
-        $dimensions        = $pdf->getPageDimensions();
-        $widthNoMargins    = $dimensions['w'] - $dimensions['rm'] - $dimensions['lm'];
-        $width             = $widthNoMargins / 2;
-        $widthQuarter      = $widthNoMargins / 4;
-        $widthThreeQuarter = $widthQuarter * 3;
-
-        $pdf->SetFont('', 'B', 12);
-        $pdf->Cell($width, 15, _EMAIL, 0, 0, 'L', false);
-        $pdf->SetFont('', '', 11);
-        $pdf->Cell($width, 15, $sentDate, 0, 1, 'R', false);
-
-        $pdf->SetY($pdf->GetY() + 5);
-        $pdf->SetFont('', '', 10);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _SENDER.'</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $sender, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _RECIPIENTS . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $recipients, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _TO_CC . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopy, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _TO_CCI . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $recipientsCopyHidden, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _SUBJECT . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $subject, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->MultiCell($widthQuarter, 30, '<b>' . _STATUS . '</b>', 1, 'L', false, 0, '', '', true, 0, true);
-        $pdf->MultiCell($widthThreeQuarter, 30, $status, 1, 'L', false, 1, '', '', true, 0, true);
-
-        $pdf->SetY($pdf->GetY() + 5);
-
-        $pdf->writeHTML($email['body']);
-        // make branch
+        $emailMeta = "<table style=\"width: $widthNoMargins_px;\" cellspacing=\"0\" cellpadding=\"5\">
+        <tbody>
+        <tr style=\"height: 18px; border-syle: none;\">
+        <td style=\"height: 18px; \"><b>"._EMAIL."</b></td>
+        <td style=\"text-align: right; height: 18px; \">$sentDate</td>
+        </tr>
+        </tbody>
+        </table>
+        <table style=\"width: $widthNoMargins_px; border-style: solid; border-color: #000000;\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">
+        <tbody>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._SENDER."</b></td>
+        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$sender</td>
+        </tr>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._RECIPIENTS."</b></td>
+        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipients</td>
+        </tr>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._TO_CC."</b></td>
+        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipientsCopy</td>
+        </tr>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._TO_CCI."</b></td>
+        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipientsCopyHidden</td>
+        </tr>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._SUBJECT."</b></td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$subject</td>
+        </tr>
+        <tr>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._STATUS."</b></td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$status</td>
+        </tr>
+        </tbody>
+        </table>
+        <br><br>";
+        $emailMeta_emailDataBody = $emailMeta.$email['body'];
 
         $tmpDir = CoreConfigModel::getTmpPath();
-        $filePathOnTmp = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'] . '.pdf';
-        $pdf->Output($filePathOnTmp, 'F');
+        $filePathInTmpNoExtension = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'];
+        file_put_contents($filePathInTmpNoExtension.'.html', mb_convert_encoding($emailMeta_emailDataBody, 'HTML', 'UTF-8'));
 
-        return $filePathOnTmp;
+        ConvertPdfController::convertInPdf(['fullFilename' => $filePathInTmpNoExtension.'.html']);
+
+        return $filePathInTmpNoExtension.'.pdf';
+        #endregion JL
     }
 
     private static function getSummarySheet(array $args)
