@@ -263,7 +263,7 @@ export class ActionsService implements OnDestroy {
                     }),
                     catchError((err: any) => {
                         if (path !== null) {
-                            this.router.navigate([path]);
+                            this.router.navigate([`/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`]);
                         } else {
                             this.notify.handleErrors(err);
                         }
