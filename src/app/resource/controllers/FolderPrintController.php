@@ -1003,6 +1003,7 @@ class FolderPrintController
         $pdf->SetY($pdf->GetY() + 5);
 
         $pdf->writeHTML($email['body']);
+        // make branch
 
         $tmpDir = CoreConfigModel::getTmpPath();
         $filePathOnTmp = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'] . '.pdf';
