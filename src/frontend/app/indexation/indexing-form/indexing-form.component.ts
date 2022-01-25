@@ -911,8 +911,8 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
-                if (data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues !== null) {
-                    this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+                if (data.indexingModel.master !== null) {
+                    this.getAllowedValues(data.indexingModel.master);
                 }
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
@@ -989,6 +989,18 @@ export class IndexingFormComponent implements OnInit {
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getAllowedValues(id: number) {
+        this.http.get(`../rest/indexingModels/${id}`).pipe(
+            tap((data: any) => {
+                this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
