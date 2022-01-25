@@ -1106,9 +1106,6 @@ export class IndexingFormComponent implements OnInit {
             }
             if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
                 this.arrFormControl[field.identifier].value = '';
-                if (this.mode !== 'indexation') {
-                    this.arrFormControl[field.identifier].touched = true;
-                }
                 return false;
             }
         } else if (this.arrFormControl[field.identifier].value === null) {
