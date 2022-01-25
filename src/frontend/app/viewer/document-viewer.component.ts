@@ -411,10 +411,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     canUploadNewVersion() {
         if (this.editMode) {
-            if (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound)))) {
+            if ((this.externalId.signatureBookId !== undefined) || (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound))))) {
                 return false;
             } else {
-                return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
+                return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && !this.noConvertedFound)) && this.resId !== null;
             }
         } else {
             return false;
