@@ -31,7 +31,7 @@ export class IndexingModelValuesSelectorComponent implements OnInit {
     }
 
     allChecked() {
-        return this.values.filter((val: any) => !val.isTitle).every((el:any) => !el.disabled);
+        return this.values.filter((val: any) => !val.isTitle).every((el: any) => !el.disabled);
     }
 
     emptyChecked() {
