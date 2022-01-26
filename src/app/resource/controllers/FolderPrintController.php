@@ -964,7 +964,7 @@ class FolderPrintController
             $status = _EMAIL_ERROR_SENT;
         }
 
-        $widthTable_px = "1000px";
+        $widthTable_px = "1200px";
         $cellPaddingBottom_px = "30px";
 
         $emailMeta = "<table style=\"width: $widthTable_px;\" cellspacing=\"0\" cellpadding=\"5\">
@@ -1013,8 +1013,9 @@ class FolderPrintController
         $tmpDir = CoreConfigModel::getTmpPath();
         $filePathInTmpNoExtension = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'];
         file_put_contents($filePathInTmpNoExtension.'.html', mb_convert_encoding($emailMeta_emailDataBody, 'HTML', 'UTF-8'));
-
         ConvertPdfController::convertInPdf(['fullFilename' => $filePathInTmpNoExtension.'.html']);
+
+        if(file_exists($filePathInTmpNoExtension.'.html')){ unlink($filePathInTmpNoExtension.'.html');}
 
         return $filePathInTmpNoExtension.'.pdf';
     }
