@@ -964,35 +964,34 @@ class FolderPrintController
             $status = _EMAIL_ERROR_SENT;
         }
 
-        #region JL
-        $widthNoMargins_px = "950px";
+        $widthTable_px = "1000px";
         $cellPaddingBottom_px = "30px";
 
-        $emailMeta = "<table style=\"width: $widthNoMargins_px;\" cellspacing=\"0\" cellpadding=\"5\">
+        $emailMeta = "<table style=\"width: $widthTable_px;\" cellspacing=\"0\" cellpadding=\"5\">
         <tbody>
-        <tr style=\"height: 18px; border-syle: none;\">
-        <td style=\"height: 18px; \"><b>"._EMAIL."</b></td>
-        <td style=\"text-align: right; height: 18px; \">$sentDate</td>
+        <tr style=\"border-syle: none;\">
+        <td style=\"\"><b>"._EMAIL."</b></td>
+        <td style=\"text-align: right; \">$sentDate</td>
         </tr>
         </tbody>
         </table>
-        <table style=\"width: $widthNoMargins_px; border-style: solid; border-color: #000000;\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">
+        <table style=\"width: $widthTable_px; border-style: solid; border-color: #000000;\" border=\"1\" cellspacing=\"0\" cellpadding=\"5\">
         <tbody>
         <tr>
         <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._SENDER."</b></td>
-        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$sender</td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$sender</td>
         </tr>
         <tr>
         <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._RECIPIENTS."</b></td>
-        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipients</td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$recipients</td>
         </tr>
         <tr>
         <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._TO_CC."</b></td>
-        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipientsCopy</td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$recipientsCopy</td>
         </tr>
         <tr>
         <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._TO_CCI."</b></td>
-        <td style=\"height: 18px; width: $widthThreeQuarter_px; padding-bottom: $cellPaddingBottom_px;\">$recipientsCopyHidden</td>
+        <td style=\"padding-bottom: $cellPaddingBottom_px;\">$recipientsCopyHidden</td>
         </tr>
         <tr>
         <td style=\"padding-bottom: $cellPaddingBottom_px;\"><b>"._SUBJECT."</b></td>
@@ -1003,9 +1002,13 @@ class FolderPrintController
         <td style=\"padding-bottom: $cellPaddingBottom_px;\">$status</td>
         </tr>
         </tbody>
-        </table>
-        <br><br>";
-        $emailMeta_emailDataBody = $emailMeta.$email['body'];
+        </table><br>";
+        $css_ = "<style>
+            table, thead, tbody, tr, td, th {
+                page-break-inside: avoid !important;
+            }
+        </style>";
+        $emailMeta_emailDataBody = $css_.$emailMeta.$email['body'];
 
         $tmpDir = CoreConfigModel::getTmpPath();
         $filePathInTmpNoExtension = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'];
@@ -1014,7 +1017,6 @@ class FolderPrintController
         ConvertPdfController::convertInPdf(['fullFilename' => $filePathInTmpNoExtension.'.html']);
 
         return $filePathInTmpNoExtension.'.pdf';
-        #endregion JL
     }
 
     private static function getSummarySheet(array $args)
