@@ -801,7 +801,8 @@ export class IndexingFormComponent implements OnInit {
 
     async loadForm(indexModelId: number, saveResourceState: boolean = true) {
         this.loading = true;
-
+        this.hasLinkedRes = false;
+        this.linkedResources = [];
         this.customDiffusion = [];
         this.indexingFormId = indexModelId;
 
@@ -1228,6 +1229,7 @@ export class IndexingFormComponent implements OnInit {
     checkRemovedItem(value: any) {
         if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
             this.hasLinkedRes = false;
+            this.resourceToLinkEvent.emit([]);
         }
     }
     
