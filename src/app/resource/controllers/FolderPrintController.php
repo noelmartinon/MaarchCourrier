@@ -1016,7 +1016,9 @@ class FolderPrintController
         file_put_contents($filePathInTmpNoExtension.'.html', mb_convert_encoding($emailMeta_emailDataBody, 'HTML', 'UTF-8'));
         ConvertPdfController::convertInPdf(['fullFilename' => $filePathInTmpNoExtension.'.html']);
 
-        if(file_exists($filePathInTmpNoExtension.'.html')){ unlink($filePathInTmpNoExtension.'.html');}
+        if(file_exists($filePathInTmpNoExtension.'.html')) { 
+            unlink($filePathInTmpNoExtension.'.html');
+        }
 
         return $filePathInTmpNoExtension.'.pdf';
     }
