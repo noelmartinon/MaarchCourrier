@@ -12,4 +12,10 @@
             [downloadActions]="data.downloadActions" [isSigned]="data.isSigned">
         </app-document-viewer>
     </mat-dialog-content>
+    <ng-container *ngIf="data.isNewVersion !== undefined">
+        <span class="divider-modal"></span>
+        <div mat-dialog-actions class="actions">
+            <button mat-raised-button color="primary" (click)="createNewVersion()">{{'lang.createNewVersion' | translate}}</button>
+        </div>
+    </ng-container>
 </div>
