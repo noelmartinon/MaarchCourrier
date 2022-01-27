@@ -970,7 +970,7 @@ class FolderPrintController
             $status = _EMAIL_ERROR_SENT;
         }
 
-        $widthTable_px = "1200px";
+        $widthTable_px = "100%";
         $cellPaddingBottom_px = "30px";
 
         $emailMeta = "<table style=\"width: $widthTable_px;\" cellspacing=\"0\" cellpadding=\"5\">
