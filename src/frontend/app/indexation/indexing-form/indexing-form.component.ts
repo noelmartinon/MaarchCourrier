@@ -41,6 +41,7 @@ export class IndexingFormComponent implements OnInit {
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
     @Output() reloadBadge = new EventEmitter<any>();
+    @Output() resourceToLinkEvent = new EventEmitter<any>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
 
@@ -1145,14 +1146,19 @@ export class IndexingFormComponent implements OnInit {
     }
 
     selectedContact(contact: any, identifier: string) {
-        if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing') && this.suggestLinksNdaysAgo > 0) {
-            const resourceNotBefore = new Date(new Date(this.creationDateClone).setDate(new Date(this.creationDateClone).getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];            
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && this.suggestLinksNdaysAgo > 0) {
+            const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
+            const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];            
             this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.resources)) {
                         if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
                             this.hasLinkedRes = false;
                         } else {
+                            data.resources = data.resources.map((element: any) => ({
+                                ...element,
+                                checked: false
+                            }));
                             this.linkedResources = data;
                             this.selectedContactClone = JSON.parse(JSON.stringify(contact));
                             this.hasLinkedRes = true;
@@ -1198,10 +1204,19 @@ export class IndexingFormComponent implements OnInit {
                 }
             });
         dialogRef.afterClosed().pipe(
-            filter((data: string) => data === 'success'),
-            tap(() => {
-                this.reloadBadge.emit();
-                this.notify.success(this.lang.resourcesLinked);
+            tap((data: any) => {
+                if (Array.isArray(data)) {
+                    this.linkedResources['resources'].forEach((element: any) => {
+                        element.checked = data.indexOf(element.resId) > -1 ? true : false;
+                    });
+                    const resToLink: any[] = this.linkedResources['resources'].filter((item: any) => item.checked);
+                    if (resToLink.length > 0) {
+                        this.resourceToLinkEvent.emit(resToLink.map((res: any) => res.resId));
+                    }
+                } else if (data === 'success') {
+                    this.reloadBadge.emit();
+                    this.notify.success(this.lang.resourcesLinked);
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

@@ -6,6 +6,7 @@ import { SearchAdvListComponent } from '../../adv-search/list/search-adv-list.co
 import { NotificationService } from '../../notification.service';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: 'link-resource-modal.component.html',
@@ -21,6 +22,7 @@ export class LinkResourceModalComponent {
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
+        public router: Router,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<LinkResourceModalComponent>) {
     }
@@ -33,16 +35,20 @@ export class LinkResourceModalComponent {
     }
 
     linkResources() {
-        const selectedRes = this.appSearchAdvList.getSelectedRessources().filter(res => res !== this.data.resId);
-        this.http.post(`../../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
-            tap(() => {
-                this.dialogRef.close('success');
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err)
-                return of(false);
-            })
-        ).subscribe();
+        if (this.router.url.includes('indexing')) {
+            this.dialogRef.close(this.appSearchAdvList.selectedRes)
+        } else {
+            const selectedRes = this.appSearchAdvList.getSelectedRessources().filter(res => res !== this.data.resId);
+            this.http.post(`../../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
+                tap(() => {
+                    this.dialogRef.close('success');
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err)
+                    return of(false);
+                })
+            ).subscribe();
+        }
 
     }
 }

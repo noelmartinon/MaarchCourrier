@@ -16,7 +16,7 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button color="primary" [disabled]="appSearchAdvList.getSelectedRessources().length === 0"
-            (click)="linkResources()">{{lang.linkSelectedResources}}</button>
+        <button mat-raised-button color="primary" [disabled]="this.router.url.includes('indexing') ? false : appSearchAdvList.getSelectedRessources().length === 0"
+            (click)="linkResources()">{{router.url.includes('indexing') ? lang.validate : lang.linkSelectedResources}}</button>
     </div>
 </div>
