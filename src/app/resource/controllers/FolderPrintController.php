@@ -586,6 +586,12 @@ class FolderPrintController
                 if (!file_exists($filePathOnTmp)) {
                     return $response->withStatus(500)->withJson(['errors' => 'Merged PDF file not created']);
                 }
+
+                // delete all tmp email_*.pdf, attachment_*.pdf, summarySheet_*.pdf, convertedAr_*.pdf and listNotes_*.pdf after merged is complete
+                foreach ($documentPaths as $documentPath) {
+                    unlink($documentPath);
+                }
+                
                 $folderPrintPaths[] = $filePathOnTmp;
             }
         }
@@ -1003,12 +1009,7 @@ class FolderPrintController
         </tr>
         </tbody>
         </table><br>";
-        $css_ = "<style>
-            table, thead, tbody, tr, td, th {
-                page-break-inside: avoid !important;
-            }
-        </style>";
-        $emailMeta_emailDataBody = $css_.$emailMeta.$email['body'];
+        $emailMeta_emailDataBody = $emailMeta.$email['body'];
 
         $tmpDir = CoreConfigModel::getTmpPath();
         $filePathInTmpNoExtension = $tmpDir . 'email_' . $email['id'] . '_' . $GLOBALS['id'];
