@@ -2631,5 +2631,6 @@
     "multigestId": "Multigest Unique Identifier (UID)",
     "downloadFile": "Download file",
     "pdfFormat": "pdf format",
-    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>"
+    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>",
+    "goToNextDocument": "Force the passage to the next document when the document leaves the perimeter of the basket"
 }

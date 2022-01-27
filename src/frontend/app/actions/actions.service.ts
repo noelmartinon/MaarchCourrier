@@ -253,7 +253,7 @@ export class ActionsService implements OnDestroy {
         }, 50000);
     }
 
-    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
+    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds, path: string = null) {
         return new Promise((resolve) => {
             if (resIds.length > 0) {
                 console.debug(`Unlock resources : ${resIds}`);
@@ -262,7 +262,11 @@ export class ActionsService implements OnDestroy {
                         resolve(true);
                     }),
                     catchError((err: any) => {
-                        this.notify.handleErrors(err);
+                        if (path !== null) {
+                            this.router.navigate([`/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`]);
+                        } else {
+                            this.notify.handleErrors(err);
+                        }
                         return of(false);
                     })
                 ).subscribe();

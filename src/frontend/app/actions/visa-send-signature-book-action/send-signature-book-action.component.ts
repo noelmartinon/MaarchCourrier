@@ -8,6 +8,8 @@ import { tap, finalize, catchError, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
+import { ActionsService } from '../actions.service';
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: 'send-signature-book-action.component.html',
@@ -45,7 +47,10 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendSignatureBookActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        public actionService: ActionsService,
+        public route: Router
+    ) { }
 
     async ngAfterViewInit(): Promise<void> {
         if (this.data.resIds.length === 0) {
@@ -111,7 +116,30 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                this.actionService.stopRefreshResourceLock();
+                const path: string = `resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}?limit=10&offset=0`;
+                this.http.get(`../rest/${path}`).pipe(
+                    tap((data: any) => {
+                        if (!this.route.url.includes('signatureBook')) {
+                            this.dialogRef.close(data.allResources[0]);
+                        } else {
+                            if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
+                                if (data.count > 0) {
+                                    this.dialogRef.close();
+                                    this.route.navigate(['/signatureBook/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/resources/' + data.allResources[0]]);
+                                } else {
+                                    this.dialogRef.close();
+                                    this.route.navigate([`/basketList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}`]);
+                                    this.notify.handleSoftErrors(err);
+                                }
+                            } else {
+                                this.dialogRef.close();
+                                this.route.navigate([`/basketList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}`]);
+                                this.notify.handleSoftErrors(err);
+                            }
+                        }
+                    })
+                ).subscribe();
                 return of(false);
             })
         ).subscribe();
