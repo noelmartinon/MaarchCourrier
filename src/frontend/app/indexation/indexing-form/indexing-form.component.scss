@@ -668,7 +668,8 @@
     display: inline-flex;
     font-size: 15px;
     text-align: center;
-    color: $primary;
+    color: $warn;
     padding-top: 10px;
     overflow-x: hidden;
+    font-weight: bold;
 }
