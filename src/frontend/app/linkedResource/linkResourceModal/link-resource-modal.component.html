@@ -8,15 +8,15 @@
         </button></h1>
     <mat-dialog-content>
         <div class="bg-primary">
-            <app-criteria-tool #appCriteriaTool [openedPanel]="true" (searchUrlGenerated)="appSearchResultList.launchSearch($event)"
+            <app-criteria-tool *ngIf="data.fromContact === undefined" #appCriteriaTool [openedPanel]="true" (searchUrlGenerated)="appSearchResultList.launchSearch($event)"
             [defaultCriteria]="['chrono', 'subject','recipients','senders']"></app-criteria-tool>
             <div id="toolTemplate" style="padding-top: 10px;"></div>
         </div>
-        <app-search-result-list #appSearchResultList [actionMode]="false" [hideFilter]="true" [appCriteriaTool]="appCriteriaTool" [standalone]="true"></app-search-result-list>
+        <app-search-result-list #appSearchResultList [linkedRes]="data.linkedRes" [actionMode]="false" [hideFilter]="true" [appCriteriaTool]="appCriteriaTool" [standalone]="true"></app-search-result-list>
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary"
-            (click)="linkResources()" [disabled]="!isSelectedResources()">{{'lang.linkSelectedResources' | translate}}</button>
+            (click)="linkResources()" [disabled]="this.router.url.includes('indexing') ? false : !isSelectedResources()">{{(router.url.includes('indexing') ? 'lang.validate' : 'lang.linkSelectedResources') | translate}}</button>
     </div>
 </div>

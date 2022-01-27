@@ -15,6 +15,8 @@ import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
+import { Router } from '@angular/router';
+import { LinkResourceModalComponent } from '@appRoot/linkedResource/linkResourceModal/link-resource-modal.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -37,6 +39,8 @@ export class IndexingFormComponent implements OnInit {
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
     @Output() afterSaveEvent = new EventEmitter<string>();
+    @Output() reloadBadge = new EventEmitter<any>();
+    @Output() resourceToLinkEvent = new EventEmitter<any>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
@@ -264,6 +268,12 @@ export class IndexingFormComponent implements OnInit {
 
     isPrivate: boolean = false;
 
+    hasLinkedRes: boolean = false;
+    linkedResources: any[] = [];
+    selectedContactClone: any = null;
+    suggestLinksNdaysAgo: number;
+    creationDateClone: Date;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -271,7 +281,8 @@ export class IndexingFormComponent implements OnInit {
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private route: Router
     ) {
 
     }
@@ -283,6 +294,10 @@ export class IndexingFormComponent implements OnInit {
         this.fieldCategories.forEach(category => {
             this['indexingModels_' + category] = [];
         });
+
+        if (!this.adminMode) {
+            await this.getParameter();
+        }
 
         if (this.indexingFormId <= 0 || this.indexingFormId === undefined) {
 
@@ -782,6 +797,7 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
+                    this.creationDateClone = JSON.parse(JSON.stringify(data['creationDate']));
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
                         // this.fieldCategories.forEach(async element => {
@@ -1315,6 +1331,92 @@ export class IndexingFormComponent implements OnInit {
                 }
             });
             this.availableFields = this.availableFields.filter((item: any) => item.identifier.indexOf('registeredMail_') === -1 && item.identifier !== 'departureDate');
+        }
+    }
+
+    selectedContact(contact: any, identifier: string) {
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && this.suggestLinksNdaysAgo > 0) {
+            const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
+            const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];
+            this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
+                tap((data: any) => {
+                    if (!this.functions.empty(data.resources)) {
+                        if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
+                            this.hasLinkedRes = false;
+                        } else {
+                            data.resources = data.resources.map((element: any) => ({
+                                ...element,
+                                checked: false
+                            }));
+                            this.linkedResources = data;
+                            this.selectedContactClone = JSON.parse(JSON.stringify(contact));
+                            this.hasLinkedRes = true;
+                        }
+                    } else {
+                        this.hasLinkedRes = false;
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.error(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.hasLinkedRes = false;
+        }
+    }
+
+    getParameter() {
+        return new Promise((resolve) => {
+            this.http.get('../../rest/parameters/suggest_links_n_days_ago').pipe(
+                tap((data: any) => {
+                    this.suggestLinksNdaysAgo = data.parameter.param_value_int;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    openSearchResourceModal() {
+        const dialogRef = this.dialog.open(LinkResourceModalComponent,
+            {
+                panelClass: 'maarch-full-height-modal', minWidth: '80%',
+                data: {
+                    resId: this.resId,
+                    linkedRes: this.linkedResources,
+                    fromContact: true,
+                    selectedContact: this.selectedContactClone
+                }
+            });
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                if (Array.isArray(data)) {
+                    this.linkedResources['resources'].forEach((element: any) => {
+                        element.checked = data.indexOf(element.resId) > -1 ? true : false;
+                    });
+                    const resToLink: any[] = this.linkedResources['resources'].filter((item: any) => item.checked);
+                    if (resToLink.length > 0) {
+                        this.resourceToLinkEvent.emit(resToLink.map((res: any) => res.resId));
+                    }
+                } else if (data === 'success') {
+                    this.reloadBadge.emit();
+                    this.notify.success(this.translate.instant('lang.resourcesLinked'));
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    checkRemovedItem(value: any) {
+        if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
+            this.hasLinkedRes = false;
         }
     }
 }

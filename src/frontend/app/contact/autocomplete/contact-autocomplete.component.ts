@@ -47,6 +47,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() afterSelected = new EventEmitter<any>();
+    @Output() removeContactEvent = new EventEmitter<any>();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -169,7 +170,6 @@ export class ContactAutocompleteComponent implements OnInit {
         this.setFormValue(ev.option.value);
         this.afterSelected.emit(ev.option.value);
         this.myControl.setValue('');
-
     }
 
     initFormValue() {
@@ -307,7 +307,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     removeItem(index: number) {
-
+        this.removeContactEvent.emit(this.controlAutocomplete.value[index].id);
         if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
             const arrValue = this.controlAutocomplete.value;
             this.controlAutocomplete.value.splice(index, 1);
@@ -370,6 +370,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     resetAll() {
         this.controlAutocomplete.setValue([]);
+        this.removeContactEvent.emit(false);
         this.valuesToDisplay = {
             contact : {},
             user: {},

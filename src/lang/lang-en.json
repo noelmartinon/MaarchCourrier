@@ -2631,5 +2631,7 @@
     "multigestId": "Multigest Unique Identifier (UID)",
     "downloadFile": "Download file",
     "pdfFormat": "pdf format",
-    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>"
+    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>",
+    "hasLinkedRes": "At least one mail registered in the last {{nbDays}} day(s) is assigned to the same contact.",
+    "seeMore": "See more !"
 }

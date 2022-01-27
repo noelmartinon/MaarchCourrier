@@ -43,6 +43,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     @Input() hideFilter: boolean = false;
     @Input() appCriteriaTool: CriteriaToolComponent;
     @Input() sidenavRight: MatSidenav;
+    @Input() linkedRes: any[] = [];
 
     @Output() loadingResult = new EventEmitter<boolean>();
 
@@ -175,36 +176,48 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (!this.functions.empty(this.searchTerm)) {
-            this.initSearch = true;
-            this.criteria = {
-                meta: {
-                    values: this.searchTerm
-                }
-            };
+        if (this.functions.empty(this.linkedRes)) {
+
+            if (!this.functions.empty(this.searchTerm)) {
+                this.initSearch = true;
+                this.criteria = {
+                    meta: {
+                        values: this.searchTerm
+                    }
+                };
+            }
+            this.headerService.sideBarAdmin = true;
+
+            this.isLoadingResults = false;
+
+            if (this.toolTemplate !== undefined) {
+                this.headerService.initTemplate(this.toolTemplate, this.viewContainerRef, 'toolTemplate');
+            }
+
+            if (this.panelTemplate !== undefined && this.sidenavRight !== undefined) {
+                this.headerService.initTemplate(this.panelTemplate, this.viewContainerRef, 'panelTemplate');
+            }
+
+            if (this.filterTemplate !== undefined && !this.hideFilter) {
+                this.headerService.initTemplate(this.filterTemplate, this.viewContainerRef, 'filterTemplate');
+            }
+
+            this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
+
+            if (!this.functions.empty(this.searchTerm)) {
+                this.listProperties.criteria = {};
+                this.listProperties.criteria.meta = this.criteria.meta;
+            }
+        } else {
+            this.data = this.processPostData(this.linkedRes);
+            this.resultsLength = this.linkedRes['count'];
+            this.allResInBasket = this.linkedRes['allResources'];
+            this.data = this.linkedRes['resources'];
+            this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
+            this.isLoadingResults = false;
+            this.hideFilter = true;
         }
-        this.headerService.sideBarAdmin = true;
 
-        this.isLoadingResults = false;
-
-        if (this.toolTemplate !== undefined) {
-            this.headerService.initTemplate(this.toolTemplate, this.viewContainerRef, 'toolTemplate');
-        }
-
-        if (this.panelTemplate !== undefined && this.sidenavRight !== undefined) {
-            this.headerService.initTemplate(this.panelTemplate, this.viewContainerRef, 'panelTemplate');
-        }
-
-        if (this.filterTemplate !== undefined && !this.hideFilter) {
-            this.headerService.initTemplate(this.filterTemplate, this.viewContainerRef, 'filterTemplate');
-        }
-
-        this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
-
-        if (!this.functions.empty(this.searchTerm)) {
-            this.listProperties.criteria = {};
-            this.listProperties.criteria.meta = this.criteria.meta;
-        }
 
         this.loading = false;
     }

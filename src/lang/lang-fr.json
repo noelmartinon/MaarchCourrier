@@ -2629,5 +2629,7 @@
     "multigestId": "Identifiant unique (UID) Multigest",
     "downloadFile": "Télécharger le fichier",
     "pdfFormat": "Format pdf",
-    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>"
+    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>",
+    "hasLinkedRes": "Au moins un courrier enregistré dans les {{nbDays}} derniers jour(s) est affecté au même contact.",
+    "seeMore": "Voir !"
 }

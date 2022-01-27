@@ -6,6 +6,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { SearchResultListComponent } from '@appRoot/search/result-list/search-result-list.component';
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: 'link-resource-modal.component.html',
@@ -21,6 +22,7 @@ export class LinkResourceModalComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
+        public router: Router,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<LinkResourceModalComponent>) {
@@ -29,17 +31,20 @@ export class LinkResourceModalComponent implements OnInit {
     ngOnInit(): void { }
 
     linkResources() {
-        const selectedRes = this.appSearchResultList.getSelectedResources().filter(res => res !== this.data.resId);
-        this.http.post(`../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
-            tap(() => {
-                this.dialogRef.close('success');
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-
+        if (this.router.url.includes('indexing')) {
+            this.dialogRef.close(this.appSearchResultList.selectedRes);
+        } else {
+            const selectedRes = this.appSearchResultList.getSelectedResources().filter(res => res !== this.data.resId);
+            this.http.post(`../../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
+                tap(() => {
+                    this.dialogRef.close('success');
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 
     isSelectedResources() {
