@@ -181,6 +181,7 @@
                             </ng-template>
                             <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                 [resId]="attachment.signedResponse.value" [mode]="'attachment'"
+                                [newPjVersion] = "newVersion"
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value + ' (' + this.translate.instant('lang.signed') + ')'">
                             </app-document-viewer>
                         </mat-tab>
@@ -192,6 +193,7 @@
                                 [resId]="data.resId" [resIdMaster]="attachment['resIdMaster'].value" [mode]="'attachment'"
                                 [format]="attachment['format'].value" [attachType]="attachment['type'].value"
                                 (triggerEvent)="setDatasViewer($event)"
+                                [newPjVersion] = "newVersion"
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value">
                             </app-document-viewer>
                         </mat-tab>
@@ -200,6 +202,7 @@
                             <ng-template matTabContent>
                                 <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                     [resId]="version.resId" [mode]="'attachment'" [format]="attachment['format'].value"
+                                    [newPjVersion] = "newVersion"
                                     [title]="attachment.chrono.value + ' - ' + attachment.title.value + ' (' + version.relation + ')'">
                                 </app-document-viewer>
                             </ng-template>
