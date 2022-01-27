@@ -974,6 +974,7 @@ class FolderPrintController
             $status = _EMAIL_ERROR_SENT;
         }
 
+        // make branch
         $pdf = new Fpdi('P', 'pt');
         $pdf->setPrintHeader(false);
         $pdf->AddPage();
