@@ -805,6 +805,8 @@ export class IndexingFormComponent implements OnInit {
         this.linkedResources = [];
         this.customDiffusion = [];
         this.indexingFormId = indexModelId;
+        this.resourceToLinkEvent.emit([]);
+
 
         await this.resetForm();
 
