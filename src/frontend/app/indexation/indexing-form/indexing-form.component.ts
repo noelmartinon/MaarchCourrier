@@ -1337,7 +1337,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     selectedContact(contact: any, identifier: string) {
-        if (this.getCategory() === 'incoming' && identifier === 'senders' && this.suggestLinksNdaysAgo > 0) {
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && this.arrFormControl['senders'].value.length === 1 && this.suggestLinksNdaysAgo > 0) {
             const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
             const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];
             this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
@@ -1345,6 +1345,9 @@ export class IndexingFormComponent implements OnInit {
                     if (!this.functions.empty(data.resources)) {
                         if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
                             this.hasLinkedRes = false;
+                            this.linkedResources = [];
+                            this.resourceToLinkEvent.emit([]);
+
                         } else {
                             data.resources = data.resources.map((element: any) => ({
                                 ...element,
@@ -1356,6 +1359,8 @@ export class IndexingFormComponent implements OnInit {
                         }
                     } else {
                         this.hasLinkedRes = false;
+                        this.linkedResources = [];
+                        this.resourceToLinkEvent.emit([]);
                     }
                 }),
                 catchError((err: any) => {
@@ -1365,6 +1370,8 @@ export class IndexingFormComponent implements OnInit {
             ).subscribe();
         } else {
             this.hasLinkedRes = false;
+            this.linkedResources = [];
+            this.resourceToLinkEvent.emit([]);
         }
     }
 
