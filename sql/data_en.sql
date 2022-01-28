@@ -834,7 +834,7 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailNotDistri
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistributedStatus', 'DSTRIBUTED');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
 INSERT INTO parameters (id, description, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 'Si activé (1), prend en compte les roles du modèle de diffusion de l''entité.', 1);
-
+INSERT INTO parameters (id, description, param_value_int) VALUES ('suggest_links_n_days_ago', 'Le nombre de jours sur lequel sont cherchés les courriers à lier', 0);
 
 ------------
 --DIFFLIST_TYPES

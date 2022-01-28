@@ -125,6 +125,12 @@ class SearchController
 
         $queryParams = $request->getQueryParams();
 
+        if (!empty($queryParams['resourceNotBefore'])) {
+            $searchWhere[] = '(creation_date >= ?)';
+            $queryCreationDate = new \DateTime($queryParams['resourceNotBefore']);
+            $searchData[] = $queryCreationDate->format('c');
+        }
+
         if (!empty($queryParams['contactId'])) {
             $contactsResId = ResourceContactModel::get([
                 'select' => ['res_id'],
