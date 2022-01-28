@@ -2630,5 +2630,7 @@
     "downloadFile": "Télécharger le fichier",
     "pdfFormat": "Format pdf",
     "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>",
-    "goToNextDocument": "Forcer le passage au document suivant quand le document sort du périmètre de la bannette"
+    "goToNextDocument": "Forcer le passage au document suivant quand le document sort du périmètre de la bannette",
+    "uploadNewVersion": "Téléverser une nouvelle version du document",
+    "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés"
 }

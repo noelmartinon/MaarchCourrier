@@ -94,6 +94,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     @Input() isSigned: boolean = false;
 
+    @Input() newPjVersion: boolean = false;
+
     /**
       * Event emitter
       */
@@ -171,6 +173,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     logoutTrigger: boolean = false;
 
     status: string = '';
+
+    isNewVersion: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -315,29 +319,113 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     uploadTrigger(fileInput: any) {
         if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
-            this.initUpload();
-
-            const reader = new FileReader();
-            this.file.name = fileInput.target.files[0].name;
-            this.file.type = fileInput.target.files[0].type;
-            this.file.format = this.file.name.split('.').pop();
-
-            reader.readAsArrayBuffer(fileInput.target.files[0]);
-
-            reader.onload = (value: any) => {
-                this.file.content = this.getBase64Document(value.target.result);
-                this.triggerEvent.emit('uploadFile');
-                if (this.file.type !== 'application/pdf') {
-                    this.convertDocument(this.file);
-                } else {
-                    this.file.src = value.target.result;
-                    this.loading = false;
-                }
+            const fileData: any = {
+                name : fileInput.target.files[0].name,
+                type : fileInput.target.files[0].type,
+                format : fileInput.target.files[0].name.split('.').pop(),
+                content: null
             };
+            // CHECK IF WE ARE UPLOADING NEW VERSION FOR DOCUMENT
+            if (this.isNewVersion && this.mode !== 'attachment') {
+                this.setNewVersion(fileInput, fileData);
+            } else {
+                this.initUpload();
+
+                const reader = new FileReader();
+                this.file.name = fileData.name;
+                this.file.type = fileData.type;
+                this.file.format = fileData.format;
+
+                reader.readAsArrayBuffer(fileInput.target.files[0]);
+
+                reader.onload = (value: any) => {
+                    this.file.content = this.getBase64Document(value.target.result);
+                    this.triggerEvent.emit('uploadFile');
+                    if (this.file.type !== 'application/pdf') {
+                        this.convertDocument(this.file);
+                    } else {
+                        this.file.src = value.target.result;
+                        this.loading = false;
+                    }
+                };
+            }
         } else {
             this.loading = false;
         }
     }
+
+    setNewVersion(fileInput: any, file: any) {
+        if (this.canBeConverted(file)) {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(fileInput.target.files[0]);
+            reader.onload = async (value: any) => {
+                file.content = this.getBase64Document(value.target.result);
+                this.triggerEvent.emit('uploadFile');
+                if (file.type !== 'application/pdf') {
+                    this.loading = true;
+                    this.convertDocument(file);
+                } else {
+                    file.base64 = this.getBase64Document(value.target.result);
+                    this.openDocumentViewerModal(file);
+                }
+            };
+        } else {
+            this.notify.error(this.translate.instant('lang.fileNotConvertible'));
+        }
+    }
+
+    openDocumentViewerModal(file: any) {
+        this.loading = false;
+        const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
+            autoFocus: false,
+            disableClose: true,
+            panelClass: 'maarch-full-height-modal',
+            data: {
+                title: file.name,
+                filename: file.name,
+                base64: file.base64,
+                isNewVersion: true
+            }
+        });
+
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                if (data === 'createNewVersion' && this.mode === 'mainDocument') {
+                    const objToSend: any = {
+                        resId: this.resId,
+                        encodedFile: file.base64,
+                        format: 'pdf',
+                    };
+                    this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, objToSend).pipe(
+                        tap(() => {
+                            this.loadRessource(this.resId);
+                            this.isNewVersion = false;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.isNewVersion = false;
+                }
+            })
+        ).subscribe();
+
+    }
+
+    canUploadNewVersion() {
+        if (this.editMode) {
+            if ((this.externalId.signatureBookId !== undefined) || (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound))))) {
+                return false;
+            } else {
+                return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && !this.noConvertedFound)) && this.resId !== null;
+            }
+        } else {
+            return false;
+        }
+    }
+
 
     initUpload() {
         this.loading = true;
@@ -392,27 +480,35 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     convertDocument(file: any) {
         if (this.canBeConverted(file)) {
-            const data = { name: file.name, base64: file.content };
-            this.upload(data).subscribe(
-                (res: any) => {
-                    if (res.encodedResource) {
-                        this.file.base64src = res.encodedResource;
-                        this.file.src = this.base64ToArrayBuffer(res.encodedResource);
+            return new Promise((resolve) => {
+                const data = { name: file.name, base64: file.content };
+                this.upload(data).pipe(
+                    tap((res: any) => {
+                        if (res.encodedResource) {
+                            if (this.isNewVersion && this.mode !== 'attachment') {
+                                file.base64 = res.encodedResource;
+                                file.src = this.base64ToArrayBuffer(res.encodedResource);
+                                this.openDocumentViewerModal(file);
+                            } else {
+                                this.file.base64src = res.encodedResource;
+                                this.file.src = this.base64ToArrayBuffer(res.encodedResource);
+                                this.loading = false;
+                            }
+                        }
+                        resolve(file);
+                    }),
+                    catchError((err: any) => {
+                        this.noConvertedFound = true;
+                        this.notify.handleErrors(err);
                         this.loading = false;
-                    }
-                },
-                (err: any) => {
-                    this.noConvertedFound = true;
-                    this.notify.handleErrors(err);
-                    this.loading = false;
-                    return of(false);
-                }
-            );
+                        return of(false);
+                    })
+                ).subscribe();
+            });
         } else {
             this.noConvertedFound = true;
             this.loading = false;
         }
-
     }
 
     upload(data: any) {
