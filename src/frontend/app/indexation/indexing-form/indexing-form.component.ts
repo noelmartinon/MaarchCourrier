@@ -1340,7 +1340,7 @@ export class IndexingFormComponent implements OnInit {
         if (this.getCategory() === 'incoming' && identifier === 'senders' && this.arrFormControl['senders'].value.length === 1 && this.suggestLinksNdaysAgo > 0) {
             const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
             const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];
-            this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
+            this.http.post(`../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`, {}).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.resources)) {
                         if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
@@ -1377,7 +1377,7 @@ export class IndexingFormComponent implements OnInit {
 
     getParameter() {
         return new Promise((resolve) => {
-            this.http.get('../../rest/parameters/suggest_links_n_days_ago').pipe(
+            this.http.get('../rest/parameters/suggest_links_n_days_ago').pipe(
                 tap((data: any) => {
                     this.suggestLinksNdaysAgo = data.parameter.param_value_int;
                     resolve(true);
