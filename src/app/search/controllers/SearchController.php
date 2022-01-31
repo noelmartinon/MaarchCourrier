@@ -125,25 +125,25 @@ class SearchController
 
         $queryParams = $request->getQueryParams();
 
-        if (!empty($queryParams['resourceNotBefore'])) {
-            $searchWhere[] = '(creation_date >= ?)';
-            $queryCreationDate = new \DateTime($queryParams['resourceNotBefore']);
-            $searchData[] = $queryCreationDate->format('c');
-        }
+        // if (!empty($queryParams['resourceNotBefore'])) {
+        //     $searchWhere[] = '(creation_date >= ?)';
+        //     $queryCreationDate = new \DateTime($queryParams['resourceNotBefore']);
+        //     $searchData[] = $queryCreationDate->format('c');
+        // }
 
-        if (!empty($queryParams['contactId'])) {
-            $contactsResId = ResourceContactModel::get([
-                'select' => ['res_id'],
-                'where'  => ['item_id = ?', 'type = ?'],
-                'data'   => [$queryParams['contactId'], 'contact']
-            ]);
-            $contactsResId = array_column($contactsResId, 'res_id');
-            if (empty($contactsResId)) {
-                return $response->withJson(['resources' => [], 'count' => 0, 'allResources' => []]);
-            }
-            $searchWhere[] = 'res_id in (?)';
-            $searchData[] = $contactsResId;
-        }
+        // if (!empty($queryParams['contactId'])) {
+        //     $contactsResId = ResourceContactModel::get([
+        //         'select' => ['res_id'],
+        //         'where'  => ['item_id = ?', 'type = ?'],
+        //         'data'   => [$queryParams['contactId'], 'contact']
+        //     ]);
+        //     $contactsResId = array_column($contactsResId, 'res_id');
+        //     if (empty($contactsResId)) {
+        //         return $response->withJson(['resources' => [], 'count' => 0, 'allResources' => []]);
+        //     }
+        //     $searchWhere[] = 'res_id in (?)';
+        //     $searchData[] = $contactsResId;
+        // }
 
         // Begin transaction for temporarySearchData
         DatabaseModel::beginTransaction();
@@ -576,6 +576,7 @@ class SearchController
             }
             $args['searchData'][] = $body['destination']['values'];
         }
+        # here jl
         if (!empty($body['creationDate']) && !empty($body['creationDate']['values']) && is_array($body['creationDate']['values'])) {
             if (Validator::date()->notEmpty()->validate($body['creationDate']['values']['start'])) {
                 $args['searchWhere'][] = 'creation_date >= ?';
@@ -636,6 +637,7 @@ class SearchController
                 $args['searchData'][] = TextFormatModel::getEndDayDate(['date' => $body['closingDate']['values']['end']]);
             }
         }
+        # here jl
         if (!empty($body['senders']) && !empty($body['senders']['values']) && is_array($body['senders']['values']) && is_array($body['senders']['values'][0])) {
             $where = '';
             $data = [];
@@ -701,6 +703,7 @@ class SearchController
                 }
             }
         }
+        # here jl
         if (!empty($body['recipients']) && !empty($body['recipients']['values']) && is_array($body['recipients']['values']) && is_array($body['recipients']['values'][0])) {
             $where = '';
             $data = [];
@@ -925,6 +928,9 @@ class SearchController
                 }
             }
         }
+
+        // print("<pre>".print_r(['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']],true)."</pre>");
+        // die();
 
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
