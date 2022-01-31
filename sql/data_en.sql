@@ -823,9 +823,9 @@ INSERT INTO parameters (id, param_value_string, param_value_int, param_value_dat
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('postindexing_workbatch', NULL, 1, NULL);
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '21.03.1', NULL, NULL);
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('user_quota', '', 0, NULL);
-INSERT INTO parameters (id, description, param_value_string, param_value_int, param_value_date) VALUES ('defaultDepartment', 'Département par défaut sélectionné dans le formulaire des adresses', NULL, 75, NULL);
-INSERT INTO parameters (id, description, param_value_string) VALUES ('homepage_message', 'Texte apparaissant dans la bannière sur la page d''accueil, mettre un espace pour supprimer la bannière.', 'Bienvenue dans votre <b>G</b>estion <b>E</b>lectronique du <b>C</b>ourrier.');
-INSERT INTO parameters (id, description, param_value_string) VALUES ('thumbnailsSize', 'Résolution des imagettes', '750x900');
+INSERT INTO parameters (id, description, param_value_string, param_value_int, param_value_date) VALUES ('defaultDepartment', 'Default department selected in the address form', NULL, 75, NULL);
+INSERT INTO parameters (id, description, param_value_string) VALUES ('homepage_message', 'Text appearing in the banner on the homepage, put a space to remove the banner.', 'Welcome to your <b>E</b>lectronic <b>M</b>ail <b>M</b>anagement.');
+INSERT INTO parameters (id, description, param_value_string) VALUES ('thumbnailsSize', 'Thumbnail resolution', '750x900');
 INSERT INTO parameters (id, description, param_value_int) VALUES ('keepDestForRedirection', 'If enabled (1), put recipient in copy for diffusion list when redirecting', 0);
 INSERT INTO parameters (id, description, param_value_int) VALUES ('QrCodePrefix', 'If enabled (1), add "Maarch_" before the content in QrCode. (Can be use with MaarchCapture >= 1.4)', 0);
 INSERT INTO parameters (id, description, param_value_int) VALUES ('workingDays', 'If enabled (1), processing time is calculated in working days (Monday to Friday). Otherwise, in calendar days', 1);
