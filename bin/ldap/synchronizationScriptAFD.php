@@ -303,7 +303,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
             $user['user_id'] != 'superadmin') 
             {
                 $delete = \User\models\UserModel::update([
-                    'set'   => ['status' => 'SPD'],
+                    'set'   => ['status' => 'DEL'],
                     'where' => ['id = ?'],
                     'data'  => [$user['id']]
                 ]);
