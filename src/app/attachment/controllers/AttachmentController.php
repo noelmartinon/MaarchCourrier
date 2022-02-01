@@ -1038,6 +1038,8 @@ class AttachmentController
             return ['errors' => 'Body resIdMaster is empty or not an integer'];
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return ['errors' => 'Body type is empty or not a string'];
+        } elseif (!empty($body['title']) && !Validator::length(1, 255)->validate($body['title'])) {
+            return ['errors' => 'Body title number of characters must be between 1 and 255 characters)'];
         } elseif (isset($body['status']) && !in_array($body['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
             return ['errors' => 'Body status can only be A_TRA, TRA or SEND_MASS'];
         }
