@@ -1,5 +1,7 @@
 <mat-form-field appearance="outline" class="noteEditorContent">
-    <textarea matInput placeholder="{{title}}" [(ngModel)]="content"></textarea>
+    <textarea matInput id="inputNote" [placeholder]="title" [(ngModel)]="content" rows="4"></textarea>
+    <hr style="margin-bottom: 10px;">
+    <mat-hitn class="warningNote">{{'lang.warningNote' | translate}}</mat-hitn>
     <button matSuffix color="primary" mat-icon-button title="{{'lang.options' | translate}}" [matMenuTriggerFor]="menuMain">
         <mat-icon fontSet="fas" fontIcon="fa-angle-right fa-2x"></mat-icon>
     </button>
