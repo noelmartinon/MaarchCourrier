@@ -187,6 +187,8 @@ export class IndexingFormComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    newEntityId: number;
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -751,7 +753,14 @@ export class IndexingFormComponent implements OnInit {
                                 }
                             }
                         });
-                        
+                        const entityId: number = this.arrFormControl['destination'].value;
+                        if (!this.functions.empty(entityId)) {
+                            this.newEntityId  = entityId;
+                        } else {
+                            this.newEntityId = null;
+                        }
+                    } else {
+                        this.newEntityId = null;
                     }
                     
                     resolve(true);
