@@ -39,6 +39,15 @@
         <refusedState>Refusé</refusedState>
     </signatoryBook>
     <signatoryBook>
+		<id>fastParapheur_SMTP</id>
+		<subscriberId></subscriberId>
+		<email></email>
+		<circuitId></circuitId>
+		<signedState>SIGNED</signedState>
+		<refusedtate>REFUSE</refuseState>
+		<koState>KO</koState>
+	</signatoryBook>
+    <signatoryBook>
         <id>xParaph</id>
         <url>https://preprodssl.ssl.spl-xdemat.fr/Xparaph/wsdl/wsdl.php</url>
         <userGeneric>
