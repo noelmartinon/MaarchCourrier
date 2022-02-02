@@ -2578,5 +2578,6 @@
     "depositProofShipping": "Preuve de dépôt envoyée par Maileva",
     "shippingSubscriptionDesc": "Permet de s'abonner aux notifications de suivi d'un courrier",
     "uploadNewVersion": "Téléverser une nouvelle version du document",
-    "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés"
+    "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
+    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant."
 }
