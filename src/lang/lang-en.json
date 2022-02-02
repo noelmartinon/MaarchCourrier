@@ -2571,7 +2571,7 @@
     "showShippingHistory": "View Maileva sending history",
     "sendDate": "Sending date",
     "shippingSubscribe": "Maileva event synchronization enabled",
-    "shippingUnsubscribe": "Disabled Maileva event synchronization",
+    "shippingUnsubscribe": "Maileva event synchronization disabled",
     "depositProof": "Deposit proof",
     "downloadFile": "Download file",
     "emptyShippingHistory": "The Maileva sending history is empty.",
