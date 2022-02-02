@@ -9,8 +9,10 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 import { FormControl, Validators } from '@angular/forms';
-import { catchError, debounceTime, filter, map, tap } from 'rxjs/operators';
+import { catchError, debounceTime, exhaustMap, filter, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'shippings-administration.component.html',
@@ -45,6 +47,7 @@ export class ShippingsAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
+        public dialog: MatDialog,
         private viewContainerRef: ViewContainerRef
     ) { }
 
@@ -117,17 +120,19 @@ export class ShippingsAdministrationComponent implements OnInit {
 
 
     deleteShipping(id: number) {
-        const r = confirm(this.translate.instant('lang.deleteMsg'));
-
-        if (r) {
-            this.http.delete('../rest/administration/shippings/' + id)
-                .subscribe((data: any) => {
-                    this.shippings = data.shippings;
-                    this.adminService.setDataSource('admin_shippings', this.shippings, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.shippingDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteShippingConfirm')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/administration/shippings/' + id)),
+            tap((data: any) => {
+                this.shippings = data.shippings;
+                this.adminService.setDataSource('admin_shippings', this.shippings, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.shippingDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }
