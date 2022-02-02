@@ -39,7 +39,7 @@
         <refusedState>Refusé</refusedState>
     </signatoryBook>
     <signatoryBook>
-		<id>fastParapheur_SMTP</id>
+		<id>fastParapheurSmtp</id>
 		<subscriberId></subscriberId>
 		<email></email>
 		<circuitId></circuitId>
