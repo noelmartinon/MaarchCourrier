@@ -43,6 +43,10 @@
                             [additionalsInfos]="additionalsInfos"
                             [externalSignatoryBookDatas]="externalSignatoryBookDatas">
                         </app-fast-paraph>
+                        <app-fast-paraph #fastParapheurSmtp *ngIf="signatoryBookEnabled=='fastParapheurSmtp'"
+                            [additionalsInfos]="additionalsInfos"
+                            [externalSignatoryBookDatas]="externalSignatoryBookDatas">
+                        </app-fast-paraph>
                         <app-maarch-paraph #maarchParapheur *ngIf="signatoryBookEnabled=='maarchParapheur'"
                             [additionalsInfos]="additionalsInfos"
                             [externalSignatoryBookDatas]="externalSignatoryBookDatas">
