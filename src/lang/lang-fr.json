@@ -1414,6 +1414,7 @@
     "sendmailShort": "Envoi de courriels",
     "sent": "Envoyé",
     "sentToFastParapheur": "Envoyer à FAST-Parapheur",
+    "sentToFastSmtpParapheur": "Envoyer à Fast-Parapheur par email",
     "sentToIParapheur": "Envoyer à IParapheur",
     "sentToIxbusParapheur": "Envoyer à Ixbus Parapheur",
     "separatorTarget": "Cible de séparateur",

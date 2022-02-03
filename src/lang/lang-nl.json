@@ -1595,6 +1595,7 @@
     "emailSent": "Email sent__TO_TRANSLATE",
     "emailCannotSent": "Error during sending email__TO_TRANSLATE",
     "sentToFastParapheur": "Send to FAST-Parapheur__TO_TRANSLATE",
+    "sentToFastSmtpParapheur": "Stuur per e-mail naar Fast-Parapheur",
     "sentToIxbusParapheur": "Send to Ixbus Parapheur__TO_TRANSLATE",
     "natureIxbusParapheur": "Document nautre__TO_TRANSLATE",
     "loginIxbus": "Ixbus login__TO_TRANSLATE",

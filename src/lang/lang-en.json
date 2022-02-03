@@ -1405,6 +1405,7 @@
     "sendmailShort": "Send emails",
     "sent": "Sent",
     "sentToFastParapheur": "Send to FAST-Parapheur",
+    "sentToFastSmtpParapheur": "Send to Fast-Parapheur by email",
     "sentToIParapheur": "Send to IParapheur",
     "sentToIxbusParapheur": "Send to Ixbus Parapheur",
     "separatorTarget": "Separator target",
