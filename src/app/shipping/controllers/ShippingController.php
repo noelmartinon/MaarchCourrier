@@ -80,4 +80,89 @@ class ShippingController
 
         return $response->withJson($shippings);
     }
+
+    public function getShippingAttachmentsList(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['shippingId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route shippingId is not an integer']);
+        }
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'document_id', 'document_type', 'attachments'],
+            'where'  => ['id = ?'],
+            'data'   => [$args['shippingId']]
+        ]);
+        if (empty($shipping[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping with this id']);
+        }
+        $shipping = $shipping[0];
+
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return $response->withStatus(400)->withJson(['No attachment with this id']);
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $shipping['attachments'] = json_decode($shipping['attachments'], true);
+        if (!Validator::arrayType()->each(Validator::intType())->validate($shipping['attachments'])) {
+            return $response->withStatus(500)->withJson(['errors' => 'Shipping attachments are improperly saved']);
+        }
+        $attachments = [];
+        foreach ($shipping['attachments'] as $attachmentId) {
+            $attachment = AttachmentModel::getById(['id' => $attachmentId, 'select' => ['res_id', 'title', 'creation_date', 'attachment_type', 'filesize']]);
+            if (empty($attachment)) {
+                continue;
+            }
+            $attachments[] = [
+                'resId'          => $attachment['res_id'],
+                'title'          => $attachment['title'],
+                'creationDate'   => $attachment['creation_date'],
+                'attachmentType' => $attachment['attachment_type'],
+                'filesize'       => $attachment['filesize']
+            ];
+        }
+        return $response->withJson(['attachments' => $attachments]);
+    }
+
+    public function getHistory(Request $request, Response $response, array $args) {
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'document_id', 'document_type', 'history'],
+            'where'  => ['id = ?'],
+            'data'   => [$args['shippingId']]
+        ]);
+        if (empty($shipping[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping with this id']);
+        }
+        $shipping = $shipping[0];
+        $shipping['history'] = json_decode($shipping['history'], true);
+
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return $response->withStatus(400)->withJson(['No attachment with this id']);
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        foreach ($shipping['history'] as $key => $history) {
+            $shipping['history'][$key]['eventDate'] = (new \DateTime($history['eventDate']))->format('Y-m-d H:i:s');
+        }
+
+        return $response->withJson(['history' => $shipping['history']]);
+    }
 }

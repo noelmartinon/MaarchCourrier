@@ -94,24 +94,17 @@ abstract class ShippingTemplateModelAbstract
         return $nextSequenceId;
     }
 
-    public static function update(array $aArgs)
+    public static function update(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'label', 'description']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::stringType($aArgs, ['label', 'description', 'options', 'fee', 'entities', 'account']);
-        
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'postSet', 'where', 'data']);
+
         DatabaseModel::update([
             'table'     => 'shipping_templates',
-            'set'       => [
-                'label'         => $aArgs['label'],
-                'description'   => $aArgs['description'],
-                'options'       => $aArgs['options'],
-                'fee'           => $aArgs['fee'],
-                'entities'      => $aArgs['entities'],
-                'account'       => $aArgs['account'],
-            ],
-            'where'     => ['id = ?'],
-            'data'      => [$aArgs['id']]
+            'set'       => $args['set'] ?? null,
+            'postSet'   => $args['postSet'] ?? null,
+            'where'     => $args['where'],
+            'data'      => $args['data']
         ]);
 
         return true;
