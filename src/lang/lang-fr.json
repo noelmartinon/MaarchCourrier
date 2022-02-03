@@ -2637,10 +2637,10 @@
     "ON_STATUS_ARCHIVED": "Archivé",
     "showShippingHistory": "Afficher l'historique de l'envoi Maileva",
     "sendDate": "Date d'envoi",
-    "shippingSubscribe": "Abonnement aux notifications activé",
-    "shippingUnsubscribe": "Abonnement aux notifications désactivé",
+    "shippingSubscribe": "Synchronisation des événements Maileva activée",
+    "shippingUnsubscribe": "Synchronisation des événements Maileva désactivée",
     "depositProof": "Preuve de dépôt",
     "emptyShippingHistory": "L'historique de l'envoi Maileva est vide.",
     "depositProofShipping": "Preuve de dépôt envoyée par Maileva",
-    "shippingSubscriptionDesc": "Permet de s'abonner aux notifications de suivi d'un courrier"
+    "shippingSubscriptionDesc": "Permet de synchroniser les événements depuis Maileva (Historique et Preuve de dépôt)"
 }

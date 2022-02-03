@@ -2638,10 +2638,10 @@
     "ON_STATUS_ARCHIVED": "Archived",
     "showShippingHistory": "View Maileva sending history",
     "sendDate": "Sending date",
-    "shippingSubscribe": "Subscribe to notifications enabled",
-    "shippingUnsubscribe": "Subscribe to notifications disabled",
+    "shippingSubscribe": "Maileva event synchronization enabled",
+    "shippingUnsubscribe": "Maileva event synchronization disabled",
     "depositProof": "Deposit proof",
     "emptyShippingHistory": "The Maileva sending history is empty.",
     "depositProofShipping": "Proof of deposit sent by Maileva",
-    "shippingSubscriptionDesc": "Allows you to subscribe to mail follow-up notifications"
+    "shippingSubscriptionDesc": "Allows you to synchronize events from Maileva (History and Proof of deposit)"
 }
