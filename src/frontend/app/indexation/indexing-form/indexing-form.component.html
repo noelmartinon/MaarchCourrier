@@ -197,7 +197,7 @@
                                     <app-contact-autocomplete [id]="field.identifier"
                                         [control]="arrFormControl[field.identifier]" style="width:100%;"
                                         (retrieveDocumentEvent)="retrieveDocumentEvent.emit()"
-                                        (afterSelected)="selectedContact($event, field.identifier)" (removeContactEvent)="checkRemovedItem($event)">
+                                        (afterContactSelected)="selectedContact($event, field.identifier)" (removeContactEvent)="checkRemovedItem($event)">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">
@@ -253,7 +253,7 @@
                             </div>
                         </div>
                         <div class="linkRes" *ngIf="hasLinkedRes && field.identifier === 'senders'">
-                            {{'lang.hasLinkedRes' | translate}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{'lang.seeMore' | translate}}</a></ng-container>
+                            {{msgToDisplay}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{'lang.seeMore' | translate}}</a></ng-container>
                         </div>
                         <div
                             *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">

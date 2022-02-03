@@ -273,6 +273,7 @@ export class IndexingFormComponent implements OnInit {
     selectedContactClone: any = null;
     suggestLinksNdaysAgo: number;
     creationDateClone: Date;
+    msgToDisplay: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -1355,6 +1356,7 @@ export class IndexingFormComponent implements OnInit {
                             }));
                             this.linkedResources = data;
                             this.selectedContactClone = JSON.parse(JSON.stringify(contact));
+                            this.msgToDisplay = this.translate.instant('lang.hasLinkedRes', {'nbDays': this.suggestLinksNdaysAgo});
                             this.hasLinkedRes = true;
                         }
                     } else {

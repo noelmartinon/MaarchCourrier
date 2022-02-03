@@ -209,11 +209,14 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 this.listProperties.criteria.meta = this.criteria.meta;
             }
         } else {
-            this.data = this.processPostData(this.linkedRes);
+            this.data = this.linkedRes;
             this.resultsLength = this.linkedRes['count'];
             this.allResInBasket = this.linkedRes['allResources'];
             this.data = this.linkedRes['resources'];
             this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
+            this.paginatorLength = this.linkedRes['count'] > 10000 ? 10000 : this.linkedRes['count'];
+            this.dataFilters = this.linkedRes['filters'];
+            this.templateColumns = this.linkedRes['templateColumns'];
             this.isLoadingResults = false;
             this.hideFilter = true;
         }

@@ -35,7 +35,7 @@ export class LinkResourceModalComponent implements OnInit {
             this.dialogRef.close(this.appSearchResultList.selectedRes);
         } else {
             const selectedRes = this.appSearchResultList.getSelectedResources().filter(res => res !== this.data.resId);
-            this.http.post(`../../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
+            this.http.post(`../rest/resources/${this.data.resId}/linkedResources`, { linkedResources: selectedRes }).pipe(
                 tap(() => {
                     this.dialogRef.close('success');
                 }),

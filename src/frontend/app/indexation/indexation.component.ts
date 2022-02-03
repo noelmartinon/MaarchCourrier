@@ -92,7 +92,7 @@ export class IndexationComponent implements OnInit, OnDestroy {
             this.appIndexationAttachmentsList.saveAttachments(resIds[0]);
 
             if (this.resourceToLink.length > 0) {
-                this.http.post(`../../rest/resources/${resIds[0]}/linkedResources`, { linkedResources: this.resourceToLink }).pipe(
+                this.http.post(`../rest/resources/${resIds[0]}/linkedResources`, { linkedResources: this.resourceToLink }).pipe(
                     tap(() => {}),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
