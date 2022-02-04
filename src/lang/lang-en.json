@@ -2234,5 +2234,6 @@
     "userIdMaarch2MaarchDesc": "User ID with a web service account",
     "userPasswordMaarch2MaarchDesc": "User password with a web service account",
     "m2mEmailDesc": "Used as part of an <b> indirect connection </b> between applications (use of mailings for digital fold)",
-    "goToNextDocument": "Force the passage to the next document when the document leaves the perimeter of the basket"
+    "goToNextDocument": "Force the passage to the next document when the document leaves the perimeter of the basket",
+    "allDoctypes": "All doctypes"
 }

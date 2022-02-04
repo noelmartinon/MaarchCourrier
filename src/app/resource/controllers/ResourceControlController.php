@@ -24,6 +24,7 @@ use Folder\controllers\FolderController;
 use Group\controllers\PrivilegeController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
+use IndexingModel\controllers\IndexingModelController;
 use Priority\models\PriorityModel;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -378,6 +379,9 @@ class ResourceControlController
         foreach ($indexingModelFields as $indexingModelField) {
             $indexingModelField['default_value'] = json_decode($indexingModelField['default_value'], true);
             $indexingModelField['allowed_values'] = json_decode($indexingModelField['allowed_values'], true);
+            if ($indexingModelField['allowed_values'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES) {
+                $indexingModelField['allowed_values'] = null; // setting to null so it is ignored in the rest of this function
+            }
             if (strpos($indexingModelField['identifier'], 'indexingCustomField_') !== false) {
                 $customFieldId = explode('_', $indexingModelField['identifier'])[1];
                 if ($indexingModelField['mandatory'] && empty($body['customFields'][$customFieldId])) {

@@ -261,6 +261,7 @@ export class IndexingFormComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     allowedValues: number[] = [];
+    allDoctypes: boolean = true;
 
     constructor(
         public translate: TranslateService,
@@ -940,6 +941,7 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
+                this.allDoctypes = data.indexingModel.allDoctypes;
                 if (data.indexingModel.master !== null) {
                     this.getAllowedValues(data.indexingModel.master);
                 }
@@ -1055,13 +1057,14 @@ export class IndexingFormComponent implements OnInit {
         const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
-            data: field
+            data: {...field, allDoctypes: this.allDoctypes}
         });
         dialogRef.afterClosed().pipe(
             filter((data: any) => !this.functions.empty(data)),
-            tap((values: any) => {
-                field.values = values;
-                field.allowedValues = values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
+            tap((result: any) => {
+                this.allDoctypes = result.allDoctypes;
+                field.values = result.values;
+                field.allowedValues = result.values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
                 // WORK AROUND UPDATING DATA
                 field.type = null;
                 setTimeout(() => {

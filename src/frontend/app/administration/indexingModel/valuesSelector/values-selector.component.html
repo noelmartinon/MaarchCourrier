@@ -2,11 +2,16 @@
     <h1 mat-dialog-title>{{data.label}}</h1>
     <div mat-dialog-content>
         <app-maarch-message>{{'lang.chooseValuesMsg' | translate}} :</app-maarch-message>
-        <mat-checkbox [checked]="allChecked()"
-            color="primary"
-            [indeterminate]="!emptyChecked() && !allChecked()"
-            (change)="toggleAll($event.checked)"><i>{{'lang.selectAll' | translate}}</i>
-        </mat-checkbox>
+        <div style="display: inline-grid;">
+            <mat-slide-toggle style="margin-bottom: 15px; margin-top: 10px;" [(ngModel)]="data.allDoctypes" [checked]="data.allDoctypes"  color="primary">
+                {{'lang.allDoctypes' | translate}}
+            </mat-slide-toggle>
+            <mat-checkbox [checked]="allChecked()"
+                color="primary"
+                [indeterminate]="!emptyChecked() && !allChecked()"
+                (change)="toggleAll($event.checked)"><i>{{'lang.selectAll' | translate}}</i>
+            </mat-checkbox>
+        </div>
         <div *ngFor="let firstLevel of values">
             <ng-container *ngIf="firstLevel.firstLevelId === undefined && firstLevel.secondLevelId === undefined">
                 <span style="font-weight: bold;"> {{ firstLevel.title }}</span>
@@ -35,7 +40,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions>
         <button class="actions" color="primary" mat-raised-button
-            (click)="onSubmit()" [disabled]="emptyChecked()">{{'lang.validate' | translate}}</button>
+            (click)="onSubmit()" [disabled]="emptyChecked() && !data.allDoctypes">{{'lang.validate' | translate}}</button>
         <button class="actions" color="" mat-raised-button
             (click)="this.dialogRef.close('');">{{'lang.cancel' | translate}}</button>
     </div>
