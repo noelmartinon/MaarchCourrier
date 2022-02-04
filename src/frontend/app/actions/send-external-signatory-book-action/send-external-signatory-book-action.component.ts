@@ -48,7 +48,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
     @ViewChild('maarchParapheur', { static: false }) maarchParapheur: MaarchParaphComponent;
     @ViewChild('fastParapheur', { static: false }) fastParapheur: FastParaphComponent;
-    @ViewChild('fastParapheurSmtp', { static: false }) fastParapheurSmtpComponent: FastParapheurSmtpComponent;
+    @ViewChild('fastParapheurSmtp', { static: false }) fastParapheurSmtp: FastParapheurSmtpComponent;
     @ViewChild('iParapheur', { static: false }) iParapheur: IParaphComponent;
     @ViewChild('ixbus', { static: false }) ixbus: IxbusParaphComponent;
 
