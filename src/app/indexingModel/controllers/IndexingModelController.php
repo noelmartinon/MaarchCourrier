@@ -36,6 +36,7 @@ use User\models\UserModel;
 class IndexingModelController
 {
     const INDEXABLE_DATES = ['documentDate', 'departureDate', 'arrivalDate', 'processLimitDate'];
+    const ALLOWED_VALUES_ALL_DOCTYPES = '_ALL_DOCTYPES_';
 
     public function get(Request $request, Response $response)
     {
@@ -81,6 +82,8 @@ class IndexingModelController
             unset($fields[$key]['allowed_values']);
             if ($value['identifier'] == 'destination') {
                 $destination = $value['default_value'];
+            } elseif ($value['identifier'] == 'doctype') {
+                $model['allDoctypes'] = $fields[$key]['allowedValues'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
             } elseif ($value['identifier'] == 'diffusionList') {
                 foreach ($fields[$key]['default_value'] as $itemKey => $item) {
                     if ($item['type'] == 'entity') {
@@ -250,6 +253,9 @@ class IndexingModelController
                     $field['default_value'] = $date->format('Y-m-d');
                 }
             }
+            if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+                $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+            }
             IndexingModelFieldModel::create([
                 'model_id'      => $modelId,
                 'identifier'    => $field['identifier'],
@@ -387,6 +393,9 @@ class IndexingModelController
                             $field['default_value'] = $date->format('Y-m-d');
                         }
                     }
+                    if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+                        $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+                    }
                     IndexingModelFieldModel::create([
                         'model_id'      => $child['id'],
                         'identifier'    => $field['identifier'],
@@ -454,6 +463,9 @@ class IndexingModelController
                     $date = new \DateTime($field['default_value']);
                     $field['default_value'] = $date->format('Y-m-d');
                 }
+            }
+            if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+                $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
             }
             IndexingModelFieldModel::create([
                 'model_id'      => $args['id'],
