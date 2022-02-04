@@ -27,7 +27,10 @@ export class IndexingModelValuesSelectorComponent implements OnInit {
     }
 
     onSubmit() {
-        this.dialogRef.close(this.values);
+        this.dialogRef.close (
+            {   values: this.values,
+                allDoctypes: this.data.allDoctypes
+            });
     }
 
     allChecked() {

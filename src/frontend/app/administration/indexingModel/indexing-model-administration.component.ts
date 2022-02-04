@@ -124,6 +124,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
             delete fields[key].values;
         });
         this.indexingModel.fields = fields;
+        this.indexingModel = {...this.indexingModel, allDoctypes: this.indexingForm.allDoctypes};
 
         if (this.creationMode) {
             this.http.post('../rest/indexingModels', this.indexingModel).pipe(
