@@ -23,6 +23,7 @@ use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
+use Doctype\models\DoctypeModel;
 use Resource\controllers\IndexingController;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
@@ -83,7 +84,12 @@ class IndexingModelController
             if ($value['identifier'] == 'destination') {
                 $destination = $value['default_value'];
             } elseif ($value['identifier'] == 'doctype') {
-                $model['allDoctypes'] = $fields[$key]['allowedValues'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+                if ($fields[$key]['allowedValues'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES) {
+                    $model['allDoctypes'] = true;
+                    $fields[$key]['allowedValues'] = array_column(DoctypeModel::get(['select' => ['type_id']]), 'type_id');
+                } else {
+                    $model['allDoctypes'] = false;
+                }
             } elseif ($value['identifier'] == 'diffusionList') {
                 foreach ($fields[$key]['default_value'] as $itemKey => $item) {
                     if ($item['type'] == 'entity') {
