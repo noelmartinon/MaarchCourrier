@@ -2633,5 +2633,6 @@
     "pdfFormat": "pdf format",
     "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>",
     "chooseValues": "Choose the values",
-    "chooseValuesMsg": "Please choose the values ​​that can be used for this field"
+    "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
+    "allDoctypes": "All doctypes"
 }

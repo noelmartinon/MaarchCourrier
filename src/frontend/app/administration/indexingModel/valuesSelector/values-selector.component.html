@@ -40,7 +40,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions>
         <button class="actions" color="primary" mat-raised-button
-            (click)="onSubmit()" [disabled]="emptyChecked()">{{'lang.validate' | translate}}</button>
+            (click)="onSubmit()" [disabled]="emptyChecked() && !data.allDoctypes">{{'lang.validate' | translate}}</button>
         <button class="actions" color="" mat-raised-button
             (click)="this.dialogRef.close('');">{{'lang.cancel' | translate}}</button>
     </div>
