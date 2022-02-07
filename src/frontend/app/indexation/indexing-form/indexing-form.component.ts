@@ -1235,7 +1235,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     checkRemovedItem(value: any) {
-        if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
+        if (typeof value === 'boolean') {
             this.hasLinkedRes = false;
             this.resourceToLinkEvent.emit([]);
         }
