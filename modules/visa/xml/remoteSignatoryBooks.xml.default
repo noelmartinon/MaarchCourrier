@@ -43,9 +43,9 @@
 		<subscriberId></subscriberId>
 		<email></email>
 		<circuitId></circuitId>
-		<signedState>SIGNED</signedState>
-		<refusedtate>REFUSE</refuseState>
-		<koState>KO</koState>
+		<signedState>signed</signedState>
+        <refusedState>refused</refusedState>
+        <errorState>error</errorState>
 	</signatoryBook>
     <signatoryBook>
         <id>xParaph</id>
