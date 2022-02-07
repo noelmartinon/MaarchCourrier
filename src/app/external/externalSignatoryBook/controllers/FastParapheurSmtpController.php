@@ -20,6 +20,7 @@ use SrcCore\models\ValidatorModel;
 use SrcCore\models\DatabaseModel;
 use Email\controllers\EmailController;
 use Configuration\models\ConfigurationModel;
+use SrcCore\models\CoreConfigModel;
 
 /**
     * @codeCoverageIgnore
@@ -65,5 +66,44 @@ class FastParapheurSmtpController
             return ['error' => $emailId['errors']];
         }
         return ['sended' => 'success'];
+    }
+
+    public static function createDocument(Request $request, Response $response, array $args) {
+
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        $config = [];
+
+        if (empty($loadedXml)) {
+            return $response->withStatus(404)->withJson(['Remote Signatory Books configuration is missing!']);
+        }
+
+        $config['id'] = (string)$loadedXml->signatoryBookEnabled;
+        foreach ($loadedXml->signatoryBook as $value) {
+            if ($value->id == $config['id']) {
+                $config['data'] = (array)$value;
+                break;
+            }
+        }
+
+        $body = $request->getParsedBody();
+
+        if (empty($body['status']) || empty($body['status']['type'])) {
+            return $response->withStatus(404)->withJson(['errors' => 'Status type is missing!']);
+        }
+
+        if ($body['status']['type'] == $config['data']['errorState']) {
+            
+        }
+        else if ($body['status']['type'] == $config['data']['refusedState']) {
+            
+        }
+        else if ($body['status']['type'] == $config['data']['signedState']) {
+            
+        }
+        else {
+            return $response->withStatus(400)->withJson(['The query syntax is incorrect.']);
+        }
+
+        return $response->withStatus(201)->withJson(['Document created']);
     }
 }
