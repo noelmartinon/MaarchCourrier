@@ -1239,10 +1239,13 @@ export class IndexingFormComponent implements OnInit {
             this.hasLinkedRes = false;
             this.resourceToLinkEvent.emit([]);
         }
-
-        const senders: any = this['indexingModels_contact'].find((item: any) => item.identifier === 'senders').default_value;
-        if (senders.length === 2) {
+        
+        const senders: any[] = this.arrFormControl['senders'].value.filter((item: any) => item.id !== value);
+        if (senders.length === 1) {            
             this.selectedContact(senders[0], 'senders', true);
+        } else {
+            this.hasLinkedRes = false;
+            this.resourceToLinkEvent.emit([]);
         }
     }
     
