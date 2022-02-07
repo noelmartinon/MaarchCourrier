@@ -1337,8 +1337,8 @@ export class IndexingFormComponent implements OnInit {
         }
     }
 
-    selectedContact(contact: any, identifier: string) {
-        if (this.getCategory() === 'incoming' && identifier === 'senders' && this.arrFormControl['senders'].value.length === 1 && this.suggestLinksNdaysAgo > 0) {
+    selectedContact(contact: any, identifier: string, removeEvent: boolean = false) {
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && (this.arrFormControl['senders'].value.length === 1 || removeEvent) && this.suggestLinksNdaysAgo > 0) {
             const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
             const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];
             this.http.post(`../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`, {}).pipe(
@@ -1429,6 +1429,11 @@ export class IndexingFormComponent implements OnInit {
         if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
             this.hasLinkedRes = false;
             this.resourceToLinkEvent.emit([]);
+        }
+
+        const senders: any = this['indexingModels_contact'].find((item: any) => item.identifier === 'senders').default_value;
+        if (senders.length === 2) {
+            this.selectedContact(senders[0], 'senders', true);
         }
     }
 }
