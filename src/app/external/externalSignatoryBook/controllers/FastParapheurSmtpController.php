@@ -64,7 +64,6 @@ class FastParapheurSmtpController
         if (!empty($emailId['errors'])) {
             return ['error' => $emailId['errors']];
         }
-        // return ['sended' => 'JL FastParapheurSmtpController => sendDatas()', 'data' => 'JL data blabla', 'historyInfos' => ' JL history blabla'];
         return ['sended' => 'success'];
     }
 }
