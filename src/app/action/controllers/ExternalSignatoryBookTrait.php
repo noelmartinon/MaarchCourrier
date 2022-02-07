@@ -91,7 +91,8 @@ trait ExternalSignatoryBookTrait
             } elseif ($config['id'] == 'fastParapheurSmtp') {
                 $sentInfo = FastParapheurSmtpController::sendDatas([
                     'config'      => $config,
-                    'resIdMaster' => $args['resId']
+                    'resIdMaster' => $args['resId'],
+                    'note' => $args['note']
                 ]);
                 
             } elseif ($config['id'] == 'iParapheur') {
