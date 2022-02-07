@@ -227,8 +227,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     loadActions() {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
-            .subscribe((data: any) => {
-                this.signatureBook.actions = data.actions;               
+            .subscribe((data: any) => {                
+                this.signatureBook.actions = data.actions
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -663,6 +663,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     async changeLocation(resId: number, origin: string) {
         if (resId !== this.resId) {
             const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
+
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
                 if (!this.actionService.actionEnded) { 
