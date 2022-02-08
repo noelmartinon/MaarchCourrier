@@ -116,9 +116,9 @@ class ConvertPdfController
         ValidatorModel::intVal($aArgs, ['resId', 'version']);
 
         if ($aArgs['collId'] == 'letterbox_coll') {
-            $resource = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename', 'format']]);
+            $resource = ResModel::getById(['resId' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename', 'format', 'fingerprint']]);
         } else {
-            $resource = AttachmentModel::getById(['id' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename', 'format']]);
+            $resource = AttachmentModel::getById(['id' => $aArgs['resId'], 'select' => ['docserver_id', 'path', 'filename', 'format', 'fingerprint']]);
         }
 
         if (empty($resource['docserver_id']) || empty($resource['path']) || empty($resource['filename'])) {
@@ -143,7 +143,7 @@ class ConvertPdfController
 
         $canConvert = ConvertPdfController::canConvert(['extension' => $docInfo['extension']]);
         if (!$canConvert) {
-            return ['docserver_id' => $resource['docserver_id'], 'path' => $resource['path'], 'filename' => $resource['filename']];
+            return ['docserver_id' => $resource['docserver_id'], 'path' => $resource['path'], 'filename' => $resource['filename'], 'fingerprint' => $resource['fingerprint']];
         }
 
         $tmpPath = CoreConfigModel::getTmpPath();
