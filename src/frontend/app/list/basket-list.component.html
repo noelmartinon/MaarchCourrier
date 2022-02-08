@@ -129,14 +129,14 @@
                                             </mat-icon>
                                         </span>
                                         <span *ngIf="!appService.getViewMode()" class="main-info-data" style="width:200px;text-align:center;cursor:pointer;" (click)="launch(defaultAction,row);">
+                                            <ng-container *ngIf="row.chrono != lang.undefined">
+                                                <b>{{row.chrono}}</b>
+                                            </ng-container><br>
                                             <ng-container>
                                                 <span style="color: rgba(0,0,0,0.4);font-size: 90%;"><i
                                                     title="{{lang.barcode}}" class="fas fa-barcode"></i>
                                                 </span>
                                                 {{row.barcode}}
-                                            </ng-container><br>
-                                            <ng-container *ngIf="row.chrono != lang.undefined">
-                                                <b>{{row.chrono}}</b>
                                             </ng-container>
                                         </span>
                                         <span class="main-info-data" style="font-weight:bold;flex:1;cursor:pointer;"

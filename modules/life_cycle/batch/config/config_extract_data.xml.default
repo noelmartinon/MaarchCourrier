@@ -11,6 +11,9 @@
         <ExportFolder>/var/www/MaarchCourrier/modules/life_cycle/batch/files/</ExportFolder>
 		<FromDate>18 months</FromDate> <!-- ex : 18 months, 20 days, ... -->
         <MailToNotify>yourmail@test.com</MailToNotify><!-- If multiple, separate by ','-->
+        <WsUser>wsuser</WsUser>
+        <WsPasswd>wspass</WsPasswd>
+        <MaarchUrl>http://localhost/MaarchCourrier/</MaarchUrl>
     </CONFIG>
     <CONFIG_BASE>
         <databaseserver>127.0.0.1</databaseserver>

@@ -27,8 +27,8 @@
                     <span *ngIf="row.status === 'DRAFT'" style="flex:1;color:orange">
                         {{lang.draft}}
                     </span>
-                    <span *ngIf="row.sendDate === null && row.status === 'SENT'" style="flex:1;color:orange">
-                        En attente de réception
+                    <span *ngIf="row.sendDate === null && row.status === 'SENT' && row.type !== 'm2m_ARCHIVETRANSFER'" style="flex:1;color:orange">
+                        {{lang.waitingReception}}
                     </span>
                     <span *ngIf="row.status === 'WAITING'" style="flex:1;color:orange;font-weight: bold;">
                         {{lang.emailSendInProgress}}
