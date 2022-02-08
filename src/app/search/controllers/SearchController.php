@@ -22,6 +22,7 @@ use Contact\models\ContactModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use Priority\models\PriorityModel;
+use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Slim\Http\Request;
@@ -200,7 +201,7 @@ class SearchController
         $resources = ResModel::get([
             'select'    => [
                 'res_id as "resId"', 'category_id as "category"', 'alt_identifier as "chrono"', 'subject', 'barcode', 'filename', 'creation_date as "creationDate"',
-                'type_id as "type"', 'priority', 'status', 'dest_user as "destUser"'
+                'type_id as "type"', 'priority', 'status', 'dest_user as "destUser"', 'format'
             ],
             'where'     => ['res_id in (?)'],
             'data'      => [$resIds],
@@ -227,6 +228,9 @@ class SearchController
             'where'     => ['res_id in (?)'],
             'data'      => [$resourcesIds]
         ]);
+
+        $allowedFiles = StoreController::getAllowedFiles();
+        $allowedFiles = array_column($allowedFiles, 'canConvert', 'extension');
 
         foreach ($resources as $key => $resource) {
             if (!empty($resource['priority'])) {
@@ -258,6 +262,8 @@ class SearchController
                 $resources[$key]['destUserLabel'] = UserModel::getLabelledUserById(['login' => $resource['destUser']]);
             }
             $resources[$key]['hasDocument'] = !empty($resource['filename']);
+            $format = strtoupper($resource['format']);
+            $resources[$key]['canConvert'] = !empty($allowedFiles[$format]);
 
             $resources[$key]['senders'] = [];
             $resources[$key]['recipients'] = [];
