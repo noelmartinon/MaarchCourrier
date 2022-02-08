@@ -1098,6 +1098,7 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (534, '', 'Imprimer le recommandé', '_NOSTATUS_', 'N', 'printRegisteredMail', 'Y', 'printRegisteredMailAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (535, '', 'Imprimer le descriptif de pli', '_NOSTATUS_', 'N', 'printDepositList', 'Y', 'printDepositListAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (536, '', 'Enregistrer le recommandé', 'NEW', 'N', 'saveRegisteredMail', 'Y', 'saveRegisteredMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (537, '', 'Envoyer à Fast-Parapheur (par email)', 'ATT_MP', 'N', 'sendToExternalSignatureBook', 'Y', 'sendExternalSignatoryBookAction');
 Select setval('actions_id_seq', (select max(id)+1 from actions), false);
 
 TRUNCATE TABLE actions_categories;
