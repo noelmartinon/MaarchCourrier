@@ -68,8 +68,8 @@ export class SearchAdvListComponent implements OnInit {
             this.selectedRes = [];
         } else {
             this.data = this.processPostData(this.linkedRes);
-            this.resultsLength = this.linkedRes['allResources'].length;
-            this.allResInSearch = this.linkedRes['allResources'];
+            this.resultsLength = this.linkedRes['resources'].length;
+            this.allResInSearch = this.linkedRes['resources'].map((item: any) => item.resId);
             this.data = this.linkedRes['resources'];
             this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
             this.loading = false;
