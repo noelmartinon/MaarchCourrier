@@ -673,6 +673,17 @@ class ResController extends ResourceControlController
         }
         $subject = $document['subject'];
 
+        $data = $request->getQueryParams();
+        if (!empty($data['signedVersion'])) {
+            $convertedDocument = AdrModel::getDocuments([
+                'select' => ['docserver_id', 'path', 'filename', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?', 'version = ?'],
+                'data'   => [$args['resId'], 'SIGN', $document['version']],
+                'limit'  => 1
+            ]);
+            $document = $convertedDocument[0] ?? $document;
+        }
+
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
@@ -714,7 +725,6 @@ class ResController extends ResourceControlController
         }
         $mimeType = $mimeAndSize['mime'];
         $pathInfo = pathinfo($pathToDocument);
-        $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
