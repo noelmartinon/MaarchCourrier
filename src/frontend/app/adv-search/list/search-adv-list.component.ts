@@ -6,9 +6,11 @@ import { HeaderService }        from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatPaginator, MatSort, MatDialog } from '@angular/material';
-import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, startWith, switchMap, map, catchError, tap } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../service/functions.service';
+
+declare function $j(selector: any): any;
 
 @Component({
     selector: 'search-adv-list',
@@ -25,7 +27,7 @@ export class SearchAdvListComponent implements OnInit {
     
     data: any;
 
-    displayedColumnsResource: string[] = ['action', 'category', 'chrono', 'status', 'subject', 'typeLabel', 'creationDate'];
+    displayedColumnsResource: string[] = ['action', 'category', 'chrono', 'status', 'subject', 'typeLabel', 'creationDate', 'actions'];
 
     selectedRes: number[] = [];
     allResInSearch: number[] = [];
@@ -36,6 +38,8 @@ export class SearchAdvListComponent implements OnInit {
     resultsLength = 0;
 
     searchResource = new FormControl();
+
+    thumbnailUrl: string = '';
 
     @Input('search') search: string = '';
     @Input('singleMode') singleMode: boolean = false;
@@ -63,9 +67,13 @@ export class SearchAdvListComponent implements OnInit {
             this.initResourceList();
             this.selectedRes = [];
         } else {
+            this.paginator.pageIndex = 0;
+            this.sort.active = 'creationDate';
+            this.sort.direction = 'desc';
+            this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
             this.data = this.processPostData(this.linkedRes);
-            this.resultsLength = this.linkedRes['count'];
-            this.allResInSearch = this.linkedRes['allResources'];
+            this.resultsLength = this.linkedRes['resources'].length;
+            this.allResInSearch = this.linkedRes['resources'];
             this.data = this.linkedRes['resources'];
             this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
             this.loading = false;
@@ -91,6 +99,8 @@ export class SearchAdvListComponent implements OnInit {
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.search);
                 }),
                 map(data => {
+                    // console.log(data);
+                    
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
                     this.resultsLength = data.count;
@@ -162,6 +172,33 @@ export class SearchAdvListComponent implements OnInit {
 
     getSelectedRessources() {
         return this.selectedRes;
+    }
+
+    viewDocument(row: any) {
+        this.http.get(`../../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
+            tap((data: any) => {
+                const file = new Blob([data], { type: 'application/pdf' });
+                const fileURL = URL.createObjectURL(file);
+                const newWindow = window.open();
+                newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
+                newWindow.document.title = row.chrono;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err)
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    viewThumbnailDoc(row: any) {
+        if (row.hasDocument) {
+            this.thumbnailUrl = '../../rest/resources/' + row.resId + '/thumbnail';
+            $j('#viewThumbnailDoc').show();
+        }
+    }
+
+    closeThumbnail() {
+        $j('#viewThumbnailDoc').hide();
     }
 
 }
