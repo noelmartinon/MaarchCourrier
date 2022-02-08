@@ -92,6 +92,8 @@ export class DiffusionsListComponent implements OnInit {
      */
     @Input() diffFormControl: FormControl;
 
+    @Input() newEntityId: number;
+
     /**
      * Catch external event after select an element in autocomplete
      */
@@ -110,9 +112,10 @@ export class DiffusionsListComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         await this.initRoles();
-        if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
+        if (this.resId !== null && this.resId != 0 && this.target !== 'redirect' && this.functions.empty(this.newEntityId)) {
             this.loadListinstance(this.resId);
-        } else if (((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) && this.customDiffusion.length === 0) {
+        } else if (!this.functions.empty(this.newEntityId) || (((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) && this.customDiffusion.length === 0)) {
+            this.entityId = !this.functions.empty(this.newEntityId) ? this.newEntityId : this.entityId;
             this.loadListModel(this.entityId, false, this.selfDest);
         } else if (this.customDiffusion.length > 0) {
             this.loadCustomDiffusion();
@@ -191,7 +194,7 @@ export class DiffusionsListComponent implements OnInit {
                 }
             ];
         }
-        if (this.resId !== null) {
+        if (this.resId !== null && this.functions.empty(this.newEntityId)) {
             const listInstance: any = await this.getListinstance(this.resId);
 
             if (listInstance !== undefined) {

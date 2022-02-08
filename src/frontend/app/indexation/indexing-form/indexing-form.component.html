@@ -207,6 +207,7 @@
                                 </div>
                             </div>
                             <app-diffusions-list #appDiffusionsList [resId]="resId"
+                                [newEntityId]="newEntityId"
                                 [entityId]="arrFormControl[field.identifier].value"
                                 [diffFormControl]="arrFormControl['diffusionList']"
                                 [allowedEntities]="field.allowedEntities" [category]="currentCategory"
