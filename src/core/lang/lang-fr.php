@@ -159,9 +159,12 @@ define('_LINK_ADDED', 'Liaison ajoutée');
 define('_LINK_DELETED', 'Liaison supprimée');
 define('_DOCUMENT_SIGNED', 'Document signé');
 define('_DOCUMENT_UNSIGNED', 'Document dé-signé');
+define('_DOCUMENT_REFUSED', 'Document refusé');
+define('_DOCUMENT_ERROR', 'Document en erreur');
 define('_LINK_ADDED_TAG', 'Liaison de mot-clé ajoutée');
 define('_LINK_DELETED_TAG', 'Liaison de mot-clé supprimée');
 define('_LOGIN', 'Connexion de l\'utilisateur');
+define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (par email)');
 
 // ADMINISTRATION
 define('_USERS', 'Utilisateurs');
@@ -217,6 +220,7 @@ define("_CLOSE_FOLDER", "Clôturer le dossier");
 define("_TAG_DEFAULT", "Mot-clé");
 define("_PRIVATE_TAGS", "Lier les Mots-clé à l'entité de l'utilisateur (Niveau direction)");
 define("_PRIVATE_TAGS_DESC", "L'utilisateur ne verra que les Mots-clé qui ont été restreints à sa direction (l'ajout / modification associera le mot clé automatiquement à sa direction).");
+define('_RECEIVE_FROM_EXTERNAL', "Recevoir des données d'un parapheur externe");
 
 // ACTIONS
 define('_REDIRECTION', 'Rediriger');

@@ -159,9 +159,12 @@ define('_LINK_ADDED', 'Link added');
 define('_LINK_DELETED', 'Link deleted');
 define('_DOCUMENT_SIGNED', 'Document signed');
 define('_DOCUMENT_UNSIGNED', 'Document unsigned');
+define('_DOCUMENT_REFUSED', 'Document refused');
+define('_DOCUMENT_ERROR', 'Document in error');
 define('_LINK_ADDED_TAG', 'Tag link added');
 define('_LINK_DELETED_TAG', 'Tag link deleted');
 define('_LOGIN', 'User connection');
+define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (by email)');
 
 // ADMINISTRATION
 define('_USERS', 'Users');
@@ -217,6 +220,7 @@ define("_CLOSE_FOLDER", "Close the folder");
 define("_TAG_DEFAULT", "Tag");
 define("_PRIVATE_TAGS", "Associate Tag to the user's entity (Direction level)");
 define("_PRIVATE_TAGS_DESC", "User will only see Tag restricted to user's direction (adding / updating will automatically associate the word to user's direction).");
+define('_RECEIVE_FROM_EXTERNAL', 'Receive data from external signature book');
 
 // ACTIONS
 define('_REDIRECTION', 'Redirection');
