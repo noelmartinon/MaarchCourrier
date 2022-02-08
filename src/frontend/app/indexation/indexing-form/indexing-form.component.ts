@@ -1348,8 +1348,10 @@ export class IndexingFormComponent implements OnInit {
                             this.hasLinkedRes = false;
                             this.linkedResources = [];
                             this.resourceToLinkEvent.emit([]);
-
                         } else {
+                            if (!this.functions.empty(this.resId)) {
+                                data.resources = data.resources.filter((item: any) => item.resId !== this.resId);
+                            }
                             data.resources = data.resources.map((element: any) => ({
                                 ...element,
                                 checked: false
@@ -1426,14 +1428,17 @@ export class IndexingFormComponent implements OnInit {
     }
 
     checkRemovedItem(value: any) {
-        if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
+        if (typeof value === 'boolean') {
             this.hasLinkedRes = false;
             this.resourceToLinkEvent.emit([]);
         }
 
-        const senders: any = this['indexingModels_contact'].find((item: any) => item.identifier === 'senders').default_value;
-        if (senders.length === 2) {
+        const senders: any[] = this.arrFormControl['senders'].value.filter((item: any) => item.id !== value);
+        if (senders.length === 1) {
             this.selectedContact(senders[0], 'senders', true);
+        } else {
+            this.hasLinkedRes = false;
+            this.resourceToLinkEvent.emit([]);
         }
     }
 }
