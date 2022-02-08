@@ -76,9 +76,9 @@
         <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef> {{lang.actions}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
-                <button mat-icon-button *ngIf="!appService.getViewMode()" [title]="row.hasDocument ? lang.viewResource : lang.noDocument" [disabled]="!row.hasDocument"
+                <button mat-icon-button *ngIf="!appService.getViewMode()" [title]="getTitle(row)" [disabled]="(!row.hasDocument) || (row.hasDocument && !row.canConvert)"
                     (click)="$event.stopPropagation();viewDocument(row)" (mouseenter)="viewThumbnailDoc(row);" (mouseleave)="closeThumbnail();">
-                    <mat-icon color="primary" class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']"></mat-icon>
+                    <mat-icon color="primary" class="fa" [ngClass]="[!row.hasDocument ? 'fa-eye' : 'fa-eye-slash']"></mat-icon>
                 </button>
             </mat-cell>
         </ng-container>
