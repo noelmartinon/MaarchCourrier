@@ -61,6 +61,8 @@ export class IndexationComponent implements OnInit {
 
     isMailing: boolean = false;
 
+    resourceToLink: number[];
+
     constructor(
         private route: ActivatedRoute,
         private _activatedRoute: ActivatedRoute,
@@ -95,6 +97,15 @@ export class IndexationComponent implements OnInit {
                 this.appDocumentViewer.triggerEvent.emit('cleanFile');
                 this.appSelectIndexingModel.resetIndexingModel();
             } else {
+                if (this.resourceToLink.length > 0) {
+                    this.http.post(`../../rest/resources/${resIds[0]}/linkedResources`, { linkedResources: this.resourceToLink }).pipe(
+                        tap(() => {}),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err)
+                            return of(false);
+                        })
+                    ).subscribe();
+                }
                 const param = this.isMailing ? {
                     isMailing: true
                 } : null;
