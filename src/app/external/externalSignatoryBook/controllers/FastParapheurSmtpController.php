@@ -14,10 +14,10 @@
 
 namespace ExternalSignatoryBook\controllers;
 
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Attachment\models\AttachmentModel;
-use Attachment\models\AttachmentModelAbstract;
 use SrcCore\models\ValidatorModel;
-use SrcCore\models\DatabaseModel;
 use Email\controllers\EmailController;
 use Configuration\models\ConfigurationModel;
 use SrcCore\models\CoreConfigModel;
@@ -68,7 +68,7 @@ class FastParapheurSmtpController
         return ['sended' => 'success'];
     }
 
-    public static function createDocument(Request $request, Response $response, array $args) {
+    public static function createDocument(Request $request, Response $response) {
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
         $config = [];
