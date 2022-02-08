@@ -197,6 +197,7 @@ export class IndexingFormComponent implements OnInit {
 
     suggestLinksNdaysAgo: number;
     creationDateClone: Date;
+    newEntityId: number;
 
     constructor(
         public http: HttpClient,

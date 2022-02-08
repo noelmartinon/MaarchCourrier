@@ -1760,5 +1760,7 @@ export const LANG_FR = {
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
     "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
     "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)",
-    "waitingReception": "En attente de réception"
+    "waitingReception": "En attente de réception",
+    "hasLinkedRes": "Au moins un courrier enregistré dans les {0} derniers jours est affecté au même contact.",
+    "seeMore": "Voir!"
 };
