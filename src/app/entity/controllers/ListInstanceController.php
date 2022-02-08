@@ -639,7 +639,7 @@ class ListInstanceController
 
         DatabaseModel::commitTransaction();
 
-        //SGAMI-SO #75 reaffectation de viseurs à viseurs
+        /*SGAMI-SO #75 reaffectation de viseurs à viseurs
         $courrier = \Resource\models\ResModel::get([
             'select'  => ['*'],
             'where'   => ['res_id = ?' ],
@@ -663,7 +663,7 @@ class ListInstanceController
                 }
             }
         }
-        //SGAMI-SO -FIN
+        //SGAMI-SO -FIN*/
 
         return $response->withStatus(204);
     }

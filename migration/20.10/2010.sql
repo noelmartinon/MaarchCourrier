@@ -338,6 +338,7 @@ UPDATE actions SET component = 'confirmAction' where action_page = 'purge_letter
 -- add
 UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
 UPDATE actions SET id_status = '_NOSTATUS_' WHERE id = 416;
+UPDATE actions SET component = 'rejectVisaBackToPreviousAction' WHERE id = 405;
 
 -- unable feature_tour
 UPDATE users SET feature_tour = '["welcome","email","notification"]';
