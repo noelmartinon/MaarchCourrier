@@ -163,6 +163,7 @@
                 <mat-label class="attachLabel">{{'lang.note' | translate}}</mat-label>
                 <textarea matInput [placeholder]="'lang.addNoteToNumericPackage' | translate" [(ngModel)]="numericPackage.content"
                     matTextareaAutosize style="padding:0" [readonly]="!canManageMail()"></textarea>
+                <mat-hint class="warningNote">{{'lang.warningNote' | translate}}</mat-hint>
             </mat-form-field>
         </div>
     </mat-dialog-content>

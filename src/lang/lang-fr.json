@@ -2632,5 +2632,6 @@
     "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>",
     "goToNextDocument": "Forcer le passage au document suivant quand le document sort du périmètre de la bannette",
     "uploadNewVersion": "Téléverser une nouvelle version du document",
-    "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés"
+    "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
+    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant."
 }
