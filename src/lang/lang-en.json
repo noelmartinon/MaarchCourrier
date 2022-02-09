@@ -2634,5 +2634,6 @@
     "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>",
     "chooseValues": "Choose the values",
     "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
-    "allDoctypes": "All doctypes"
+    "allDoctypes": "Add all doctypes",
+    "allDoctypesDesc": "This option enabled automatically adds new types to the list below"
 }

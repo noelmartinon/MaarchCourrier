@@ -2632,5 +2632,6 @@
     "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>",
     "chooseValues": "Choisir les valeurs",
     "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisées pour ce champ",
-    "allDoctypes": "Tous les types"
+    "allDoctypes": "Ajouter tous les types",
+    "allDoctypesDesc": "Cette option activée permet d'ajouter automatiquement les nouveaux types à la liste ci-dessous"
 }
