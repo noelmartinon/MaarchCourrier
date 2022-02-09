@@ -2248,5 +2248,6 @@
     "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)",
     "waitingReception": "En attente de réception",
     "goToNextDocument": "Forcer le passage au document suivant quand le document sort du périmètre de la bannette",
-    "allDoctypes": "Tous les types"
+    "allDoctypes": "Ajouter tous les types",
+    "allDoctypesDesc": "Cette option activée permet d'ajouter automatiquement les nouveaux types à la liste ci-dessous"
 }

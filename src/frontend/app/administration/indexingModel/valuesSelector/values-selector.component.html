@@ -1,11 +1,15 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>{{data.label}}</h1>
     <div mat-dialog-content>
-        <app-maarch-message>{{'lang.chooseValuesMsg' | translate}} :</app-maarch-message>
-        <div style="display: inline-grid;">
-            <mat-slide-toggle style="margin-bottom: 15px; margin-top: 10px;" [(ngModel)]="data.allDoctypes" [checked]="data.allDoctypes"  color="primary">
-                {{'lang.allDoctypes' | translate}}
-            </mat-slide-toggle>
+        <mat-slide-toggle style="margin-bottom: 15px; margin-top: 10px;"
+            [title]="'lang.allDoctypesDesc' | translate"
+            [(ngModel)]="data.allDoctypes"
+            [checked]="data.allDoctypes"
+            color="primary">
+            {{'lang.allDoctypes' | translate}}
+        </mat-slide-toggle>
+        <div style="display: grid;">
+            <app-maarch-message style="margin-bottom: 8px;">{{'lang.chooseValuesMsg' | translate}} :</app-maarch-message>
             <mat-checkbox [checked]="allChecked()"
                 color="primary"
                 [indeterminate]="!emptyChecked() && !allChecked()"
