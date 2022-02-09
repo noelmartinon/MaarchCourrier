@@ -143,7 +143,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     constructor(
         private _activatedRoute: ActivatedRoute,
         public translate: TranslateService,
-        private router: Router,
+        public router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
         public dialog: MatDialog,
@@ -210,11 +210,11 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
             }
         } else {
             this.data = this.linkedRes;
-            this.resultsLength = this.linkedRes['count'];
-            this.allResInBasket = this.linkedRes['allResources'];
+            this.resultsLength = this.linkedRes['resources'].length;
+            this.allResInBasket = this.linkedRes['resources'].map((item: any) => item.resId);
             this.data = this.linkedRes['resources'];
             this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
-            this.paginatorLength = this.linkedRes['count'] > 10000 ? 10000 : this.linkedRes['count'];
+            this.paginatorLength = this.linkedRes['resources'].length > 10000 ? 10000 : this.linkedRes['resources'].length;
             this.dataFilters = this.linkedRes['filters'];
             this.templateColumns = this.linkedRes['templateColumns'];
             this.isLoadingResults = false;
@@ -433,14 +433,24 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     viewThumbnail(row: any) {
         if (row.hasDocument) {
             this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
-            $('#viewThumbnail').show();
+            $('#viewThumbnailDoc').show();
             $('#listContent').css({ 'overflow': 'hidden' });
         }
     }
 
     closeThumbnail() {
-        $('#viewThumbnail').hide();
+        $('#viewThumbnailDoc').hide();
         $('#listContent').css({ 'overflow': 'auto' });
+    }
+
+    getTitle(row: any) {
+        if (!row.hasDocument) {
+            return this.translate.instant('lang.noDocument');
+        } else if (row.hasDocument && row.canConvert) {
+            return this.translate.instant('lang.viewResource');
+        } else if (row.hasDocument && !row.canConvert) {
+            return this.translate.instant('lang.noAvailablePreview');
+        }
     }
 
     processPostData(data: any) {
@@ -705,19 +715,21 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
-            tap((data: any) => {
-                const file = new Blob([data], { type: 'application/pdf' });
-                const fileURL = URL.createObjectURL(file);
-                const newWindow = window.open();
-                newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
-                newWindow.document.title = row.chrono;
-            }),
-            catchError((err: any) => {
-                this.notify.handleBlobErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        if (row.canConvert) {
+            this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
+                tap((data: any) => {
+                    const file = new Blob([data], { type: 'application/pdf' });
+                    const fileURL = URL.createObjectURL(file);
+                    const newWindow = window.open();
+                    newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
+                    newWindow.document.title = row.chrono;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleBlobErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 
     emptyCriteria() {

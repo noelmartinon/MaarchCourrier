@@ -1,4 +1,4 @@
-<mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: -28px; top: 0;">
+<mat-card id="viewThumbnailDoc" style="display:none;position: fixed;z-index: 2;margin-left: -28px; top: 0;">
     <img style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" />
 </mat-card>
 <ng-template #filterTemplate>
@@ -200,7 +200,17 @@
                     </span>
                     <span class="main-info-data" (click)="launch(row);" style="font-weight:bold;flex:1;cursor:pointer;"
                         [class.undefined]="row.subject == ('lang.undefined' | translate)"
-                        title="{{row.subject_title}}" [innerHTML]="row.subject"></span>
+                        title="{{row.subject_title}}" [innerHTML]="row.subject">
+                    </span>
+                    <span *ngIf="!router.url.includes('search')" class="main-info-actions" style="margin-right: 20px;">
+                        <button mat-icon-button *ngIf="!appService.getViewMode()"
+                            [title]="getTitle(row)" [disabled]="(!row.hasDocument) || (row.hasDocument && !row.canConvert)"
+                            (click)="$event.stopPropagation();viewDocument(row)" (mouseenter)="viewThumbnail(row);"
+                            (mouseleave)="closeThumbnail();">
+                            <mat-icon color="primary" class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']">
+                            </mat-icon>
+                        </button>
+                    </span>
                     <span *ngIf="sidenavRight !== undefined" class="main-info-action">
                         <button mat-icon-button [class.highlightResultIcon]="row.inNotes"
                             title="{{'lang.notes' | translate}}"
