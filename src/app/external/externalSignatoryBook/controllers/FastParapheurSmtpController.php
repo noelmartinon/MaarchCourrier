@@ -58,17 +58,24 @@ class FastParapheurSmtpController
         }
         $smtpConfig = json_decode($smtpConfig['value'], true);
 
+        $_TOTAL_EMAIL_SIZE = FastParapheurSmtpController::convertSizeToOctets([
+            'size' => explode("|", $config['data']['emailSize'])[0],
+            'format' => explode("|", $config['data']['emailSize'])[1]
+        ]);
+
         // get courrier
-        $mainDocument = FastParapheurSmtpController::getMainDocument(['res_id'=> $args['resIdMaster'], 'collId' => 'letterbox_coll']);
+        $mainDocument = FastParapheurSmtpController::getMainDocument(['res_id'=> $args['resIdMaster'], 'collId' => 'letterbox_coll', 'sizeLimit' => $_TOTAL_EMAIL_SIZE]);
         if (!empty($mainDocument['error'])) {
             return ['error' => $mainDocument['error']];
         }
+        $_TOTAL_EMAIL_SIZE = $_TOTAL_EMAIL_SIZE - $mainDocument['documentFileSize'];
 
         // get attachments
         $attachments = FastParapheurSmtpController::getMainDocumentAttachments(['res_id'=> $args['resIdMaster']]);
         if (!empty($attachments['error'])) {
             return ['error' => $attachments['error']];
         }
+        $attachments = FastParapheurSmtpController::filterMainDocumentAttachments(['attachments' => $attachments, 'sizeLimit' => $_TOTAL_EMAIL_SIZE]);
 
         // make request json
         $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
@@ -187,10 +194,10 @@ class FastParapheurSmtpController
 
         return $response->withStatus(201)->withJson(['Document created']);
     }
-    
+
     public static function getMainDocument($args) {
-        ValidatorModel::notEmpty($args, ['res_id']);
-        ValidatorModel::intVal($args, ['res_id']);
+        ValidatorModel::notEmpty($args, ['res_id', 'sizeLimit']);
+        ValidatorModel::intVal($args, ['res_id', 'sizeLimit']);
         ValidatorModel::stringType($args, ['collId']);
 
         $document['res_id'] = $args['res_id'];
@@ -225,11 +232,23 @@ class FastParapheurSmtpController
             return ['error' => 'Fingerprints do not match', 'code' => 400];
         }
 
+        // check size
+        $documentFileSize = DatabaseModel::select([
+            'select'    => ['filesize'],
+            'table'     => ['res_letterbox'],
+            'where'     => ['res_id = ?', 'filesize < ?'],
+            'data'      => [$args['res_id'], $args['sizeLimit']]
+        ]);
+        if (empty($documentFileSize)) {
+            return ['error' => "The main document size exceeds the allowed limit '" . FastParapheurSmtpController::convertOctetsToOther(['size' => $args['sizeLimit']]) . "'"];
+        }
+
         return [
-            'documentName' => $document['filename'],
-            'fingerprint' => $document['fingerprint'],
-            "hashAlgorithm" => $docserverType['fingerprint_mode'],
-            'pathToDocument' => $pathToDocument
+            'documentName'      => $document['filename'],
+            'fingerprint'       => $document['fingerprint'],
+            "hashAlgorithm"     => $docserverType['fingerprint_mode'],
+            'pathToDocument'    => $pathToDocument,
+            'documentFileSize'  => $documentFileSize[0]['filesize']
         ];
 
     }
@@ -238,7 +257,7 @@ class FastParapheurSmtpController
         ValidatorModel::notEmpty($args, ['res_id']);
         ValidatorModel::intVal($args, ['res_id']);
 
-        $attachments = DatabaseModel::select([
+        $tmpAttachments = DatabaseModel::select([
             'select'    => ['ra.res_id as id', '(select false) as original', 'ra.title', 'ra.format', 'ra.fingerprint', 'ra.filesize', 'dt.fingerprint_mode', 'CONCAT(d.path_template, ra.path, ra.filename) as file_path_name'],
             'table'     => ['res_attachments as ra, docservers as d, docserver_types as dt'],
             'where'     => ['ra.res_id_master = ?', 'ra.docserver_id = d.docserver_id', 'd.docserver_type_id = dt.docserver_type_id'],
@@ -246,17 +265,36 @@ class FastParapheurSmtpController
         ]);
 
         $errorMsg = '';
-        $jsonAttachments = [];
-        $emailAttachments = [];
-        
-        if (!empty($attachments)) {
-            foreach ($attachments as $key => $attachment) {
+        if (!empty($tmpAttachments)) {
+            foreach ($tmpAttachments as $key => $attachment) {
                 $fingerprint = StoreController::getFingerPrint(['filePath' => $attachment['file_path_name'], 'mode' => $attachment['fingerprint_mode']]);
                 if ($attachment['fingerprint'] != $fingerprint) {
                     $errorMsg .= "Fingerprint do not match for file {$attachment['title']}\n";
                     continue;
                 }
-    
+                $attachments[]= $attachment;
+            }
+
+            if (!empty($errorMsg)) {
+                return ['error' => $errorMsg, 'code' => 400];
+            }
+        }
+        return ['attachments' => $attachments];
+    }
+
+    public static function filterMainDocumentAttachments($args) {
+        ValidatorModel::notEmpty($args, ['attachments', 'sizeLimit']);
+        ValidatorModel::arrayType($args, ['attachments']);
+        ValidatorModel::intVal($args, ['sizeLimit']);
+
+        $jsonAttachments = [];
+        $emailAttachments = [];
+        $currentSize = $args['sizeLimit'];
+
+        foreach ($args['attachments'] as $key => $attachment) {
+
+            if (filesize($attachment['filesize']) > 0 && $attachment['filesize'] < $currentSize) {
+                
                 $jsonAttachments[]= array(
                     "name" => $attachment['title'] . '.' . $attachment['format'],
                     "hash" => $attachment['fingerprint'],
@@ -266,11 +304,8 @@ class FastParapheurSmtpController
                     "id" => $attachment['id'],
                     "original" => $attachment['original']
                 );
-            }
-    
-            if (!empty($errorMsg)) {
-                return ['error' => $errorMsg, 'code' => 400];
-            }
+                $currentSize = $currentSize - $attachment['filesize'];
+            }            
         }
 
         return ['jsonAttachments' => $jsonAttachments, 'emailAttachments' => $emailAttachments];
@@ -352,5 +387,75 @@ class FastParapheurSmtpController
         ];
     }
 
-    
+    public static function convertSizeToOctets($args) {
+        ValidatorModel::notEmpty($args, ['size', 'format']);
+        ValidatorModel::intVal($args, ['size']);
+        ValidatorModel::stringType($args, ['format']);
+
+        switch ($args['format']) {
+            case 'O':
+                return $args['size'];
+            case 'Ko':
+                return $args['size'] * 1000;
+            case 'Mo':
+                return $args['size'] * 1000000;
+            case 'Go':
+                return $args['size'] * 1000000000;
+            case 'To':
+                return $args['size'] * 1000000000000;
+            default:
+                return ['error' => "Unknown format to convert it's value"];
+        }
+    }
+
+    public static function convertOctetsToOther($agrs) {
+        ValidatorModel::notEmpty($agrs, ['size']);
+        ValidatorModel::intVal($agrs, ['size']);
+
+        // Array with differents units
+        $octet = $agrs['size'];
+        $unite = array('Octet','Ko','Mo','Go', 'To');
+
+        if ($octet < 1000) // octet
+        {
+            return $octet.$unite[0];
+        }
+        elseif ($octet < 1000000) // ko
+        {
+            // $ko = round($octet/1024,2);
+            $ko = round($octet/1000,2);
+            return $ko.$unite[1];
+        }
+        elseif ($octet < 1000000000) // Mo 
+        {
+            // $mo = round($octet/(1024*1024),2);
+            $mo = round($octet/1000000,2);
+            return $mo.$unite[2];
+        }
+        elseif ($octet < 1000000000000) // Go 
+        {
+            // $go = round($octet/(1024*1024*1024),2);
+            $go = round($octet/1000000000,2);
+            return $go.$unite[3];
+        }
+        elseif ($octet < 1000000000000000) // To 
+        {
+            // $to = round($octet/(1024*1024*1024*1024),2);
+            $to = round($octet/1000000000000,2);
+            return $to.$unite[4];
+        }
+    }
+
+    public static function returnFilesUnderSizeLimit($args) {
+        ValidatorModel::notEmpty($args, ['files', 'sizeLimit']);
+        ValidatorModel::arrayType($args, ['files']);
+        ValidatorModel::intVal($args, ['sizeLimit']);
+
+        if (is_file($value) && file_exists($value)) {
+            if (filesize($value) < $args['sizeLimit']) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
