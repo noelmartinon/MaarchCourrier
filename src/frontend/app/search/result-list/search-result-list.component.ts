@@ -715,21 +715,31 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        if (row.canConvert) {
-            this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
-                tap((data: any) => {
-                    const file = new Blob([data], { type: 'application/pdf' });
-                    const fileURL = URL.createObjectURL(file);
-                    const newWindow = window.open();
-                    newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
-                    newWindow.document.title = row.chrono;
-                }),
-                catchError((err: any) => {
-                    this.notify.handleBlobErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }
+        this.http.get(`../rest/resources/${row.resId}/fileInformation`).pipe(
+            tap((res: any) => {
+                if (res.information.canConvert) {
+                    this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
+                        tap((data: any) => {
+                            const file = new Blob([data], { type: 'application/pdf' });
+                            const fileURL = URL.createObjectURL(file);
+                            const newWindow = window.open();
+                            newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
+                            newWindow.document.title = row.chrono;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleBlobErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.notify.handleSoftErrors(this.translate.instant('lang.noAvailablePreview'));
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     emptyCriteria() {

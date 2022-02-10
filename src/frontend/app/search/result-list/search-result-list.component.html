@@ -204,8 +204,10 @@
                     </span>
                     <span *ngIf="!router.url.includes('search')" class="main-info-actions" style="margin-right: 20px;">
                         <button mat-icon-button *ngIf="!appService.getViewMode()"
-                            [title]="getTitle(row)" [disabled]="(!row.hasDocument) || (row.hasDocument && !row.canConvert)"
-                            (click)="$event.stopPropagation();viewDocument(row)" (mouseenter)="viewThumbnail(row);"
+                            [title]="row.hasDocument ? ('lang.viewResource' | translate) : ('lang.noDocument' | translate)"
+                            [disabled]="!row.hasDocument"
+                            (click)="$event.stopPropagation();viewDocument(row)"
+                            (mouseenter)="viewThumbnail(row);"
                             (mouseleave)="closeThumbnail();">
                             <mat-icon color="primary" class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']">
                             </mat-icon>
