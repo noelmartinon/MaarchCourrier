@@ -90,9 +90,11 @@ trait ExternalSignatoryBookTrait
                 ]);
             } elseif ($config['id'] == 'fastParapheurSmtp') {
                 $sentInfo = FastParapheurSmtpController::sendDatas([
-                    'config'      => $config,
-                    'resIdMaster' => $args['resId'],
-                    'note' => $args['note']
+                    'config'        => $config,
+                    'resIdMaster'   => $args['resId'],
+                    'userId'        => $GLOBALS['login'],
+                    'steps'         => $args['data']['steps'],
+                    'note'          => $args['note']['content'] ?? null
                 ]);
                 
             } elseif ($config['id'] == 'iParapheur') {
