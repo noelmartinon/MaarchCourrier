@@ -259,7 +259,7 @@ class IndexingModelController
                     $field['default_value'] = $date->format('Y-m-d');
                 }
             }
-            if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+            if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
                 $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
             }
             IndexingModelFieldModel::create([
@@ -399,7 +399,7 @@ class IndexingModelController
                             $field['default_value'] = $date->format('Y-m-d');
                         }
                     }
-                    if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+                    if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
                         $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
                     }
                     IndexingModelFieldModel::create([
@@ -470,7 +470,7 @@ class IndexingModelController
                     $field['default_value'] = $date->format('Y-m-d');
                 }
             }
-            if ($field['identifier'] == 'doctype' && !!$body['allDoctypes']) {
+            if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
                 $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
             }
             IndexingModelFieldModel::create([
