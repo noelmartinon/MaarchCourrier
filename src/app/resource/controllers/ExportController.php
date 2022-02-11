@@ -624,7 +624,7 @@ class ExportController
         return $aSignatories;
     }
 
-    private static function getSignatureDates(array $args)
+   private static function getSignatureDates(array $args)
     {
         ValidatorModel::notEmpty($args, ['chunkedResIds']);
         ValidatorModel::arrayType($args, ['chunkedResIds']);
@@ -635,20 +635,20 @@ class ExportController
         }
 
         foreach ($args['chunkedResIds'] as $resIds) {
-            $attachments = AttachmentModel::get([
-                'select'    => ['creation_date', 'res_id_master'],
-                'where'     => ['res_id_master in (?)', 'attachment_type = ?', 'status = ?'],
-                'data'      => [$resIds, 'signed_response', 'TRA'],
+            $attachments = ListInstanceModel::get([
+                'select'    => ['process_date', 'res_id'],
+                'where'     => ['res_id in (?)', 'item_type = ?','item_mode = ?', 'requested_signature = ?'],
+                'data'      => [$resIds, 'user_id','sign', true],
                 'order_by'  => ['res_id']
             ]);
 
             foreach ($attachments as $attachment) {
                 if (!empty($aSignatureDates[$attachment['res_id']])) {
-                    $aSignatureDates[$attachment['res_id_master']] .= "\n";
+                    $aSignatureDates[$attachment['res_id']] .= "\n";
                 } else {
-                    $aSignatureDates[$attachment['res_id_master']] = '';
+                    $aSignatureDates[$attachment['res_id']] = '';
                 }
-                $aSignatureDates[$attachment['res_id_master']] .= TextFormatModel::formatDate($attachment['creation_date']);
+                $aSignatureDates[$attachment['res_id']] .= TextFormatModel::formatDate($attachment['process_date']);
             }
         }
 
