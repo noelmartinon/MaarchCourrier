@@ -1341,7 +1341,18 @@ export class IndexingFormComponent implements OnInit {
         if (this.getCategory() === 'incoming' && identifier === 'senders' && (this.arrFormControl['senders'].value.length === 1 || removeEvent) && this.suggestLinksNdaysAgo > 0) {
             const documentDate: Date = this.functions.empty(this.creationDateClone) ? new Date() : new Date(this.creationDateClone);
             const resourceNotBefore = new Date(documentDate.setDate(documentDate.getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];
-            this.http.post(`../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`, {}).pipe(
+            const objToSend: any = {
+                creationDate : {
+                    values : {
+                        start: resourceNotBefore,
+                        end: null,
+                    }
+                },
+                senders: {
+                    values: [contact]
+                }
+            };
+            this.http.post('../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate', objToSend).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.resources)) {
                         if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
