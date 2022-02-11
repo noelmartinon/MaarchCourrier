@@ -7,6 +7,8 @@ import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { SearchResultListComponent } from '@appRoot/search/result-list/search-result-list.component';
 import { Router } from '@angular/router';
+import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'link-resource-modal.component.html',
@@ -15,6 +17,7 @@ import { Router } from '@angular/router';
 export class LinkResourceModalComponent implements OnInit {
 
     @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
+    @ViewChild('appCriteriaTool', { static: false }) appCriteriaTool: CriteriaToolComponent;
 
     searchUrl: string = '';
 
@@ -23,6 +26,7 @@ export class LinkResourceModalComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         public router: Router,
+        public functions: FunctionsService,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<LinkResourceModalComponent>) {

@@ -209,7 +209,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 this.listProperties.criteria.meta = this.criteria.meta;
             }
         } else {
-            this.data = this.linkedRes;
+            this.data = this.processPostData(this.linkedRes);
             this.resultsLength = this.linkedRes['resources'].length;
             this.allResInBasket = this.linkedRes['resources'].map((item: any) => item.resId);
             this.data = this.linkedRes['resources'];
