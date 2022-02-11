@@ -648,7 +648,7 @@ class ExportController
                 } else {
                     $aSignatureDates[$attachment['res_id']] = '';
                 }
-                $aSignatureDates[$attachment['res_id']] .= TextFormatModel::formatDate($attachment['process_date']);
+                $aSignatureDates[$attachment['res_id']] .= TextFormatModel::formatDate($attachment['process_date']); 
             }
         }
 
