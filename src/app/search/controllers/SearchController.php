@@ -125,26 +125,6 @@ class SearchController
 
         $queryParams = $request->getQueryParams();
 
-        if (!empty($queryParams['resourceNotBefore'])) {
-            $searchWhere[] = '(creation_date >= ?)';
-            $queryCreationDate = new \DateTime($queryParams['resourceNotBefore']);
-            $searchData[] = $queryCreationDate->format('c');
-        }
-
-        if (!empty($queryParams['contactId'])) {
-            $contactsResId = ResourceContactModel::get([
-                'select' => ['res_id'],
-                'where'  => ['item_id = ?', 'type = ?'],
-                'data'   => [$queryParams['contactId'], 'contact']
-            ]);
-            $contactsResId = array_column($contactsResId, 'res_id');
-            if (empty($contactsResId)) {
-                return $response->withJson(['resources' => [], 'count' => 0, 'allResources' => []]);
-            }
-            $searchWhere[] = 'res_id in (?)';
-            $searchData[] = $contactsResId;
-        }
-
         // Begin transaction for temporarySearchData
         DatabaseModel::beginTransaction();
         SearchModel::createTemporarySearchData(['where' => $searchWhere, 'data' => $searchData, 'order' => $queryParams['order']]);
