@@ -635,20 +635,20 @@ class ExportController
         }
 
         foreach ($args['chunkedResIds'] as $resIds) {
-            $attachments = ListInstanceModel::get([
+            $listInstances = ListInstanceModel::get([
                 'select'    => ['process_date', 'res_id'],
                 'where'     => ['res_id in (?)', 'item_type = ?','item_mode = ?', 'requested_signature = ?'],
                 'data'      => [$resIds, 'user_id','sign', true],
                 'order_by'  => ['res_id']
             ]);
 
-            foreach ($attachments as $attachment) {
-                if (!empty($aSignatureDates[$attachment['res_id']])) {
-                    $aSignatureDates[$attachment['res_id']] .= "\n";
+            foreach ($listInstances as $listInstance) {
+                if (!empty($aSignatureDates[$listInstance['res_id']])) {
+                    $aSignatureDates[$listInstance['res_id']] .= "\n";
                 } else {
-                    $aSignatureDates[$attachment['res_id']] = '';
+                    $aSignatureDates[$listInstance['res_id']] = '';
                 }
-                $aSignatureDates[$attachment['res_id']] .= TextFormatModel::formatDate($attachment['process_date']); 
+                $aSignatureDates[$listInstance['res_id']] .= TextFormatModel::formatDate($listInstance['process_date']);
             }
         }
 
