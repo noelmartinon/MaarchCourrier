@@ -120,7 +120,7 @@ class FastParapheurSmtpController
 
         $documentsToSign = [];
         $documentsToSign['letterbox'] = ResModel::get([
-            'select' => ['res_id', 'path', 'filename', 'filesize', 'fingerprint', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations'],
+            'select' => ['res_id', 'path', 'subject', 'filename', 'filesize', 'fingerprint', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations'],
             'where'  => ['res_id = ?', 'filesize < ?'],
             'data'   => [$args['resIdMaster'], $args['sizeLimit']]
         ]);
@@ -172,7 +172,7 @@ class FastParapheurSmtpController
             $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
                 'res_id'        => $documentsToSign['letterbox'][0]['res_id'],
                 'clientDocType' => 'mainDocument',
-                'documentName'  => $documentsToSign['letterbox'][0]['filename'], 
+                'documentName'  => $documentsToSign['letterbox'][0]['subject'] . '.' . $documentsToSign['letterbox'][0]['format'], 
                 'fingerprint'   => $documentsToSign['letterbox'][0]['fingerprint'], 
                 'hashAlgorithm' => $documentsToSign['letterbox'][0]['fingerprint_mode'], 
                 'circuitId'     => $circuitId,
@@ -215,7 +215,7 @@ class FastParapheurSmtpController
                 $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
                     'res_id'        => $document['id'],
                     'clientDocType'  => 'attachment',
-                    'documentName'  => $document['filename'], 
+                    'documentName'  => $document['title'] . '.' . $document['format'], 
                     'fingerprint'   => $document['fingerprint'], 
                     'hashAlgorithm' => $document['fingerprint_mode'], 
                     'circuitId'     => $circuitId,
