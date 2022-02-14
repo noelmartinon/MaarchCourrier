@@ -5,7 +5,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '@service/app.service';
-import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
+import { tap, catchError, exhaustMap, filter, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -721,6 +721,7 @@ export class IndexingFormComponent implements OnInit {
                     if (!this.functions.empty(elem.default_value) && !this.adminMode) {
                         this.calcLimitDate(elem, elem.default_value);
                     }
+                    this.setAllowedValues(elem);
                     resolve(true);
                 })
             ).subscribe();
@@ -775,7 +776,6 @@ export class IndexingFormComponent implements OnInit {
                     elem.event = 'getIssuingSites';
                     // await this.setDoctypeField(elem);
                 }
-                this.setAllowedValues(elem);
             }));
         }));
 
@@ -1284,19 +1284,33 @@ export class IndexingFormComponent implements OnInit {
     }
 
     checkDisabledValues(field: any) {
-        let disabledItems: number[] = [];
-        // CHECK SECOND LEVEL
-        disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
-        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+        this.http.get(`../rest/resources/${this.resId}`).pipe(
+            tap ((data: any) => {
+                if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                    field.values.find((item: any) => item.id === data['doctype']).disabled = false;
+                }
+            }),
+            finalize(() => {
+                let disabledItems: number[] = [];
+                // CHECK SECOND LEVEL
+                disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
+                field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
 
 
-        // CHECK FIRST LEVEL
-        field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
-            if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
-                disabledItems.push(item.id);
-            }
-        });
-        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+                // CHECK FIRST LEVEL
+                field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
+                    if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
+                        disabledItems.push(item.id);
+                    }
+                });
+                field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     openValuesSelector(field: any) {
