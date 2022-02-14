@@ -295,6 +295,7 @@ define('_ASSIGNEE', 'Assignee');
 define('_DOCUMENT_WITH_NOTES', 'Document with notes');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Acknowledgement receipt (Record management)");
 define("_REPLY_RECORD_MANAGEMENT", "Transfer reply (Record management)");
+define("_RESPONSE_JSON", "Response json");
 
 define('_SUMMARY_SHEET', 'Summary sheet');
 define('_UNDEFINED', 'Undefined');
@@ -433,7 +434,7 @@ define("_UPDATE_LISTINSTANCE", "Diffusion list updated");
 define("_UPDATE_LISTINSTANCE_DEST", "Diffusion list recipient updated");
 define("_UPDATE_VISA_CIRCUIT", "Visa workflow updated");
 define("_UPDATE_AVIS_CIRCUIT", "Opinion workflow updated");
-
+define("_CONFIGURE_VISA_CIRCUIT", "Please configure the 'Visa workflow'");
 define("_VISA_CIRCUIT_DELETED", "Visa workflow deleted");
 define("_AVIS_CIRCUIT_DELETED", "Opinion workflow updated");
 

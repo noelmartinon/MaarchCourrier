@@ -295,6 +295,7 @@ define('_ASSIGNEE', 'Attributaire');
 define('_DOCUMENT_WITH_NOTES', 'Document annoté');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Accusé de réception (Archivage)");
 define("_REPLY_RECORD_MANAGEMENT", "Réponse au transfert (Archivage)");
+define("_RESPONSE_JSON", "Json de réponse");
 
 define('_SUMMARY_SHEET', 'Fiche de liaison');
 define('_UNDEFINED', 'Non défini');
@@ -433,7 +434,7 @@ define("_UPDATE_LISTINSTANCE", "Liste de diffusion mise à jour");
 define("_UPDATE_LISTINSTANCE_DEST", "Destinataire de la liste de diffusion mis à jour");
 define("_UPDATE_VISA_CIRCUIT", "Circuit de visa mis à jour");
 define("_UPDATE_AVIS_CIRCUIT", "Circuit d'avis mis à jour");
-
+define("_CONFIGURE_VISA_CIRCUIT", "Veuillez configurer le 'Circuit de visa'");
 define("_VISA_CIRCUIT_DELETED", "Circuit de visa supprimé");
 define("_AVIS_CIRCUIT_DELETED", "Circuit d'avis supprimé");
 
