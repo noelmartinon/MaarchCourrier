@@ -45,6 +45,10 @@
             <id>reply_record_management</id>
             <label>_REPLY_RECORD_MANAGEMENT</label>
         </type>
+        <type show="false" with_chrono="true" icon="" sign="false">
+            <id>response_json</id>
+            <label>_RESPONSE_JSON</label>
+        </type>
     </attachment_types>
     <contact_check>
         <check_days_before>5</check_days_before>  <!-- 0 if you want to disabled -->
