@@ -612,7 +612,7 @@ $app->get('/documents/{id}/maarchParapheurWorkflow', \ExternalSignatoryBook\cont
 $app->get('/maarchParapheur/user/{id}/picture', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getUserPicture');
 $app->get('/externalSignatureBooks/enabled', \ExternalSignatoryBook\controllers\ExternalSignatureBookController::class . ':getEnabledSignatureBook');
 $app->get('/externalSummary/{resId}', \ExternalSummary\controllers\SummaryController::class . ':getByResId');
-$app->post('/fastParapheurSmtp/create', \ExternalSignatoryBook\controllers\FastParapheurSmtpController::class . ':createDocument');
+$app->post('/fastParapheurSmtp', \ExternalSignatoryBook\controllers\FastParapheurSmtpController::class . ':createDocument');
 $app->get('/externalConnectionsEnabled', \SrcCore\controllers\CoreController::class . ':externalConnectionsEnabled');
 
 //Alfresco
