@@ -28,6 +28,7 @@ use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
+use Resource\models\ResModel;
 use Resource\controllers\StoreController;
 use User\models\UserModel;
 use SrcCore\models\PasswordModel;
@@ -39,18 +40,233 @@ use SrcCore\models\CurlModel;
 class FastParapheurSmtpController 
 {
     /**
-     * description send unsigned pdf with attachments via SMTP
+     * Prepare data before sending to Fast Parapheur via email
      * 
-     * @param   array   $agrs   Need config and resIdMaster attributs/value
+     * @param   array   $args
      * @return  array   
      */
-    public static function sendDatas($args)
+    public static function sendDatas(array $args)
     {
-        ValidatorModel::notEmpty($args, ['config', 'resIdMaster']);
-        ValidatorModel::intVal($args, ['resIdMaster']);
-
-        // get config
         $config = $args['config'];
+        $_TOTAL_EMAIL_SIZE = FastParapheurSmtpController::convertSizeToBytes([
+            'size'      => explode("|", $config['data']['emailSize'])[0],
+            'format'    => explode("|", $config['data']['emailSize'])[1]
+        ]);
+
+        // We need the SIRET field and the user_id of the signatory user's primary entity
+        $signatory = DatabaseModel::select([
+            'select'    => ['user_id', 'business_id', 'entities.entity_label'],
+            'table'     => ['listinstance', 'users_entities', 'entities'],
+            'left_join' => ['item_id = user_id', 'users_entities.entity_id = entities.entity_id'],
+            'where'     => ['res_id = ?', 'item_mode = ?', 'process_date is null'],
+            'data'      => [$args['resIdMaster'], 'sign']
+        ])[0];
+        $redactor = DatabaseModel::select([
+            'select'    => ['short_label'],
+            'table'     => ['res_view_letterbox', 'users_entities', 'entities'],
+            'left_join' => ['dest_user = user_id', 'users_entities.entity_id = entities.entity_id'],
+            'where'     => ['res_id = ?'],
+            'data'      => [$args['resIdMaster']]
+        ])[0];
+
+        if (empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org') {
+            $signatory['business_id'] = $config['data']['subscriberId'];
+        }
+
+        if (!empty($signatory['user_id'])) {
+            $user = UserModel::getById(['id' => $signatory['user_id'], 'select' => ['user_id']]);
+        }
+
+        if (empty($user)) {
+            return ['error' => _CONFIGURE_VISA_CIRCUIT];
+        }
+
+        $prepareUpload = FastParapheurSmtpController::prepareUpload([
+            'config'        => $config, 
+            'resIdMaster'   => $args['resIdMaster'], 
+            'businessId'    => $signatory['business_id'], 
+            'circuitId'     => $user['user_id'], 
+            'label'         => $redactor['short_label'],
+            'notes'         => $args['note'],
+            'sizeLimit'     => $_TOTAL_EMAIL_SIZE
+        ]);
+
+        if (!empty($prepareUpload['error'])) {
+            AttachmentModel::delete([
+                'where' => ['res_id = ?'],
+                'data'  => [$prepareUpload['jsonRequest']['id']]
+            ]);
+            return ['error' => $prepareUpload['error']];
+        }
+
+        return ['sended' => $prepareUpload['sended'], 'historyInfos' => $prepareUpload['historyInfos']];
+    }
+
+    /**
+     * Prepare letterbox, attachments (to sign) and annexes data
+     * 
+     * @param   array   $args
+     * @return  array
+     */
+    public static function prepareUpload(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['config', 'circuitId', 'label', 'resIdMaster']);
+        ValidatorModel::intVal($args, ['resIdMaster', 'sizeLimit']);
+        ValidatorModel::arrayType($args, ['config']);
+
+        $circuitId    = $args['circuitId'];
+        $label        = $args['label'];
+        $subscriberId = $args['businessId'];
+
+        $documentsToSign = [];
+        $documentsToSign['letterbox'] = ResModel::get([
+            'select' => ['res_id', 'path', 'filename', 'filesize', 'fingerprint', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations'],
+            'where'  => ['res_id = ?', 'filesize < ?'],
+            'data'   => [$args['resIdMaster'], $args['sizeLimit']]
+        ]);
+
+        if (!empty($documentsToSign['letterbox'][0]['docserver_id'])) {
+            $adrMainInfo   = ConvertPdfController::getConvertedPdfById(['resId' => $args['resIdMaster'], 'collId' => 'letterbox_coll']);
+            $letterboxPath = DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $docserverType = DocserverTypeModel::getById(['id' => $letterboxPath['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $documentsToSign['letterbox'][0]['fingerprint_mode'] = $docserverType['fingerprint_mode'];
+            $documentsToSign['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
+        }
+
+        $attachments = AttachmentModel::get([
+            'select'    => ['res_id as id', '(select false) as original', 'title', 'filesize', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'],
+            'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
+            'data'      => [$args['resIdMaster'], ['signed_response', 'response_json']]
+        ]);
+        
+        $annexes = [];
+        $documentsToSign['attachments'] = [];
+        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        foreach ($attachments as $key => $value) {
+
+            $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $value['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            $value['filePath']    = $annexeAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $value['path']) . $value['filename'];
+
+            $docserverType = DocserverTypeModel::getById(['id' => $annexeAttachmentPath['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+            $value['fingerprint_mode'] = $docserverType['fingerprint_mode'];
+            $fingerprint = StoreController::getFingerPrint(['filePath' => $value['filePath'], 'mode' => $docserverType['fingerprint_mode']]);
+            if ($value['fingerprint'] != $fingerprint) {
+                return ['error' => 'Fingerprints do not match'];
+            }
+            
+            if (!$attachmentTypes[$value['attachment_type']]['sign']) {
+                
+                unset($attachments[$key]);
+                $annexes[] = $value;
+            }
+            else{
+                $documentsToSign['attachments'][]= $value;
+            }
+        }
+
+        $documentsToSign['annexes'] = FastParapheurSmtpController::filterMainDocumentAttachments(['attachments' => $annexes, 'sizeLimit' => $args['sizeLimit']]);
+
+        $count = 0;
+        if (!empty($documentsToSign['letterbox'])) {
+            // make request json
+            $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
+                'res_id'        => $documentsToSign['letterbox'][0]['res_id'],
+                'clientDocType' => 'mainDocument',
+                'documentName'  => $documentsToSign['letterbox'][0]['filename'], 
+                'fingerprint'   => $documentsToSign['letterbox'][0]['fingerprint'], 
+                'hashAlgorithm' => $documentsToSign['letterbox'][0]['fingerprint_mode'], 
+                'circuitId'     => $circuitId,
+                'subscriberId'  => $subscriberId,
+                'label'         => $label,
+                'note'          => $args['note'], 
+                'attachments'   => $documentsToSign['annexes']['jsonAttachments'],
+                'resIdMaster'   => $args['resIdMaster'],
+            ]);
+            if (!empty($jsonRequest['error'])) {
+                return ['error' => $jsonRequest['error']];
+            }
+
+            $_annexes  = $documentsToSign['annexes']['emailAttachments'];
+            $_annexes[]= $jsonRequest;
+
+            $resultEmail = FastParapheurSmtpController::uploadEmail([
+                'config'            => $args['config'],
+                'note'              => $args['note'],
+                'documentsToSign'   => $documentsToSign['letterbox'][0],
+                'documentType'      => 'letterbox',
+                'attachments'       => $_annexes,
+                'resIdMaster'       => $args['resIdMaster'],
+                'circuitId'         => $circuitId,
+                'label'             => $label,
+                'subscriberId'      => $subscriberId,
+            ]);
+
+            if(!empty($resultEmail['error'])) {
+                return ['error' => $resultEmail['error'], 'jsonRequest' => $jsonRequest];
+            }
+            $count++;
+        }
+
+        
+        if (!empty($documentsToSign['attachments'])) {
+            foreach ($documentsToSign['attachments'] as $document) {
+             
+                // make request json
+                $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
+                    'res_id'        => $document['id'],
+                    'clientDocType'  => 'attachment',
+                    'documentName'  => $document['filename'], 
+                    'fingerprint'   => $document['fingerprint'], 
+                    'hashAlgorithm' => $document['fingerprint_mode'], 
+                    'circuitId'     => $circuitId,
+                    'subscriberId'  => $subscriberId,
+                    'label'         => $label,
+                    'note'          => $args['note'], 
+                    'attachments'   => $documentsToSign['annexes']['jsonAttachments'],
+                    'resIdMaster'   => $args['resIdMaster'],
+                ]);
+
+                if (!empty($jsonRequest['error'])) {
+                    return ['error' => $jsonRequest['error']];
+                }
+    
+                $_annexes = $documentsToSign['annexes']['emailAttachments'];
+                $_annexes[]= $jsonRequest;
+    
+                $resultEmail = FastParapheurSmtpController::uploadEmail([
+                    'config'            => $args['config'],
+                    'note'              => $args['note'],
+                    'documentsToSign'   => $document,
+                    'documentType'      => 'attachments',
+                    'attachments'       => $_annexes,
+                    'resIdMaster'       => $args['resIdMaster'],
+                    'circuitId'         => $circuitId,
+                    'label'             => $label,
+                    'subscriberId'      => $subscriberId,
+                ]);
+
+                if(!empty($resultEmail['error'])) {
+                    return ['error' => $resultEmail['error'], 'jsonRequest' => $jsonRequest];
+                }
+                $count++;
+            }
+        }
+
+        return ['sended' => $resultEmail['success'], 'historyInfos' => " $count email(s) was send successfully"];
+    }
+
+    /**
+     * Create and send mail
+     * 
+     * @param   array   $args
+     * @return  array
+     */
+    public static function uploadEmail($args)
+    {
+        ValidatorModel::notEmpty($args, ['config', 'circuitId', 'label', 'resIdMaster']);
+        ValidatorModel::intVal($args, ['resIdMaster', 'sizeLimit']);
+        ValidatorModel::arrayType($args, ['config']);
+
         $smtpConfig = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
 
         if (empty($smtpConfig)) {
@@ -58,49 +274,26 @@ class FastParapheurSmtpController
         }
         $smtpConfig = json_decode($smtpConfig['value'], true);
 
-        $_TOTAL_EMAIL_SIZE = FastParapheurSmtpController::convertSizeToOctets([
-            'size' => explode("|", $config['data']['emailSize'])[0],
-            'format' => explode("|", $config['data']['emailSize'])[1]
-        ]);
-
-        // get courrier
-        $mainDocument = FastParapheurSmtpController::getMainDocument(['res_id'=> $args['resIdMaster'], 'collId' => 'letterbox_coll', 'sizeLimit' => $_TOTAL_EMAIL_SIZE]);
-        if (!empty($mainDocument['error'])) {
-            return ['error' => $mainDocument['error']];
+        $document;
+        if ($args['documentType'] == 'letterbox') {
+            $document['id'] = $args['documentsToSign']['res_id'];
+            $document['isLinked'] = true;
+        } elseif ($args['documentType'] == 'attachments') {
+            $document['id'] = $args['resIdMaster'];
+            $document['isLinked'] = false;
+        } else {
+            return ['error' => 'documentType'];
         }
-        $_TOTAL_EMAIL_SIZE = $_TOTAL_EMAIL_SIZE - $mainDocument['documentFileSize'];
-
-        // get attachments
-        $attachments = FastParapheurSmtpController::getMainDocumentAttachments(['res_id'=> $args['resIdMaster']]);
-        if (!empty($attachments['error'])) {
-            return ['error' => $attachments['error']];
-        }
-        $attachments = FastParapheurSmtpController::filterMainDocumentAttachments(['attachments' => $attachments, 'sizeLimit' => $_TOTAL_EMAIL_SIZE]);
-
-        // make request json
-        $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
-            'config' => $config, 
-            'res_id'=> $args['resIdMaster'], 
-            'userId' => $args['userId'], 
-            'note' => $args['note'], 
-            'mainDocument' => $mainDocument, 
-            'attachments' => $attachments['jsonAttachments']
-        ]);
-        if (!empty($jsonRequest['error'])) {
-            return ['error' => $jsonRequest['error']];
-        }
-
-        $attachments['emailAttachments'][]= $jsonRequest;
 
         // create email and send it
         $emailId = EmailController::createEmail([
             'userId'    => $GLOBALS['id'],
             'data'      => [
                 'sender'        => ['email' => $smtpConfig['from']],
-                'recipients'    => [$config['data']['email']],
-                'object'        => $config['data']['subject'],
-                'body'          => empty($args['note']) ? '' : 'Annotation du documment ' . $args['note'],
-                'document'      => ['id' => $args['resIdMaster'], 'isLinked' => true, 'original' => false, 'attachments' => $attachments['emailAttachments']],
+                'recipients'    => [$args['config']['data']['email']],
+                'object'        => $args['config']['data']['subject'],
+                'body'          => (empty($args['documentsToSign']['note']) ? '' : 'Annotation du documment ' . $args['documentsToSign']['note']),
+                'document'      => ['id' => $document['id'], 'isLinked' => $document['isLinked'], 'original' => false, 'attachments' => $args['attachments']],
                 'isHtml'        => true,
                 'status'        => 'EXPRESS'
             ]
@@ -112,270 +305,87 @@ class FastParapheurSmtpController
 
         HistoryController::add([
             'tableName' => 'res_letterbox',
-            'recordId'  => $args['resIdMaster'],
+            'recordId'  => $document['id'],
             'eventType' => 'UP',
             'info'      => _SEND_TO_EXTERNAL_SB . ' : ' . _FAST_PARAPHEUR_SMTP,
             'eventId'   => 'sendToFastParapheurSmtp'                
         ]);
-
-        return ['sended' => 'success', 'historyInfos' => ' The Document was send successfully'];
-    }
-
-    public static function createDocument(Request $request, Response $response) {
-
-        $body = $request->getParsedBody();
-
-        $mainDocument = FastParapheurSmtpController::getMainDocument(['res_id'=> $body['res_id'], 'collId' => 'letterbox_coll']);
-        return $response->withStatus(400)->withJson($mainDocument);
-
-        ValidatorModel::notEmpty($body, ['clientDocId', 'clientDocType', 'documentName', 'documentHash', 'hashAlgorithm', 'documentBase64']);
-        ValidatorModel::stringType($body, ['clientDocType', 'documentName', 'documentHash', 'hashAlgorithm', 'documentBase64']);
-        ValidatorModel::intVal($body, ['clientDocId']);
-
-        if (empty($body['status'])) {
-            return $response->withStatus(409)->withJson(['errors' => "The object 'status' is missing. Exemple : \"status\": {\"message\": \"something\",\"type\": \"error|refused|signed\"}"]);
-        }
-        if (empty($body['status']['type'])) {
-            return $response->withStatus(409)->withJson(['errors' => 'The status type is missing!']);
-        }
-        if (empty($body['status']['message'])) {
-            return $response->withStatus(409)->withJson(['errors' => 'The status message is missing!']);
-        }
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
-        $config = [];
-
-        if (empty($loadedXml)) {
-            return $response->withStatus(404)->withJson(['Remote Signatory Books configuration is missing!']);
-        }
-
-        $config['id'] = (string)$loadedXml->signatoryBookEnabled;
-        foreach ($loadedXml->signatoryBook as $value) {
-            if ($value->id == $config['id']) {
-                $config['data'] = (array)$value;
-                break;
-            }
-        }
-
         
-
-        
-
-        if ($body['status']['type'] == $config['data']['errorState']) {
-            HistoryController::add([
-                'tableName' => 'res_letterbox',
-                'recordId'  => $body['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_ERROR . (!empty($body['status']['message']) ? ', ' . $body['status']['message'] : ''),
-                'eventId'   => 'fromFastParapheurSmtp'
-            ]);
-        }
-        else if ($body['status']['type'] == $config['data']['refusedState']) {
-            HistoryController::add([
-                'tableName' => 'res_letterbox',
-                'recordId'  => $body['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_REFUSED . (!empty($body['status']['message']) ? ', ' . $body['status']['message'] : ''),
-                'eventId'   => 'fromFastParapheurSmtp'
-            ]);
-        }
-        else if ($body['status']['type'] == $config['data']['signedState']) {
-            HistoryController::add([
-                'tableName' => 'res_letterbox',
-                'recordId'  => $body['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_SIGNED,
-                'eventId'   => 'fromFastParapheurSmtp'
-            ]);
-        }
-        else {
-            return $response->withStatus(400)->withJson(['The query syntax is incorrect.']);
-        }
-
-        return $response->withStatus(201)->withJson(['Document created']);
+        return ['success' => 'success'];
     }
-
-    public static function getMainDocument($args) {
-        ValidatorModel::notEmpty($args, ['res_id', 'sizeLimit']);
-        ValidatorModel::intVal($args, ['res_id', 'sizeLimit']);
-        ValidatorModel::stringType($args, ['collId']);
-
-        $document['res_id'] = $args['res_id'];
-
-        if (!empty($args['collId']) && in_array($args['collId'], ['letterbox_coll', 'attachments_coll'])) {
-            $document = ConvertPdfController::getConvertedPdfById(['resId' => $document['res_id'], 'collId' => $args['collId']]);
-            if (!empty($document['errors'])) {
-                return ['error' => 'Conversion error : ' . $document['errors'], 'code' => 400];
-            }
-
-            if (strtolower(pathinfo($document['filename'], PATHINFO_EXTENSION)) != 'pdf') {
-                return ['error' => 'Document can not be converted', 'code' => 400];
-            }
-        }
-
-        $docserver = DocserverModel::getByDocserverId([
-            'docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']
-        ]);
-        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return ['error' => 'Docserver does not exist', 'code' => 400];
-        }
-
-        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
-
-        if (!file_exists($pathToDocument)) {
-            return ['error' => 'Document not found on docserver', 'code' => 404];
-        }
-
-        $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
-        $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-        if ($document['fingerprint'] != $fingerprint) {
-            return ['error' => 'Fingerprints do not match', 'code' => 400];
-        }
-
-        // check size
-        $documentFileSize = DatabaseModel::select([
-            'select'    => ['filesize'],
-            'table'     => ['res_letterbox'],
-            'where'     => ['res_id = ?', 'filesize < ?'],
-            'data'      => [$args['res_id'], $args['sizeLimit']]
-        ]);
-        if (empty($documentFileSize)) {
-            return ['error' => "The main document size exceeds the allowed limit '" . FastParapheurSmtpController::convertOctetsToOther(['size' => $args['sizeLimit']]) . "'"];
-        }
-
-        return [
-            'documentName'      => $document['filename'],
-            'fingerprint'       => $document['fingerprint'],
-            "hashAlgorithm"     => $docserverType['fingerprint_mode'],
-            'pathToDocument'    => $pathToDocument,
-            'documentFileSize'  => $documentFileSize[0]['filesize']
-        ];
-
-    }
-
-    public static function getMainDocumentAttachments($args) {
-        ValidatorModel::notEmpty($args, ['res_id']);
-        ValidatorModel::intVal($args, ['res_id']);
-
-        $tmpAttachments = DatabaseModel::select([
-            'select'    => ['ra.res_id as id', '(select false) as original', 'ra.title', 'ra.format', 'ra.fingerprint', 'ra.filesize', 'dt.fingerprint_mode', 'CONCAT(d.path_template, ra.path, ra.filename) as file_path_name'],
-            'table'     => ['res_attachments as ra, docservers as d, docserver_types as dt'],
-            'where'     => ['ra.res_id_master = ?', 'ra.docserver_id = d.docserver_id', 'd.docserver_type_id = dt.docserver_type_id'],
-            'data'      => [$args['res_id']]
-        ]);
-
-        $errorMsg = '';
-        if (!empty($tmpAttachments)) {
-            foreach ($tmpAttachments as $key => $attachment) {
-                $fingerprint = StoreController::getFingerPrint(['filePath' => $attachment['file_path_name'], 'mode' => $attachment['fingerprint_mode']]);
-                if ($attachment['fingerprint'] != $fingerprint) {
-                    $errorMsg .= "Fingerprint do not match for file {$attachment['title']}\n";
-                    continue;
-                }
-                $attachments[]= $attachment;
-            }
-
-            if (!empty($errorMsg)) {
-                return ['error' => $errorMsg, 'code' => 400];
-            }
-        }
-        return ['attachments' => $attachments];
-    }
-
-    public static function filterMainDocumentAttachments($args) {
-        ValidatorModel::notEmpty($args, ['attachments', 'sizeLimit']);
+    
+    /**
+     * Filter attachments by checking the sizeLimit and prepare two arrays
+     * 
+     * @param   array   $args   sizeLimit(int) attachments(array)
+     * @return  array   jsonAttachments and emailAttachments
+     */
+    public static function filterMainDocumentAttachments($args) 
+    {
+        ValidatorModel::notEmpty($args, ['sizeLimit']);
         ValidatorModel::arrayType($args, ['attachments']);
         ValidatorModel::intVal($args, ['sizeLimit']);
 
-        $jsonAttachments = [];
+        $jsonAttachments  = [];
         $emailAttachments = [];
-        $currentSize = $args['sizeLimit'];
+        $currentSize      = $args['sizeLimit'];
 
         foreach ($args['attachments'] as $key => $attachment) {
 
-            if (filesize($attachment['filesize']) > 0 && $attachment['filesize'] < $currentSize) {
+            if (filesize($attachment['filePath']) > 0 && $attachment['filesize'] < $currentSize) {
                 
                 $jsonAttachments[]= array(
-                    "name" => $attachment['title'] . '.' . $attachment['format'],
-                    "hash" => $attachment['fingerprint'],
+                    "name"          => $attachment['title'] . '.' . $attachment['format'],
+                    "hash"          => $attachment['fingerprint'],
                     "hashAlgorithm" => $attachment['fingerprint_mode']
                 );
                 $emailAttachments[]= array(
-                    "id" => $attachment['id'],
-                    "original" => $attachment['original']
+                    "id"        => $attachment['id'],
+                    "original"  => $attachment['original']
                 );
                 $currentSize = $currentSize - $attachment['filesize'];
-            }            
+            }
         }
 
         return ['jsonAttachments' => $jsonAttachments, 'emailAttachments' => $emailAttachments];
     }
 
+    /**
+     * Create response json
+     * 
+     * @param   array   $args   resIdMaster(int) res_id(int) circuitId subscriberId
+     * @return  array   attachment id && original
+     */
     public static function makeJsonRequest($args) {
-        ValidatorModel::notEmpty($args, ['config', 'res_id', 'userId', 'mainDocument']);
-        ValidatorModel::intVal($args, ['res_id']);
+        ValidatorModel::notEmpty($args, ['resIdMaster', 'res_id', 'circuitId', 'subscriberId']);
+        ValidatorModel::intVal($args, ['resIdMaster', 'res_id']);
 
-        $jsonRequest = array(
-            "clientDocId" => $args['res_id'],
-            "clientDocType" => "mainDocument",
-            "documentName" => $args['mainDocument']['documentName'],
-            "documentHash" => $args['mainDocument']['fingerprint'],
-            "hashAlgorithm" => $args['mainDocument']['hashAlgorithm'],
-            "circuitId" => $args['userId'],
-            "businessId" => $args['config']['data']['subscriberId'],
-            "label" => "test label",
-            "comment" => empty($args['note']) ? '' : $args['note'],
-            "annexes" => $args['attachments']
-        );
+        $jsonRequest = [
+            "clientDocId"   => $args['res_id'],
+            "clientDocType" => $args['clientDocType'],
+            "documentName"  => $args['documentName'],
+            "documentHash"  => $args['fingerprint'],
+            "hashAlgorithm" => $args['hashAlgorithm'],
+            "circuitId"     => $args['circuitId'],
+            "businessId"    => $args['subscriberId'],
+            "label"         => $args['label'],
+            "comment"       => empty($args['note']) ? '' : $args['note'],
+            "annexes"       => $args['attachments']
+        ];
 
-        // $userCryptedPwd = UserModel::get([
-        //     'select'    => ['password'],
-        //     'where'     => ['user_id = ?'],
-        //     'data'      => [$GLOBALS['login']]
-        // ]);
-
-        $_body = [
-            'title'         => 'Request-Json',
-            'resIdMaster'   => $args['res_id'],
-            'type'          => 'simple_attachment',
+        $body = [
+            'title'         => 'response',
+            'resIdMaster'   => $args['resIdMaster'],
+            'type'          => 'response_json',
             'format'        => 'JSON',
+            'typist'        => $GLOBALS['id'],
             'encodedFile'   => base64_encode(json_encode($jsonRequest))
         ];
 
-        $id = StoreController::storeAttachment($_body);
+        $id = StoreController::storeAttachment($body);
         if (empty($id) || !empty($id['errors'])) {
-            return ['error' => '[AttachmentController create] ' . $id['errors']];
+            return ['error' => '[FastParapheurSmtpController makeJsonRequest] ' . $id['errors']];
         }
-
-        // this works
-        // $response = CurlModel::exec([
-        //     'url'      => $_SERVER['HTTP_ORIGIN'] . $_SERVER['PHP_SELF'] . '/../../rest/attachments',
-        //     'user'     => $GLOBALS['login'],
-        //     'password' => "maarch", //PasswordModel::decrypt(['cryptedPassword' => $userCryptedPwd[0]['password']]),
-        //     'method'   => 'POST',
-        //     'bodyData' => [
-        //         'title'         => 'Request-Json',
-        //         'resIdMaster'   => $args['res_id'],
-        //         'type'          => 'simple_attachment',
-        //         'format'        => 'JSON',
-        //         'encodedFile'   => base64_encode(json_encode($jsonRequest))
-        //     ]
-        // ]);
-        // var_dump($_COOKIE);
-
-        // $response = CurlModel::execSimple([
-        //     'url'           => $_SERVER['HTTP_ORIGIN'] . $_SERVER['PHP_SELF'] . '/../../rest/attachments',
-        //     'basicAuth'     => ['user' => $GLOBALS['login'], 'password' => PasswordModel::decrypt(['cryptedPassword' => $userCryptedPwd[0]['password']])],
-        //     'headers'       => ['content-type:application/json', 'Accept: application/json'],
-        //     'method'        => 'POST',
-        //     'body'          => json_encode([
-        //         'title'         => 'Request-Json',
-        //         'resIdMaster'   => $args['res_id'],
-        //         'type'          => 'request_json',
-        //         'format'        => 'JSON',
-        //         'encodedFile'   => base64_encode(json_encode($jsonRequest))
-        //     ])
-        // ]);
 
         if (!empty($response['errors'])) {
             return ['error' => $response['errors']];
@@ -387,7 +397,12 @@ class FastParapheurSmtpController
         ];
     }
 
-    public static function convertSizeToOctets($args) {
+    /**
+     * 
+     * @param   array       $args   size(int) format(string)
+     * @return  int|array   converted size or error
+     */
+    public static function convertSizeToBytes($args) {
         ValidatorModel::notEmpty($args, ['size', 'format']);
         ValidatorModel::intVal($args, ['size']);
         ValidatorModel::stringType($args, ['format']);
@@ -406,56 +421,5 @@ class FastParapheurSmtpController
             default:
                 return ['error' => "Unknown format to convert it's value"];
         }
-    }
-
-    public static function convertOctetsToOther($agrs) {
-        ValidatorModel::notEmpty($agrs, ['size']);
-        ValidatorModel::intVal($agrs, ['size']);
-
-        // Array with differents units
-        $octet = $agrs['size'];
-        $unite = array('Octet','Ko','Mo','Go', 'To');
-
-        if ($octet < 1000) // octet
-        {
-            return $octet.$unite[0];
-        }
-        elseif ($octet < 1000000) // ko
-        {
-            // $ko = round($octet/1024,2);
-            $ko = round($octet/1000,2);
-            return $ko.$unite[1];
-        }
-        elseif ($octet < 1000000000) // Mo 
-        {
-            // $mo = round($octet/(1024*1024),2);
-            $mo = round($octet/1000000,2);
-            return $mo.$unite[2];
-        }
-        elseif ($octet < 1000000000000) // Go 
-        {
-            // $go = round($octet/(1024*1024*1024),2);
-            $go = round($octet/1000000000,2);
-            return $go.$unite[3];
-        }
-        elseif ($octet < 1000000000000000) // To 
-        {
-            // $to = round($octet/(1024*1024*1024*1024),2);
-            $to = round($octet/1000000000000,2);
-            return $to.$unite[4];
-        }
-    }
-
-    public static function returnFilesUnderSizeLimit($args) {
-        ValidatorModel::notEmpty($args, ['files', 'sizeLimit']);
-        ValidatorModel::arrayType($args, ['files']);
-        ValidatorModel::intVal($args, ['sizeLimit']);
-
-        if (is_file($value) && file_exists($value)) {
-            if (filesize($value) < $args['sizeLimit']) {
-                return true;
-            }
-        }
-        return false;
     }
 }
