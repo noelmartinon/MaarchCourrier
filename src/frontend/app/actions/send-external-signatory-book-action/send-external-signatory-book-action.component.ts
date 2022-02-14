@@ -108,8 +108,6 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         realResSelected = this[this.signatoryBookEnabled].getRessources();
         datas = this[this.signatoryBookEnabled].getDatas();
 
-        console.log('JL http', this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas});
-        
         this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(
             tap((data: any) => {
                 if (!data) {
