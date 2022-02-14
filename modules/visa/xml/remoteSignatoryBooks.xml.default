@@ -43,9 +43,10 @@
 		<subscriberId></subscriberId>
 		<email></email>
 		<circuitId></circuitId>
+        <emailSize>8|Mo</emailSize>
 		<signedState>signed</signedState>
         <refusedState>refused</refusedState>
-        <errorState>error</errorState>
+        <errorState>error</errorState>        
 	</signatoryBook>
     <signatoryBook>
         <id>xParaph</id>
