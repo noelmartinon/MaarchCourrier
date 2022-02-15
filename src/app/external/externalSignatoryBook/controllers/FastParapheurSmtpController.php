@@ -33,6 +33,9 @@ use Resource\controllers\StoreController;
 use User\models\UserModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\CurlModel;
+use Group\controllers\PrivilegeController;
+use Resource\controllers\ResourceControlController;
+use Respect\Validation\Validator;
 
 /**
     * @codeCoverageIgnore
@@ -132,6 +135,8 @@ class FastParapheurSmtpController
             $documentsToSign['letterbox'][0]['fingerprint_mode'] = $docserverType['fingerprint_mode'];
             $documentsToSign['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
         }
+
+        $args['sizeLimit'] = $args['sizeLimit'] - $documentsToSign['letterbox']['filesize'];
 
         $attachments = AttachmentModel::get([
             'select'    => ['res_id as id', '(select false) as original', 'title', 'filesize', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'],
@@ -252,7 +257,7 @@ class FastParapheurSmtpController
             }
         }
 
-        return ['sended' => $resultEmail['success'], 'historyInfos' => " $count email(s) was send successfully"];
+        return ['sended' => $resultEmail['success'], 'historyInfos' => ", $count email(s) was send successfully"];
     }
 
     /**
@@ -261,7 +266,7 @@ class FastParapheurSmtpController
      * @param   array   $args
      * @return  array
      */
-    public static function uploadEmail($args)
+    public static function uploadEmail(array $args)
     {
         ValidatorModel::notEmpty($args, ['config', 'circuitId', 'label', 'resIdMaster']);
         ValidatorModel::intVal($args, ['resIdMaster', 'sizeLimit']);
@@ -274,7 +279,7 @@ class FastParapheurSmtpController
         }
         $smtpConfig = json_decode($smtpConfig['value'], true);
 
-        $document;
+        $document = [];
         if ($args['documentType'] == 'letterbox') {
             $document['id'] = $args['documentsToSign']['res_id'];
             $document['isLinked'] = true;
@@ -320,7 +325,7 @@ class FastParapheurSmtpController
      * @param   array   $args   sizeLimit(int) attachments(array)
      * @return  array   jsonAttachments and emailAttachments
      */
-    public static function filterMainDocumentAttachments($args) 
+    public static function filterMainDocumentAttachments(array $args) 
     {
         ValidatorModel::notEmpty($args, ['sizeLimit']);
         ValidatorModel::arrayType($args, ['attachments']);
@@ -356,7 +361,8 @@ class FastParapheurSmtpController
      * @param   array   $args   resIdMaster(int) res_id(int) circuitId subscriberId
      * @return  array   attachment id && original
      */
-    public static function makeJsonRequest($args) {
+    public static function makeJsonRequest(array $args) 
+    {
         ValidatorModel::notEmpty($args, ['resIdMaster', 'res_id', 'circuitId', 'subscriberId']);
         ValidatorModel::intVal($args, ['resIdMaster', 'res_id']);
 
@@ -402,7 +408,8 @@ class FastParapheurSmtpController
      * @param   array       $args   size(int) format(string)
      * @return  int|array   converted size or error
      */
-    public static function convertSizeToBytes($args) {
+    public static function convertSizeToBytes(array $args) 
+    {
         ValidatorModel::notEmpty($args, ['size', 'format']);
         ValidatorModel::intVal($args, ['size']);
         ValidatorModel::stringType($args, ['format']);
@@ -411,15 +418,135 @@ class FastParapheurSmtpController
             case 'O':
                 return $args['size'];
             case 'Ko':
-                return $args['size'] * 1000;
+                return $args['size'] * 1024;
             case 'Mo':
-                return $args['size'] * 1000000;
+                return $args['size'] * (1024*1024);
             case 'Go':
-                return $args['size'] * 1000000000;
+                return $args['size'] * (1024*1024*1024);
             case 'To':
-                return $args['size'] * 1000000000000;
+                return $args['size'] * (1024*1024*1024*1024);
             default:
                 return ['error' => "Unknown format to convert it's value"];
         }
+    }
+
+
+    public function createDocument(Request $request, Response $response) 
+    {
+        $body = $request->getParsedBody();
+        $body = StoreController::setDisabledFields($body);
+        
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        $config = [];
+
+        if (empty($loadedXml)) {
+            return $response->withStatus(404)->withJson(['Remote Signatory Books configuration is missing!']);
+        }
+        $config['id'] = (string)$loadedXml->signatoryBookEnabled;
+        foreach ($loadedXml->signatoryBook as $value) {
+            if ($value->id == $config['id']) {
+                $config['data'] = (array)$value;
+                break;
+            }
+        }
+
+        if (empty($body)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
+        } elseif (!Validator::arrayType()->notEmpty()->validate($body['metadata'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body metadata is missing or not an array']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['metadata']['clientDocType'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body metadata clientDocType is missing or not a string']);
+        } elseif(!in_array($body['metadata']['clientDocType'], ['mainDocument', 'attachment'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body metadata \'clientDocType\' require \'mainDocument\' or \'attachment\' as value']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['encodedFile'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body encodedFile is missing, empty or not a string']);
+        }
+
+        $result = [];
+
+        if ($body['metadata']['status']['type'] == $config['data']['errorState']) {
+
+            $res = FastParapheurStmpController::documentErrorState([
+                'clientDocId' => $body['metadeta']['clientDocId'],
+                'clientDocType' => $body['metadeta']['clientDocType'],
+            ]);
+
+            $historyInfo = 'La signature ' . $res['messageOfType'] . ' ' . $res['resId'] . ' (' . $res['table'] . ') a été en erreur dans le parapheur externe' . $res['additionalHistoryInfo'];
+            $result = ['success' => 'Document was updated with the error'];
+
+            // HistoryController::add([
+            //     'tableName' => 'res_letterbox',
+            //     'recordId'  => $body['clientDocId'],
+            //     'eventType' => 'UP',
+            //     // 'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_ERROR . (!empty($body['status']['message']) ? ', ' . $body['status']['message'] : ''),
+            //     'info'      => $historyInfo,
+            //     'eventId'   => 'fromFastParapheurSmtp'
+            // ]);
+
+        } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
+
+            $res = FastParapheurStmpController::documentRefusedState([
+                'clientDocId' => $body['metadeta']['clientDocId'],
+                'clientDocType' => $body['metadeta']['clientDocType'],
+            ]);
+
+            $historyInfo = 'La signature ' . $res['messageOfType'] . ' ' . $res['resId'] . ' (' . $res['table'] . ') a été refusé dans le parapheur externe' . $res['additionalHistoryInfo'];
+            $result = ['success' => 'Refused document was updated'];
+            
+            // HistoryController::add([
+            //     'tableName' => 'res_letterbox',
+            //     'recordId'  => $body['clientDocId'],
+            //     'eventType' => 'UP',
+            //     // 'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_REFUSED . (!empty($body['status']['message']) ? ', ' . $body['status']['message'] : ''),
+            //     'info'      => $historyInfo,
+            //     'eventId'   => 'fromFastParapheurSmtp'
+            // ]);
+        } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
+
+            $res = FastParapheurStmpController::documentSignedState([
+                'clientDocId' => $body['metadeta']['clientDocId'],
+                'clientDocType' => $body['metadeta']['clientDocType'],
+            ]);
+
+            $historyInfo = 'La signature ' . $res['messageOfType'] . ' ' . $res['resId'] . ' (' . $res['table'] . ') a été signé dans le parapheur externe' . $res['additionalHistoryInfo'];
+            $result = ['success' => 'Signed document created'];
+
+            // HistoryController::add([
+            //     'tableName' => 'res_letterbox',
+            //     'recordId'  => $body['clientDocId'],
+            //     'eventType' => 'UP',
+            //     // 'info'      => _RECEIVE_FROM_EXTERNAL . ' : ' . _DOCUMENT_SIGNED,
+            //     'info'      => $historyInfo,
+            //     'eventId'   => 'fromFastParapheurSmtp'
+            // ]);
+        }
+        else {
+            return $response->withStatus(400)->withJson(['The query syntax is incorrect.']);
+        }
+
+        return $response->withStatus(201)->withJson($result);
+    }
+
+
+    public static function documentErrorState(array $args) {
+
+        if (!Validator::stringType()->notEmpty()->validate($args['clientDocId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body metadata clientDocId is missing, empty or not a string']);
+        } elseif (!Validator::arrayType()->notEmpty()->validate($args['clientDocType'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body metadata clientDocType is missing, empty or not a string']);
+        }
+
+        if ($args['clientDocType'] == 'mainDocument') {
+
+        } elseif ($args['clientDocType'] == 'mainDocument') {
+            
+        } else {
+
+        }
+
+        return [
+            'messageOfType' => 'de la pièce jointe',
+            
+        ];
     }
 }
