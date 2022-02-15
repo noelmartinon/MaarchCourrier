@@ -181,7 +181,6 @@ export class VisaWorkflowComponent implements OnInit {
         if (!this.functions.empty(this.resId)) {
             await this.loadDefaultModel();
         }
-
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/availableCircuits?circuit=visa`).pipe(
                 tap((data: any) => {
@@ -535,7 +534,6 @@ export class VisaWorkflowComponent implements OnInit {
                 this.http.get(`../rest/listTemplates/${item.id}`).pipe(
                     tap((data: any) => {
                         this.visaWorkflow.items = this.visaWorkflow.items.concat(
-
                             data.listTemplate.items.map((itemTemplate: any) => {
                                 return {
                                     item_id: itemTemplate.item_id,
@@ -553,6 +551,7 @@ export class VisaWorkflowComponent implements OnInit {
                         );
                         this.searchVisaSignUser.reset();
                         this.searchVisaSignUserInput.nativeElement.blur();
+                        this.workflowUpdated.emit(this.visaWorkflow.items);
                         resolve(true);
                     })
                 ).subscribe();
