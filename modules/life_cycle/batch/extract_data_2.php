@@ -68,7 +68,7 @@ try {
 //chdir('../../..');
 /********************************   DEFINITION   **********************************************/
 $fichierDuJour = date('Y-m-d-Hi');
-$chemin = $GLOBALS['exportFolder'].'History_Stats_2'.$fichierDuJour.'.csv';
+$chemin = $GLOBALS['exportFolder'].'History_Stats_2_'.$fichierDuJour.'.csv';
 $delimiteur = ";";
 $extractData = fopen($chemin, 'w+');
 $countMail = 0;
