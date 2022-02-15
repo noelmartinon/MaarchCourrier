@@ -343,7 +343,7 @@ class StoreController
 
         if ($args['type'] == 'signed_response') {
             $linkSign = "{$args['originId']},res_attachments";
-            AttachmentModel::update(['set' => ['status' => 'SIGN'], 'where' => ['res_id = ?'], 'data' => [$args['originId']]]);
+            AttachmentModel::update(['set' => ['status' => 'SIGN'], 'where' => ['res_id = ?'], 'data' => [$args['originId']]]); 
             unset($args['originId']);
         }
 
