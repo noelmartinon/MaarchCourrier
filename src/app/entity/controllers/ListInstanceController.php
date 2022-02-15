@@ -266,16 +266,13 @@ class ListInstanceController
                 }
 
                 if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                    if (!is_numeric($instance['item_id'])) {
-                        $user = UserModel::getByLogin(['login' => $instance['item_id'], 'select' => ['id']]);
-                        $instance['item_id'] = $user['id'] ?? null;
-                    } else {
-                        $user = UserModel::getById(['id' => $instance['item_id'], 'select' => [1]]);
-                    }
+                    $user = UserModel::getByLogin(['login' => strval($instance['item_id']), 'select' => ['id']]);
+                    $instance['item_id'] = $user['id'] ?? null;
+               
                     $instance['item_type'] = 'user_id';
                     if (empty($user)) {
                         DatabaseModel::rollbackTransaction();
-                        return ['errors' => 'User not found', 'code' => 400];
+                        return ['errors' => 'User not found'.json_encode($instance['item_id']), 'code' => 400];
                     }
                 } elseif (in_array($instance['item_type'], ['entity_id', 'entity'])) {
                     if (!is_numeric($instance['item_id'])) {
