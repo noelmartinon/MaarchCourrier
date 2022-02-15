@@ -30,10 +30,10 @@
  */
 
 /*****************************************************************************
-WARNING : THIS BATCH ERASE RESOURCES IN DATABASE AND IN DOCSERVERS 
-Please note this batch deletes resources in the database 
-and storage spaces (docservers). 
-You need to run only if it is set -> Make especially careful to 
+WARNING : THIS BATCH ERASE RESOURCES IN DATABASE AND IN DOCSERVERS
+Please note this batch deletes resources in the database
+and storage spaces (docservers).
+You need to run only if it is set -> Make especially careful to
 define the where clause.
 FOR THE CASE OF AIP : to be used only if the AIP are single resources.
 *****************************************************************************/
@@ -65,493 +65,305 @@ try {
     echo "Maarch_CLITools required ! \n (pear.maarch.org)\n";
     exit(106);
 }
-
-/******************************************************************************/
-    $fichierDuJour = date('Y-m-d-Hi');
-    $chemin = $GLOBALS['exportFolder'].'History_Stats_2_'.$fichierDuJour.'.csv';
-    $delimiteur = ";";
-
-    $extractData = fopen($chemin, 'w+');
-    $GLOBALS['logger']->write('Create the file ' . $chemin, 'INFO');
-
-    fprintf($extractData, chr(0xEF).chr(0xBB).chr(0xBF));
-    fputcsv(
-        $extractData, 
-        array(
-            "Num Chrono",  //0
-            "Date d'enregistrement", 
-            "Date du courrier", 
-            "Objet du courrier", 
-            "Catégorie",
-            "Type du courrier", 
-            "Département",  //5
-            "Thésaurus", 
-            "Thème", 
-            "Sous Thème", 
-            "Classement",
-            "Nombre d'expéditeur",//10
-            "Civilité de l'expéditeur", 
-            "Prénom de l'expéditeur", 
-            "Nom de l'expéditeur", 
-            "Organisme de l'expéditeur", 
-            "Type de contact",  //15
-            "Nombre de tiers bénéficiaire",//10
-            "Prénom tiers bénéficiaire",
-            "Nom tiers bénéficiaire",
-            "Destinataire", 
-            "Service destinataire", 
-            "Services en copie", //20
-            "Statut du courrier", 
-            "Date limite de traitement", 
-            "Priorité", 
-            "Nombre de réponses", 
-            "Numéro chrono réponse", //25 
-            "Viseurs", 
-            "Signataire", 
-            "Date de signature", 
-            "Date de départ", 
-            "Nombre de transmissions", 
-            "Numéro chrono transmission 1", 
-            "Destinataire transmission 1", 
-            "Date de retour attendue 1", //35
-            "Date de retour 1", 
-            "Numéro chrono transmission 2", 
-            "Destinataire transmission 2", 
-            "Date de retour attendue 2", //40
-            "Date de retour 2", 
-            "Numéro chrono transmission 3", 
-            "Destinataire transmission 3", 
-            "Date de retour attendue 3", //45
-            "Date de retour 3", 
-            "Numéro chrono transmission 4", 
-            "Destinataire transmission 4", 
-            "Date de retour attendue 4", //50
-            "Date de retour 4", 
-        ),
-        $delimiteur
-    );
-
-    foreach ($GLOBALS['FromDateList'] as $key => $fromdatelist) {
-    
-    $GLOBALS['logger']->write('Select incoming mails created from last ' . $fromdatelist['FromDate'], 'INFO');
-    $querySelectedFile = "SELECT *  
-                        FROM " . $GLOBALS['view'] . " WHERE (cast(res_id as character varying) NOT IN (select distinct(record_id) as record_id from history where event_type like 'ACTION%' AND event_date >= current_timestamp - interval '".$fromdatelist['FromDate']."')) AND destination = '".$fromdatelist['EntityId']."' AND status <> 'DEL' AND status <> 'END' ORDER BY creation_date";
-    $stmt = Bt_doQuery(
-        $GLOBALS['db'], 
-        $querySelectedFile
-    );
-
-    $countMail = 0;
-    while($selectedFile = $stmt->fetchObject()) {
-
-        #### Contact type ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT ct.label FROM res_view_letterbox r LEFT JOIN contacts_v2 c ON c.contact_id = r.contact_id LEFT JOIN contact_types ct ON ct.id = c.contact_type WHERE r.res_id = ?", array($selectedFile->res_id)
-        );
-
-        $resContactType = $stmt2->fetchObject();
-        $contactType = $resContactType->label;
-
-	#### Parent Folder ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT folder_name FROM folders WHERE folders_system_id = ?", array($selectedFile->fold_parent_id)
-        );
-
-        $resParentFolder = $stmt2->fetchObject();
-        $parentFolder = $resParentFolder->folder_name;
+//chdir('../../..');
+/********************************   DEFINITION   **********************************************/
+$fichierDuJour = date('Y-m-d-Hi');
+$chemin = $GLOBALS['exportFolder'].'History_Stats_2'.$fichierDuJour.'.csv';
+$delimiteur = ";";
+$extractData = fopen($chemin, 'w+');
+$countMail = 0;
+$columns = [
+    "Num Chrono",  
+    "Date d'enregistrement",
+    "Date du courrier",
+    "Objet du courrier",
+    "Type du courrier",
+    "Nature",
+    "Département",  
+    "Thésaurus",
+    "Nombre d'expéditeurs",
+    "Civilité de l'expéditeur",
+    "Prénom de l'expéditeur",
+    "Nom de l'expéditeur",
+    "Organisme de l'expéditeur",
+    "Type de contact",  
+    "Nombre de tiers bénéficiaire",
+    "Tiers Bénéficiaires",
+    "Destinataire",
+    "Service destinataire",
+    "Services en copie", 
+    "Statut du courrier",
+    "Date limite de traitement",
+    "Priorité",
+    "Nombre de réponses",
+    "Numéro chrono réponse", 
+    "Viseurs",
+    "Signataire",
+    "Date de signature",
+    "Date d'envoi en visa",
+    "Date de départ",
+    "Nombre de transmissions",
+    "Numéro chrono transmission 0",
+    "Destinataire transmission 0",
+    "Date de retour attendue 0", 
+    "Date de retour 0",
+    "Numéro chrono transmission 1",
+    "Destinataire transmission 1",
+    "Date de retour attendue 1", 
+    "Date de retour 1",
+    "Numéro chrono transmission 2",
+    "Destinataire transmission 2",
+    "Date de retour attendue 2", 
+    "Date de retour 2",
+    "Numéro chrono transmission 3",
+    "Destinataire transmission 3",
+    "Date de retour attendue 3", 
+    "Date de retour 3",
+    "Numéro chrono transmission 4",
+    "Destinataire transmission 4",
+    "Date de retour attendue 4", 
+    "Date de retour 4",
+];
 
 
-        #### User Name ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT lastname, firstname FROM users WHERE user_id = ?", array($selectedFile->dest_user)
-        );
+/********************************   PROCESS   **********************************************/
 
-        $userName = $stmt2->fetchObject();
-        $userName = strtoupper($userName->lastname) . " " . ucfirst($userName->firstname);
+$GLOBALS['logger']->write('Create the file ' . $chemin, 'INFO');
 
-        #### Status ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT label_status FROM status WHERE id = ?", array($selectedFile->status)
-        );
+fprintf($extractData, chr(0xEF).chr(0xBB).chr(0xBF));
+fputcsv($extractData, $columns, $delimiteur);
+foreach ($GLOBALS['FromDateList'] as $key => $fromdatelist) {
+$GLOBALS['logger']->write('Select incoming mails created from last ' . $fromdatelist['FromDate'], 'INFO');
 
-        $LabelStatus = $stmt2->fetchObject();
-        $LabelStatus = ucfirst($LabelStatus->label_status);
+/**** Retrieve Civilities ****/
+$civilities = \SrcCore\models\CurlModel::exec([
+    'url'           => rtrim($GLOBALS['MaarchUrl'], '/') . '/rest/civilities' ,
+    'user'          => $GLOBALS['WsUser'],
+    'password'      => $GLOBALS['WsPasswd'],
+    'headers'       => ['Content-Type:application/json'],
+    'method'        => 'GET'
+]);
+$civilities = $civilities['civilities'];
 
-        #### Civility ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT c.title FROM contacts_v2 c left join res_view_letterbox res on c.contact_id = res.contact_id WHERE res.res_id = ?", array($selectedFile->res_id)
-        );
 
-        $LabelCivility = $stmt2->fetchObject();
-        $LabelCivility = $LabelCivility->title;
+$querySelectedFile = "SELECT *  FROM res_view_letterbox r
+                    LEFT JOIN status s on s.id = r.status
+                    LEFT JOIN priorities p on p.id = r.priority
+                    WHERE cast(res_id as character varying) 
+                    NOT IN (select distinct(record_id) 
+                    as record_id from history 
+                    where event_type like 'ACTION%' 
+                    AND event_date >= current_timestamp - interval '".$fromdatelist['FromDate']."') 
+                    AND destination = '".$fromdatelist['EntityId']."' 
+                    AND status <> 'DEL' 
+                    AND status <> 'END' 
+                    ORDER BY creation_date";
 
-        #### Department Full Name ####
-        $department_name = "";
-        if($selectedFile->department_number_id <> ""){
-            $department_name = $selectedFile->department_number_id . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$selectedFile->department_number_id];
+
+$stmt = Bt_doQuery($GLOBALS['db'], $querySelectedFile);
+while($selectedFile = $stmt->fetchObject()) {
+    $line = [];
+    foreach ($columns as $value) {
+        $line[$value] = "";
+    }
+    $customfields = "SELECT custom_fields FROM res_letterbox WHERE res_id = $selectedFile->res_id;";
+    $stmtCustom = Bt_doQuery($GLOBALS['db'], $customfields);
+    while ($customfield = $stmtCustom->fetch()){
+        $customfields_array = json_decode($customfield['custom_fields']);
+    }
+    foreach ($customfields_array as $key => $value) {
+        if ($key==3){
+            if($value <> ""){
+                $department_name = $value . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$value];
+            }
+            $line["Département"]= $department_name; 
         }
-
-        #### Info contacts ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode <> 'third'", array($selectedFile->res_id)
-        );
-
-        $Nb_contact = $stmt2->fetchObject();
-        $Nb_contact = $Nb_contact->nb;
-
-        $contact_lastname = "";
-        $contact_firstname = "";
-        $contact_title = "";
-        $contact_society = "";
-        $contact_type = "";
-
-        if ($Nb_contact < 1) {
-            $stmt2 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT contact_id FROM res_view_letterbox WHERE res_id = ?", array($selectedFile->res_id)
-            );
-
-            $contact_id = $stmt2->fetchObject();
-            $contact_id = $contact_id->contact_id;
-
-            if ($contact_id <> "") {
-                $Nb_contact = 1;
-                $contact_lastname = $selectedFile->contact_lastname;
-                $contact_firstname = $selectedFile->contact_firstname;
-                $contact_title = $LabelCivility;
-                $contact_society = $selectedFile->contact_society;
-                $contact_type = $contactType;
-
-		 $stmt2 = Bt_doQuery(
-                        $GLOBALS['db'], 
-                        "SELECT contact_target FROM contact_types WHERE label like ?", array($contact_type)
-                );
-                $contactType = $stmt2->fetchObject();
-
-                if($contactType->contact_target == 'corporate'){
-                        $stmt2 = Bt_doQuery(
-                                $GLOBALS['db'], 
-                                "SELECT lastname, firstname, title FROM contact_addresses WHERE id = ? and contact_id = ?", array($selectedFile->address_id, $contact_id)
-                        );
-                        $contact_1 = $stmt2->fetchObject();
-                        $contact_lastname = $contact_1->lastname;
-                        $contact_firstname = $contact_1->firstname;
-                        $contact_title = $contact_1->title;
+        elseif ($key==1){
+            $line["Nature"]= $value; 
+        }
+        elseif ($key==2){
+            $line["Date de départ"]= format_date_db($value); 
+        }
+        elseif ($key==7){
+            $line["Nombre de tiers bénéficiaire"]=count($value);
+            $index =count($value);
+            foreach ($value as $key => $value) {
+                $contact = NomPrenomContact($value->id);
+                $line["Tiers Bénéficiaires"].= $contact;
+                if ($key < $index -1){
+                    $line["Tiers Bénéficiaires"].= ", \n";
                 }
-
-            } else {
-                $Nb_contact = 0;
             }
-        } else {
-
-            $stmt2 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT contact_id FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode <> 'third'", array($selectedFile->res_id)
-            );
-
-            $contactId = $stmt2->fetchObject();
-
-
-            if(is_numeric($contactId->contact_id)){
-                $stmt2 = Bt_doQuery(
-                    $GLOBALS['db'], 
-                    "SELECT lastname, firstname, title, society, contact_type FROM contacts_v2 WHERE contact_id = ?", array($contactId->contact_id)
-                );
-                $contact_1 = $stmt2->fetchObject();
-                $contact_lastname = $contact_1->lastname;
-                $contact_firstname = $contact_1->firstname;
-                $contact_title = $contact_1->title;
-                $contact_society = $contact_1->society;
-
-		$stmt2 = Bt_doQuery(
-    			$GLOBALS['db'], 
-    			"SELECT label, contact_target FROM contact_types WHERE id = ?", array($contact_1->contact_type)
-		);
-		$contactType = $stmt2->fetchObject();
-		$contact_type = $contactType->label;
-		
-		if($contactType->contact_target == 'corporate'){
-        		$stmt2 = Bt_doQuery(
-        			$GLOBALS['db'], 
-        			"SELECT lastname, firstname, title FROM contact_addresses WHERE id = ? and contact_id = ?", array($selectedFile->address_id, $contactId->contact_id)
-        		);
-        		$contact_1 = $stmt2->fetchObject();
-        		$contact_lastname = $contact_1->lastname;
-        		$contact_firstname = $contact_1->firstname;
-        		$contact_title = $contact_1->title;
-		}
-            }else{
-                 $stmt2 = Bt_doQuery(
-                    $GLOBALS['db'], 
-                    "SELECT lastname, firstname, entity_id FROM users, users_entities WHERE users.user_id = ? AND users.user_id = users_entities.user_id AND users_entities.primary_entity = ? ", array($contactId->contact_id,'Y')
-                );
-                $contact_1 = $stmt2->fetchObject();
-                $contact_lastname = $contact_1->lastname;
-                $contact_firstname = $contact_1->firstname;
-                $contact_title = '';
-                $contact_society = $contact_1->entity_id;
-                $contact_type = 'Interne';
-            }
-            
-
-            
         }
-
-        #### Info tiers beneficaires ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT count(*) as nb FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode = 'third'", array($selectedFile->res_id)
-        );
-
-        $Nb_contact_third = $stmt2->fetchObject();
-        $Nb_contact_third = $Nb_contact_third->nb;
-
-        $contactThird_lastname = "";
-        $contactThird_firstname = "";
-        $contactThird_title = "";
-        $contactThird_society = "";
-        $contactThird_type = "";
-
-        $stmt2 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT * FROM contacts_res WHERE coll_id = 'letterbox_coll' and res_id = ? and mode = 'third'", array($selectedFile->res_id)
-            );
-
-            $contactThirdId = $stmt2->fetchObject();
-
-
-            if(is_numeric($contactThirdId->contact_id)){
-                $stmt2 = Bt_doQuery(
-                    $GLOBALS['db'], 
-                    "SELECT lastname, firstname, title, society, contact_type FROM contacts_v2 WHERE contact_id = ?", array($contactThirdId->contact_id)
-                );
-                $contactThird_1 = $stmt2->fetchObject();
-                $contactThird_lastname = $contactThird_1->lastname;
-                $contactThird_firstname = $contactThird_1->firstname;
-                $contactThird_title = $contactThird_1->title;
-                $contactThird_society = $contactThird_1->society;
-
-        $stmt2 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT label, contact_target FROM contact_types WHERE id = ?", array($contactThird_1->contact_type)
-        );
-        $contactThirdType = $stmt2->fetchObject();
-        $contactThird_type = $contactThirdType->label;
-        
-        if($contactThirdType->contact_target == 'corporate'){
-                $stmt2 = Bt_doQuery(
-                    $GLOBALS['db'], 
-                    "SELECT lastname, firstname, title FROM contact_addresses WHERE id = ? and contact_id = ?", array($contactThirdId->address_id, $contactThirdId->contact_id)
-                );
-                $contactThird_1 = $stmt2->fetchObject();
-                $contactThird_lastname = $contactThird_1->lastname;
-                $contactThird_firstname = $contactThird_1->firstname;
-                $contactThird_title = $contactThird_1->title;
-        }
-            }else{
-                 $stmt2 = Bt_doQuery(
-                    $GLOBALS['db'], 
-                    "SELECT lastname, firstname, entity_id FROM users, users_entities WHERE users.user_id = ? AND users.user_id = users_entities.user_id AND users_entities.primary_entity = ? ", array($contactThirdId->contact_id,'Y')
-                );
-                $contactThird_1 = $stmt2->fetchObject();
-                $contactThird_lastname = $contactThird_1->lastname;
-                $contactThird_firstname = $contactThird_1->firstname;
-                $contactThird_title = '';
-                $contactThird_society = $contactThird_1->entity_id;
-                $contactThird_type = 'Interne';
-            }
-
-        #### Service destinataire ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT short_label FROM entities WHERE entity_id = ?", array($selectedFile->destination)
-        );
-
-        $destination = $stmt2->fetchObject();
-        $destination = $destination->short_label;
-
-        #### Services en copies ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT e.short_label FROM entities e LEFT JOIN listinstance l on l.item_id = e.entity_id WHERE l.item_mode = 'cc' and l.item_type = 'entity_id' and res_id = ?", array($selectedFile->res_id)
-        );        
-
-        $array_entities_cc = array();
-        while($entities = $stmt2->fetchObject()){
-            $array_entities_cc[] = $entities->short_label;
-        }
-
-        $txt_entities_cc = implode(", ", $array_entities_cc);
-
-        #### Projet de réponse ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT identifier, typist, creation_date FROM res_attachments WHERE attachment_type = 'response_project' and res_id_master = ? and status <> 'DEL' and status <> 'OBS' ORDER BY creation_date desc", array($selectedFile->res_id)
-        );
-
-        $arrayAttachments = array();
-        $signed_response = $stmt2->fetchObject();
-
-
-        #### Viseur Name ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT lastname,firstname,to_char(l.process_date,'DD/MM/YYYY à HH12:MI') as process_date from listinstance l RIGHT JOIN users u ON l.item_id = u.user_id WHERE res_id = ? and item_mode = 'visa' ORDER BY sequence ASC", array($selectedFile->res_id)
-        );
-        $visa_list_arr = array();
-        while ($visa_list = $stmt2->fetchObject()) {
-            $visa_list_arr[] = $visa_list->lastname . ' ' . $visa_list->firstname . ' (date de visa :'.$visa_list->process_date . ')';
-        }
-        if($stmt2->rowCount()<>0){
-            $visa_list_arr = implode(' → ', $visa_list_arr);
-        }else{
-            $visa_list_arr = '';
-        }
-        
-
-        #### Signataire Name ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT u.lastname || ' ' || u.firstname as user, l.process_date FROM users u, listinstance l WHERE user_id in (SELECT item_id FROM listinstance WHERE item_mode = 'sign' and res_id = ?) and l.listinstance_id in (SELECT listinstance_id FROM listinstance WHERE item_mode = 'sign' and res_id = ?)", array($selectedFile->res_id,$selectedFile->res_id)
-        );
-        $signataire = $stmt2->fetchObject();
-
-        array_push($arrayAttachments, array( "identifier" => $signed_response->identifier, "typist" => strtoupper($signataire->lastname) . " " . ucfirst($signataire->firstname), "creation_date" => format_date_db($signed_response->creation_date, "", $GLOBALS['databasetype'])));
-
-        #### Nombre de Projet de réponse ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT count(1) as total FROM res_attachments WHERE attachment_type = 'response_project' and res_id_master = ? and status <> 'DEL' and status <> 'OBS'", array($selectedFile->res_id)
-        );
-
-        $NbResponseProject = $stmt2->fetchObject();
-        $NbResponseProject = $NbResponseProject->total;
-
-        #### Nb Transmission ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT count(1) as total FROM res_attachments WHERE attachment_type = 'transmission' and res_id_master = ? and status <> 'DEL' and status <> 'OBS'", array($selectedFile->res_id)
-        );
-
-        $NbTransmission = $stmt2->fetchObject();
-        $NbTransmission = $NbTransmission->total;
-
-        #### Transmission ####
-        $stmt2 = Bt_doQuery(
-            $GLOBALS['db'], 
-            "SELECT identifier, dest_contact_id, validation_date, effective_date, dest_address_id FROM res_attachments WHERE attachment_type = 'transmission' and res_id_master = ? and status <> 'DEL' and status <> 'OBS' ORDER BY creation_date DESC LIMIT 4", array($selectedFile->res_id)
-        );
-
-        $arrayTransmission = array();
-
-        while ($signed_response = $stmt2->fetchObject()){
-
-            $stmt3 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT lastname, firstname, society, is_corporate_person FROM contacts_v2 WHERE contact_id = ? ", array($signed_response->dest_contact_id)
-            );
-            $dest_contact = $stmt3->fetchObject();
-
-	    if($dest_contact->is_corporate_person == 'Y'){
-		$stmt3 = Bt_doQuery(
-                $GLOBALS['db'], 
-                "SELECT lastname, firstname FROM contact_addresses WHERE contact_id = ? and id = ?", array($signed_response->dest_contact_id,$signed_response->dest_address_id)
-            );
-		$dest_contact2 = $stmt3->fetchObject();
-
-		array_push($arrayTransmission, array( "identifier" => $signed_response->identifier, "dest_contact" => $dest_contact->society . " - " . strtoupper($dest_contact2->lastname) . " " . ucfirst($dest_contact2->firstname), "validation_date" => format_date_db($signed_response->validation_date, "", $GLOBALS['databasetype']), "effective_date" => format_date_db($signed_response->effective_date, "", $GLOBALS['databasetype'])));
-	    }else{
-		array_push($arrayTransmission, array( "identifier" => $signed_response->identifier, "dest_contact" => strtoupper($dest_contact->lastname) . " " . ucfirst($dest_contact->firstname) . " " . $dest_contact->society, "validation_date" => format_date_db($signed_response->validation_date, "", $GLOBALS['databasetype']), "effective_date" => format_date_db($signed_response->effective_date, "", $GLOBALS['databasetype'])));
-	    }
-        }
-                
-        fputcsv(
-            $extractData, 
-            array(
-                $selectedFile->alt_identifier,
-                format_date_db(str_replace("/", "-",$selectedFile->creation_date), "", $GLOBALS['databasetype']),
-                format_date_db(str_replace("/", "-",$selectedFile->doc_date), "", $GLOBALS['databasetype']),
-                $selectedFile->subject,             
-                $selectedFile->category_id,
-                $selectedFile->type_label,
-                $department_name,  //5
-                $parentFolder,
-                $selectedFile->folder_name,//"Sous Thème", 
-                $selectedFile->doc_custom_t2,
-                $Nb_contact, //nombre d'expéditeur   //10
-                $GLOBALS['mail_titles'][$contact_title],//"Civilité de l'expéditeur"
-                $contact_firstname,
-                $contact_lastname, 
-                $contact_society,
-                $contact_type,  //15
-                $Nb_contact_third, //nb tiers benef
-                $contactThird_firstname, //prenom tiers benef
-                $contactThird_lastname, //nom tiers benef
-                $userName,
-                $destination,
-                $txt_entities_cc,// "Services en copie", 
-                $LabelStatus,
-                format_date_db(str_replace("/", "-",$selectedFile->process_limit_date), "", $GLOBALS['databasetype']),
-                $GLOBALS['mail_priorities'][$selectedFile->priority],
-                $NbResponseProject, 
-                $arrayAttachments[0]['identifier'], //25 
-                $visa_list_arr, // viseurs
-                $signataire->user, 
-                $signataire->process_date, 
-                format_date_db(str_replace("/", "-",$selectedFile->departure_date), "", $GLOBALS['databasetype']), // date de départ
-                $NbTransmission, 
-                $arrayTransmission[0]['identifier'], //"Numéro chrono transmission 1", 
-                $arrayTransmission[0]['dest_contact'], //"Destinataire transmission 1", 
-                $arrayTransmission[0]['validation_date'],//"Date de retour 1", 
-                $arrayTransmission[0]['effective_date'],//"Date de retour 1", 
-                $arrayTransmission[1]['identifier'], //"Numéro chrono transmission 2", 
-                $arrayTransmission[1]['dest_contact'], //"Destinataire transmission 2", 
-                $arrayTransmission[1]['validation_date'], //"Date de retour 2", 
-                $arrayTransmission[1]['effective_date'], //"Date de retour 2", 
-                $arrayTransmission[2]['identifier'], //"Numéro chrono transmission 3", 
-                $arrayTransmission[2]['dest_contact'], //"Destinataire transmission 3", 
-                $arrayTransmission[2]['validation_date'], //"Date de retour 3", 
-                $arrayTransmission[2]['effective_date'], //"Date de retour 3", 
-                $arrayTransmission[3]['identifier'], //"Numéro chrono transmission 4", 
-                $arrayTransmission[3]['dest_contact'], //"Destinataire transmission 4", 
-                $arrayTransmission[3]['validation_date'], //"Date de retour 4", */
-                $arrayTransmission[3]['effective_date'] //"Date de retour 4", */
-            ), 
-            $delimiteur
-        );
-        $countMail++;
     }
-    }
-    fclose($extractData);
 
+    /**** "Thésaurus" ****/
+    $stmt2 = Bt_doQuery(
+        $GLOBALS['db'], 
+        "SELECT tags.label FROM tags, resources_tags WHERE tags.id = resources_tags.tag_id and resources_tags.res_id = ?", array($selectedFile->res_id)
+    );
+    $iTags = 0;
+    while($resTags = $stmt2->fetchObject()){
+        if ($iTags >0) {
+            $line["Thésaurus"] .= ", ";
+        }
+        $line["Thésaurus"].= $resTags->label;
+        $iTags++;
+    }
+
+    /**** "Destinataire" ****/
+    $stmt2 = Bt_doQuery(
+        $GLOBALS['db'], 
+        "SELECT concat(firstname,' ',lastname) as fullname from users where user_id = ?", array($selectedFile->dest_user)
+    );
+    $destuserFullname=$stmt2->fetchObject();
+    $line["Destinataire"]=$destuserFullname->fullname;
+
+    /**** "Services en copies" ****/
+    $stmt2 = Bt_doQuery(
+        $GLOBALS['db'], 
+        "SELECT e.short_label FROM entities e LEFT JOIN listinstance l on l.item_id = e.entity_id WHERE l.item_mode = 'cc' and l.item_type = 'entity_id' and res_id = ?", array($selectedFile->res_id)
+    );        
+    $array_entities_cc = array();
+    while($entities = $stmt2->fetchObject()){
+        $array_entities_cc[] = $entities->short_label;
+    }
+    $line["Services en copie"] = implode(", ", $array_entities_cc);
+    $stmt2 = Bt_doQuery(
+        $GLOBALS['db'], 
+        "SELECT concat(u.firstname,' ',u.lastname) as fullname,l.process_date as process_date FROM listinstance l left join users u ON u.user_id = l.item_id WHERE l.item_mode = 'sign' and l.res_id = ?", array($selectedFile->res_id)
+    );    
+    $signatory=$stmt2->fetchObject();
+    $line["Signataire"] = $signatory->fullname;
+    $line["Date de signature"] = format_date_db($signatory->process_date);
+       
+    /**** "Viseurs" ****/
+    $stmt2 = Bt_doQuery(
+        $GLOBALS['db'], 
+        "SELECT lastname,firstname,process_date from listinstance l RIGHT JOIN users u ON l.item_id = u.user_id WHERE l.res_id = ? and item_mode = 'visa' ORDER BY sequence ASC", array($selectedFile->res_id)
+    );   
+    $visa_list_arr = array();
+    while ($visa_list = $stmt2->fetchObject()) {
+        $visa_list_arr[] = $visa_list->lastname . ' ' . $visa_list->firstname . ' (date de visa :'.$visa_list->process_date . ')';
+    }
+    if(count($visa_list_arr)<>0){
+        $line["Viseurs"] = implode(' → ', $visa_list_arr);
+    }else{
+        $line["Viseurs"] = '';
+    }
+        
+    /**** "Nombre d'expéditeurs" ****/
+    $sqlCountExp = "select count(rc.id) as count from resource_contacts rc left join contacts c on c.id = rc.item_id where rc.mode = 'sender' and rc.res_id = $selectedFile->res_id;";
+    $stmtCountExp = Bt_doQuery($GLOBALS['db'], $sqlCountExp);
+    $countExp = $stmtCountExp->fetchObject();
+    $line["Nombre d'expéditeurs"] = $countExp->count;
+
+    /**** "Infos expéditeurs" ****/
+    $sqlExp = "select * from resource_contacts rc left join contacts c on c.id = rc.item_id where rc.mode = 'sender' and rc.res_id = $selectedFile->res_id;";
+    $stmtExp = Bt_doQuery($GLOBALS['db'], $sqlExp);
+    $ivarExpediteur = 0;
+    while($exp = $stmtExp->fetchObject()){
+        if ($ivarExpediteur > 0){
+            $line["Civilité de l'expéditeur"] .= "\n".$civilities[$exp->civility]['label'];
+            $line["Prénom de l'expéditeur"] .= "\n".$exp->firstname;
+            $line["Nom de l'expéditeur"] .= "\n".$exp->lastname;
+            $line["Organisme de l'expéditeur"] .= "\n".$exp->company; 
+            $line["Type de contact"] .= "\n".$exp->function;
+        }
+        else {
+            $line["Civilité de l'expéditeur"] .= $civilities[$exp->civility]['label'];
+            $line["Prénom de l'expéditeur"] .= $exp->firstname;
+            $line["Nom de l'expéditeur"] .= $exp->lastname;
+            $line["Organisme de l'expéditeur"] .= $exp->company;
+            $line["Type de contact"] .= $exp->function;
+        }
+        $iivarExpediteur++;
+    }
+
+    /**** "Nombre de réponses" ****/
+    $sqlCountAttachments = "select count(*) as count from res_attachments where attachment_type = 'response_project' and status <> 'DEL' and status <> 'OBS' and res_id_master = $selectedFile->res_id;";
+    $stmtCountAttachments = Bt_doQuery($GLOBALS['db'], $sqlCountAttachments);
+    $countAttachments = $stmtCountAttachments->fetchObject();
+    $line["Nombre de réponses"] = $countAttachments->count;
+
+    /**** "Numéro chrono réponse" ****/
+    $sqlAttachments = "select identifier,creation_date from res_attachments where attachment_type = 'response_project' and status <> 'DEL' and status <> 'OBS' and res_id_master = $selectedFile->res_id;";
+    $stmtAttachments = Bt_doQuery($GLOBALS['db'], $sqlAttachments);
+    $iResponses = 0;
+    while($resAttachments = $stmtAttachments->fetchObject()){
+        if ($iResponses > 0) {
+            $line["Numéro chrono réponse"] .= ", "."\n".$resAttachments->identifier;
+        }
+        else {
+            $line["Numéro chrono réponse"].= $resAttachments->identifier;
+        }
+        $iResponses++;
+    }
+
+    /**** "Nombre de transmissions" ****/
+    $sqlCountTransmission = "select count(*) as count from res_attachments where attachment_type = 'transmission' and res_id_master = $selectedFile->res_id;";
+    $stmtCountTransmission = Bt_doQuery($GLOBALS['db'], $sqlCountTransmission);
+    $countTransmission = $stmtCountTransmission->fetchObject();
+    $line["Nombre de transmissions"] = $countTransmission->count;
+
+    $sqlTransmission = "select identifier, validation_date, effective_date, concat(lastname,' ',firstname) as name from res_attachments ra left join contacts c on c.id = ra.recipient_id where attachment_type = 'transmission' and res_id_master = $selectedFile->res_id limit 4;";
+    $stmtTransmission = Bt_doQuery($GLOBALS['db'], $sqlTransmission);
+    //function to read all line and split in a table.
+    $arrayTransmission = splitInColumn($stmtTransmission);
+
+    /**** "Main Request Values" ****/
+    $line["Num Chrono"] = $selectedFile->alt_identifier;
+    $line["Date d'enregistrement"] = format_date_db($selectedFile->creation_date, true);//format_date_db
+    $line["Date du courrier"] = format_date_db($selectedFile->doc_date);//format_date_db
+    $line["Objet du courrier"] = $selectedFile->subject;
+    $line["Type du courrier"] = $selectedFile->doctypes_second_level_label;
+    $line["Date limite de traitement"] = format_date_db($selectedFile->process_limit_date, true);
+    $line["Statut du courrier"] = $selectedFile->label_status;
+    $line["Priorité"] = $selectedFile->label;
+    $line["Nombre de transmissions"] = $stmtTransmission->count;
+    $line["Service destinataire"] = $selectedFile->destination;
+
+    
+    $stmtCsvColumnsTransmissions = [
+        "identifier" => "Numéro chrono transmission ",
+        "validation_date" => "Date de retour ",
+        "effective_date" => "Date de retour attendue ", 
+        "name" => "Destinataire transmission "
+    ];
+    
+    foreach ($arrayTransmission as $key => $value) {
+            foreach ($stmtCsvColumnsTransmissions as $stmtValue => $csvColumns) {
+                     $line[$csvColumns.$key] = $value->$stmtValue;
+            }
+    }
+
+    fputcsv($extractData, $line, $delimiteur);
+    $countMail++;
+}
+}
+fclose($extractData);
+
+
+/********************************   END   **********************************************/
 $GLOBALS['logger']->write($countMail . ' incoming mails selected', 'INFO');
 $GLOBALS['logger']->write('End of process', 'INFO');
-// Bt_logInDataBase(
-//     $GLOBALS['totalProcessedResources'], 0, 'process without error'
-// );
-unlink($GLOBALS['lckFile']);
+
+
+//unlink($GLOBALS['lckFile']);
 exit($GLOBALS['exitCode']);
 
+
+
+
+/********************************   FUNCTIONS   **********************************************/
 /**
 * Returns a formated date for SQL queries
 *
 * @param  $date date Date to format
-* @param  $insert bool If true format the date to insert in the database (true by default)
 * @return Formated date or empty string if any error
 */
-function format_date_db($date, $insert=true, $databasetype= '', $withTimeZone=false)
+function format_date_db($date, $withTimeZone=false)
 {
-    if (isset($_SESSION['config']['databasetype'])
-        && ! empty($_SESSION['config']['databasetype'])) {
-        $databasetype = $_SESSION['config']['databasetype'];
-    }
-
     if ($date <> "" ) {
         $var = explode('-', $date);
 
@@ -575,37 +387,37 @@ function format_date_db($date, $insert=true, $databasetype= '', $withTimeZone=fa
         if ($year <= "1900") {
             return '';
         } else {
-            if ($databasetype == "SQLSERVER") {
-                if ($withTimeZone) {
-                    return  $day . "-" . $month . "-" . $year . " &nbsp;  " . $hours;
-                }else{
-                    return  $day . "-" . $month . "-" . $year;
-                }
-                
-            } else if ($databasetype == "POSTGRESQL") {
-                if ($_SESSION['config']['lang'] == "fr") {
-                    if ($withTimeZone) {
-                        return $day . "-" . $month . "-" . $year . "  &nbsp; " . $hours;
-                    }else{
-                        return $day . "-" . $month . "-" . $year;
-                    }
-                } else {
-                    if ($withTimeZone) {
-                        return $year . "-" . $month . "-" . $day . "  &nbsp; " . $hours;
-                    }else{
-                        return $year . "-" . $month . "-" . $day;
-                    }
-                }
-            } else if ($databasetype == "ORACLE") {
-                
-                return  $day . "-" . $month . "-" . $year;
-            } else if ($databasetype == "MYSQL" && $insert) {
-                return $year . "-" . $month . "-" . $day;
-            } else if ($databasetype == "MYSQL" && !$insert) {
-                return  $day . "-" . $month . "-" . $year;
+            if ($withTimeZone) {
+                return $day . "-" . $month . "-" . $year . "  &nbsp; " . $hours;
+            }else{
+                return $day . "-" . $month . "-" . $year;
             }
         }
     } else {
         return '';
     }
+}
+
+
+/**
+* Returns a formated date for SQL queries
+*
+* @param stmt statement with multiple line
+* @return array for each line
+*/
+function splitInColumn($stmt){
+    $stmtParsed = [];
+    $i = 0;
+    while($line = $stmt->fetchObject()) {
+        $stmtParsed[$i] = $line;
+        $i ++;
+    }
+    return $stmtParsed;
+}
+
+function NomPrenomContact($id){
+    $sqlContact = "select concat(firstname,' ',lastname) as fullname from contacts where id = $id;";
+    $fullnameContact = Bt_doQuery($GLOBALS['db'], $sqlContact);
+    $fullnameContact=$fullnameContact->fetch();
+    return $fullnameContact['fullname'];
 }
