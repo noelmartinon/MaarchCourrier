@@ -91,7 +91,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
 
     setRedirectUserRes(user: any) {
         if (this.data.user.user_id != user.id) {
-            this.userDestDifflistsRedirectUserId = user.id;
+            this.userDestDifflistsRedirectUserId = user.serialId;
         } else {
             this.userDestDifflistsRedirectUserId = null;
             this.notify.error(this.translate.instant('lang.userUnauthorized'));
@@ -158,6 +158,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
             });
         });
         return new Promise((resolve) => {
+  
             this.http.put(`../rest/listinstances`, this.userDestDifflists).pipe(
                 tap((data: any) => {
                     if (data && data.hasOwnProperty('errors')) {

@@ -266,9 +266,12 @@ class ListInstanceController
                 }
 
                 if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                    $user = UserModel::getByLogin(['login' => strval($instance['item_id']), 'select' => ['id']]);
-                    $instance['item_id'] = $user['id'] ?? null;
-               
+                    if (!is_numeric($instance['item_id'])) {
+                        $user = UserModel::getByLogin(['login' => $instance['item_id'], 'select' => ['id']]);
+                        $instance['item_id'] = $user['id'] ?? null;
+                    } else {
+                        $user = UserModel::getById(['id' => $instance['item_id'], 'select' => [1]]);
+                    }
                     $instance['item_type'] = 'user_id';
                     if (empty($user)) {
                         DatabaseModel::rollbackTransaction();
