@@ -98,7 +98,7 @@ class FastParapheurSmtpController
             'businessId'    => $signatory['business_id'], 
             'circuitId'     => $user['user_id'], 
             'label'         => $redactor['short_label'],
-            'notes'         => $args['note'],
+            'note'         => $args['note'],
             'sizeLimit'     => $_TOTAL_EMAIL_SIZE
         ]);
 
@@ -336,7 +336,7 @@ class FastParapheurSmtpController
                 'sender'        => ['email' => $args['smtpConfig']['from']],
                 'recipients'    => [$args['config']['data']['email']],
                 'object'        => $args['config']['data']['subject'],
-                'body'          => (empty($args['documentsToSign']['note']) ? '' : 'Annotation du documment ' . $args['documentsToSign']['note']),
+                'body'          => (empty($args['note']) ? '' : $args['note']),
                 'document'      => ['id' => $document['id'], 'isLinked' => $document['isLinked'], 'original' => false, 'attachments' => $document['attachments']],
                 'isHtml'        => true,
                 'status'        => 'EXPRESS'
@@ -512,7 +512,7 @@ class FastParapheurSmtpController
                 'clientDocType' => $body['metadata']['clientDocType'],
                 'info'          => $historyInfo
             ]);
-            $result = ['info' => 'Document was updated with the error', 'code' => 400];
+            $result = ['info' => 'Document was updated with the error', 'code' => 200];
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
 
@@ -523,7 +523,7 @@ class FastParapheurSmtpController
                 'clientDocType' => $body['metadeta']['clientDocType'],
                 'info'          => $historyInfo
             ]);
-            $result = ['info' => 'Refused document was updated', 'code' => 400];
+            $result = ['info' => 'Refused document was updated', 'code' => 200];
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
 
