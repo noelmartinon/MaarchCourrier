@@ -86,6 +86,10 @@ footer {
         /*change color of underline when focused*/
         background-color: white !important;
     }
+
+    ::ng-deep.mat-form-field-appearance-outline .mat-form-field-suffix {
+        top: 0;
+    }
 }
 
 .login-form:before {
