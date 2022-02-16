@@ -42,7 +42,6 @@
         <id>fastParapheurSmtp</id>
         <subscriberId></subscriberId>
         <email></email>
-        <circuitId></circuitId>
         <emailSize>8|Mo</emailSize>
         <signedState>signed</signedState>
         <refusedState>refused</refusedState>

@@ -51,7 +51,7 @@ class FastParapheurSmtpController
      */
     public static function sendDatas(array $args)
     {
-        $config = $args['config'];
+        $config = $args['config'];  
         $_TOTAL_EMAIL_SIZE = FastParapheurSmtpController::convertSizeToBytes([
             'size'      => explode("|", $config['data']['emailSize'])[0],
             'format'    => explode("|", $config['data']['emailSize'])[1]
@@ -96,7 +96,7 @@ class FastParapheurSmtpController
             'smtpConfig'    => $smtpConfig,
             'resIdMaster'   => $args['resIdMaster'], 
             'businessId'    => $signatory['business_id'], 
-            'circuitId'     => $config['data']['circuitId'], 
+            'circuitId'     => $user['user_id'], 
             'label'         => $redactor['short_label'],
             'notes'         => $args['note'],
             'sizeLimit'     => $_TOTAL_EMAIL_SIZE
@@ -144,8 +144,6 @@ class FastParapheurSmtpController
             $documentsToSign['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
         }
 
-        
-
         $attachments = AttachmentModel::get([
             'select'    => ['res_id as id', '(select false) as original', 'title', 'filesize', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'],
             'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
@@ -187,49 +185,57 @@ class FastParapheurSmtpController
             if ($mainDocumentIntegration['inSignatureBook'] && empty($externalId['signatureBookId'])) {
                 // check size
                 if ($sizeLimit < $documentsToSign['letterbox'][0]['filesize']) {
-                    return ['error' => 'The main document is to heavy to send via email', 'jsonRequest' => null];
+                    HistoryController::add([
+                        'tableName' => 'res_letterbox',
+                        'recordId'  => $document['id'],
+                        'eventType' => 'UP',
+                        'info'      => _SEND_TO_EXTERNAL_SB . ' - ' . _FAST_PARAPHEUR_SMTP . ' : The main document size \'' . $documentsToSign['letterbox'][0]['subject'] . '\' was to heavy to send via email',
+                        'eventId'   => 'sendToFastParapheurSmtp'                
+                    ]);
                 }
-                $sizeLimit = $sizeLimit - $documentsToSign['letterbox'][0]['filesize'];
+                else {
+                    $sizeLimit = $sizeLimit - $documentsToSign['letterbox'][0]['filesize'];
 
-                $documentsToSign['annexes'] = FastParapheurSmtpController::filterMainDocumentAttachments(['attachments' => $annexes, 'sizeLimit' => $sizeLimit]);
+                    $documentsToSign['annexes'] = FastParapheurSmtpController::filterMainDocumentAttachments(['attachments' => $annexes, 'sizeLimit' => $sizeLimit]);
 
-                // make request json
-                $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
-                    'res_id'        => $documentsToSign['letterbox'][0]['res_id'],
-                    'clientDocType' => 'mainDocument',
-                    'documentName'  => $documentsToSign['letterbox'][0]['subject'] . '.pdf', 
-                    'fingerprint'   => $documentsToSign['letterbox'][0]['fingerprint'], 
-                    'hashAlgorithm' => $documentsToSign['letterbox'][0]['fingerprint_mode'], 
-                    'circuitId'     => $circuitId,
-                    'subscriberId'  => $subscriberId,
-                    'label'         => $label,
-                    'note'          => $args['note'], 
-                    'attachments'   => $documentsToSign['annexes']['jsonAttachments'],
-                    'resIdMaster'   => $args['resIdMaster'],
-                ]);
-                if (!empty($jsonRequest['error'])) {
-                    return ['error' => $jsonRequest['error']];
+                    // make request json
+                    $jsonRequest = FastParapheurSmtpController::makeJsonRequest([
+                        'res_id'        => $documentsToSign['letterbox'][0]['res_id'],
+                        'clientDocType' => 'mainDocument',
+                        'documentName'  => $documentsToSign['letterbox'][0]['subject'] . '.pdf', 
+                        'fingerprint'   => $documentsToSign['letterbox'][0]['fingerprint'], 
+                        'hashAlgorithm' => $documentsToSign['letterbox'][0]['fingerprint_mode'], 
+                        'circuitId'     => $circuitId,
+                        'subscriberId'  => $subscriberId,
+                        'label'         => $label,
+                        'note'          => $args['note'], 
+                        'attachments'   => $documentsToSign['annexes']['jsonAttachments'],
+                        'resIdMaster'   => $args['resIdMaster'],
+                    ]);
+                    if (!empty($jsonRequest['error'])) {
+                        return ['error' => $jsonRequest['error']];
+                    }
+
+                    $_annexes  = $documentsToSign['annexes']['emailAttachments'];
+                    $_annexes[]= $jsonRequest;
+
+                    $resultEmail = FastParapheurSmtpController::uploadEmail([
+                        'config'            => $args['config'],
+                        'smtpConfig'        => $args['smtpConfig'],
+                        'note'              => $args['note'],
+                        'documentsToSign'   => $documentsToSign['letterbox'][0],
+                        'documentType'      => 'letterbox',
+                        'attachments'       => $_annexes,
+                        'resIdMaster'       => $args['resIdMaster'],
+                        'label'             => $label,
+                        'subscriberId'      => $subscriberId,
+                    ]);
+
+                    if(!empty($resultEmail['error'])) {
+                        return ['error' => $resultEmail['error'], 'jsonRequest' => $jsonRequest];
+                    }
+                    $count++;
                 }
-
-                $_annexes  = $documentsToSign['annexes']['emailAttachments'];
-                $_annexes[]= $jsonRequest;
-
-                $resultEmail = FastParapheurSmtpController::uploadEmail([
-                    'config'            => $args['config'],
-                    'smtpConfig'        => $args['smtpConfig'],
-                    'note'              => $args['note'],
-                    'documentsToSign'   => $documentsToSign['letterbox'][0],
-                    'documentType'      => 'letterbox',
-                    'attachments'       => $_annexes,
-                    'resIdMaster'       => $args['resIdMaster'],
-                    'label'             => $label,
-                    'subscriberId'      => $subscriberId,
-                ]);
-
-                if(!empty($resultEmail['error'])) {
-                    return ['error' => $resultEmail['error'], 'jsonRequest' => $jsonRequest];
-                }
-                $count++;
             }
         }
 
