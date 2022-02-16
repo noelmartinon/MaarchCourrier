@@ -445,4 +445,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     emptyData() {
         return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
     }
+
+    getLabel(id: any) {
+        return this.datas?.find((item: any) => item.id === id)?.label?.replaceAll('&nbsp;', '');
+    }
 }
