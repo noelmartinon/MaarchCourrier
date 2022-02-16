@@ -39,12 +39,12 @@
         <refusedState>Refusé</refusedState>
     </signatoryBook>
     <signatoryBook>
-		<id>fastParapheurSmtp</id>
-		<subscriberId></subscriberId>
-		<email></email>
-		<circuitId></circuitId>
+        <id>fastParapheurSmtp</id>
+        <subscriberId></subscriberId>
+        <email></email>
+        <circuitId></circuitId>
         <emailSize>8|Mo</emailSize>
-		<signedState>signed</signedState>
+        <signedState>signed</signedState>
         <refusedState>refused</refusedState>
         <errorState>error</errorState>        
 	</signatoryBook>
