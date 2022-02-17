@@ -165,6 +165,13 @@ define('_LINK_ADDED_TAG', 'Tag link added');
 define('_LINK_DELETED_TAG', 'Tag link deleted');
 define('_LOGIN', 'User connection');
 define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (by email)');
+define('_MAIN_DOCUMENT_SIGNED_FROM_SB', 'The main document has been signed from the external signature book');
+define('_MAIN_DOCUMENT_REFUSED_FROM_SB', 'The main document has been refused from the external signature book');
+define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'The main document was in error from the external signature book');
+define('_ATTACHMENT_SIGNED_FROM_SB', 'The attachment has been refused from the external signature book');
+define('_ATTACHMENT_REFUSED_FROM_SB', 'The attachment has been refused from the external signature book');
+define('_ATTACHMENT_ERROR_FROM_SB', 'The attachment was in error from the external signature book');
+
 
 // ADMINISTRATION
 define('_USERS', 'Users');
