@@ -424,14 +424,17 @@ class ContactGroupController
                         'name'              => $contactToDisplay['contact']['contact'],
                         'address'           => $contactToDisplay['contact']['address'],
                         'sector'            => $contactToDisplay['contact']['sector'],
-                        'thresholdLevel'    => $contactToDisplay['contact']['thresholdLevel']
+                        'thresholdLevel'    => $contactToDisplay['contact']['thresholdLevel'],
+                        'email'              => $contactToDisplay['contact']['email']
                     ];
                 }
             } elseif ($correspondent['correspondent_type'] == 'user') {
+                $userEmail = UserModel::getById(['id' => $correspondent['correspondent_id'], 'select' => ['mail']]);
                 $correspondents[] = [
                     'id'    => $correspondent['correspondent_id'],
                     'type'  => $correspondent['correspondent_type'],
-                    'name'  => UserModel::getLabelledUserById(['id' => $correspondent['correspondent_id']])
+                    'name'  => UserModel::getLabelledUserById(['id' => $correspondent['correspondent_id']]),
+                    'email' => $userEmail['mail']
                 ];
             } elseif ($correspondent['correspondent_type'] == 'entity') {
                 $entity = EntityModel::getById(['id' => $correspondent['correspondent_id'], 'select' => ['*']]);
