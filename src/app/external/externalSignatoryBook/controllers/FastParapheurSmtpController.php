@@ -500,17 +500,12 @@ class FastParapheurSmtpController
         }
 
         $result = [];
-        $table = ($body['metadata']['clientDocType'] == 'mainDocument' ? 'res_letterbox' : 'res_attachment');
-        $messageOfType = ($body['metadata']['clientDocType'] == 'mainDocument' ? 'du document principal' : 'de la pièce jointe');
 
         if ($body['metadata']['status']['type'] == $config['data']['errorState']) {
 
-            $historyInfo = 'La signature ' . $messageOfType . ' ' . $body['metadata']['clientDocId'] . ' (' . $table . ') a été en erreur dans le parapheur externe. ' . $body['metadata']['status']['message'];
-
             $res = FastParapheurSmtpController::documentErrorState([
                 'clientDocId'   => $body['metadata']['clientDocId'],
-                'clientDocType' => $body['metadata']['clientDocType'],
-                'info'          => $historyInfo
+                'clientDocType' => $body['metadata']['clientDocType']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -519,12 +514,9 @@ class FastParapheurSmtpController
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
 
-            $historyInfo = 'La signature ' . $messageOfType . ' ' . $body['metadata']['clientDocId'] . ' (' . $table . ') a été refusé dans le parapheur externe. ' . $body['metadata']['status']['message'];
-            
             $res = FastParapheurSmtpController::documentRefusedState([
                 'clientDocId'   => $body['metadata']['clientDocId'],
-                'clientDocType' => $body['metadata']['clientDocType'],
-                'info'          => $historyInfo
+                'clientDocType' => $body['metadata']['clientDocType']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -533,13 +525,10 @@ class FastParapheurSmtpController
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
 
-            $historyInfo = 'La signature ' . $messageOfType . ' ' . $body['metadata']['clientDocId'] . ' (' . $table . ') a été signé dans le parapheur externe. ' . $body['metadata']['status']['message'];
-            
             $res = FastParapheurSmtpController::documentSignedState([
                 'clientDocId'   => $body['metadata']['clientDocId'],
                 'clientDocType' => $body['metadata']['clientDocType'],
-                'encodedFile'   => $body['encodedFile'],
-                'info'          => $historyInfo
+                'encodedFile'   => $body['encodedFile']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -564,7 +553,6 @@ class FastParapheurSmtpController
 
         if ($args['clientDocType'] == 'mainDocument') {
             
-
             ResModel::update([
                 'set' => ['status' => 'COU'],
                 'where' => ['res_id = ?'],
@@ -574,16 +562,11 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $args['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' . $args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_ERROR_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
-            // return [
-            //     'messageOfType' => 'du document principal',
-            //     'resId' => $args['clientDocId'],
-            //     'table' => 'res_letterbox'
-            // ];
         } elseif ($args['clientDocType'] == 'attachment') {
             ListInstanceModel::update([
                 'set' => ['process_date' => null],
@@ -599,16 +582,10 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_attachment',
                 'recordId'  => $args['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_ERROR_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);         
-
-            // return [
-            //     'messageOfType' => 'de la pièce jointe',
-            //     'resId' => $args['clientDocId'],
-            //     'table' => 'res_attachment'
-            // ];
         }
     }
 
@@ -629,8 +606,8 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $args['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' . $args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_REFUSED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         } elseif ($args['clientDocType'] == 'attachment') {
@@ -649,8 +626,8 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_attachment',
                 'recordId'  => $args['clientDocId'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_REFUSED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
@@ -708,8 +685,8 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $resLetterbox['res_id'],
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_SIGNED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         } elseif ($args['clientDocType'] == 'attachment') {
@@ -766,8 +743,8 @@ class FastParapheurSmtpController
             HistoryController::add([
                 'tableName' => 'res_attachment',
                 'recordId'  => $storeControllerId,
-                'eventType' => 'UP',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
+                'eventType' => 'ACTION#1',
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         }
