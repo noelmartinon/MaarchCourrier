@@ -79,8 +79,8 @@ $columns = [
     "Objet du courrier",
     "Type du courrier",
     "Nature",
-    "Département",  
     "Thésaurus",
+    "Département",
     "Nombre d'expéditeurs",
     "Civilité de l'expéditeur",
     "Prénom de l'expéditeur",
@@ -169,13 +169,13 @@ while($selectedFile = $stmt->fetchObject()) {
         $customfields_array = json_decode($customfield['custom_fields']);
     }
     foreach ($customfields_array as $key => $value) {
-        if ($key==3){
+/*         if ($key==3){
             if($value <> ""){
                 $department_name = $value . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$value];
             }
             $line["Département"]= $department_name; 
-        }
-        elseif ($key==1){
+        } */
+        if ($key==1){
             $line["Nature"]= $value; 
         }
         elseif ($key==2){
@@ -186,6 +186,7 @@ while($selectedFile = $stmt->fetchObject()) {
             $index =count($value);
             foreach ($value as $key => $value) {
                 $contact = NomPrenomContact($value->id);
+                $dptcontact = retrieveDepartment($value->id);
                 $line["Tiers Bénéficiaires"].= $contact;
                 if ($key < $index -1){
                     $line["Tiers Bénéficiaires"].= ", \n";
@@ -274,7 +275,14 @@ while($selectedFile = $stmt->fetchObject()) {
             $line["Organisme de l'expéditeur"] .= $exp->company;
             $line["Type de contact"] .= $exp->function;
         }
-        $iivarExpediteur++;
+        $ivarExpediteur++;
+
+    }
+    $sqlDptExp = "select * from resource_contacts rc left join contacts c on c.id = rc.item_id where rc.mode = 'sender' and rc.res_id = $selectedFile->res_id limit 1;";
+    $stmtDptExp = Bt_doQuery($GLOBALS['db'], $sqlDptExp);
+    while($dptExp = $stmtDptExp->fetchObject()){
+        $dptExp = $dptExp->address_postcode;
+        $line["Département"] = retrieveDepartment($dptExp);
     }
 
     /**** "Nombre de réponses" ****/
@@ -310,7 +318,7 @@ while($selectedFile = $stmt->fetchObject()) {
 
     /**** "Main Request Values" ****/
     $line["Num Chrono"] = $selectedFile->alt_identifier;
-    $line["Date d'enregistrement"] = format_date_db($selectedFile->creation_date, true);//format_date_db
+    $line["Date d'enregistrement"] = format_date_db($selectedFile->creation_date);//format_date_db
     $line["Date du courrier"] = format_date_db($selectedFile->doc_date);//format_date_db
     $line["Objet du courrier"] = $selectedFile->subject;
     $line["Type du courrier"] = $selectedFile->type_label;
@@ -416,4 +424,19 @@ function NomPrenomContact($id){
     $fullnameContact = Bt_doQuery($GLOBALS['db'], $sqlContact);
     $fullnameContact=$fullnameContact->fetch();
     return $fullnameContact['fullname'];
+}
+
+function retrieveDepartment($postcode){
+    //pour les DOMTOM
+    $postcode = trim($postcode);
+    $postcodetest = substr($postcode,0,2);
+    if ($postcodetest == "97"){
+        $postcode = substr($postcode,0,3);
+        $department_name = $postcode . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$postcode];
+    }
+    else{
+        $postcode = $postcodetest;
+        $department_name = $postcode . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$postcode];
+    }
+    return $department_name;
 }
