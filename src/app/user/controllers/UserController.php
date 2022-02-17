@@ -1681,8 +1681,9 @@ class UserController
             'userId'    => 'user_id',
             'firstname' => 'firstname',
             'lastname'  => 'lastname',
-            'phone'     => 'phone',
-            'mail'      => 'mail'
+            'mail'      => 'mail',
+            'phone'     => 'phone'
+            
         ];
         $personalFields = ['phone'];
 
