@@ -2579,5 +2579,6 @@
     "shippingSubscriptionDesc": "Permet de synchroniser les événements depuis Maileva (Historique et Preuve de dépôt)",
     "uploadNewVersion": "Téléverser une nouvelle version du document",
     "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
-    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant."
+    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant.",
+    "emptyEmails": "Les correspondants du groupe ne contiennent pas d'adresses e-mail"
 }

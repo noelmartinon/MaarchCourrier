@@ -706,16 +706,20 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         this[type].splice(this[type].length - 1, 1);
 
         if (item.type === 'contactGroup') {
-            this.http.get(`../rest/contactsGroups/${item.id}`).pipe(
+            this.http.get(`../rest/contactsGroups/${item.id}/correspondents?limit=none`).pipe(
                 map((data: any) => {
-                    data = data.contactsGroup.contacts.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
+                    data = data.correspondents.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
                         label: contact.contact,
                         email: contact.email
                     }));
                     return data;
                 }),
                 tap((data: any) => {
-                    this[type] = this[type].concat(data);
+                    if (this.functions.empty(data)) {
+                        this.notify.error(this.translate.instant('lang.emptyEmails'));
+                    } else {
+                        this[type] = this[type].concat(data);
+                    }
                 }),
                 catchError((err) => {
                     this.notify.handleSoftErrors(err);
