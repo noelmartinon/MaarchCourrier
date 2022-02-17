@@ -679,7 +679,7 @@ class FastParapheurSmtpController
             DatabaseModel::delete([
                 'table' => 'adr_letterbox',
                 'where' => ['res_id = ?', 'type in (?)', 'version = ?'],
-                'data'  => [$resId, ['SIGN', 'TNL'], $resLetterbox['version']]
+                'data'  => [$resLetterbox['res_id'], ['SIGN', 'TNL'], $resLetterbox['version']]
             ]);
             $storeResult = DocserverController::storeResourceOnDocServer([
                 'collId'          => 'letterbox_coll',
@@ -690,7 +690,7 @@ class FastParapheurSmtpController
             DatabaseModel::insert([
                 'table'         => 'adr_letterbox',
                 'columnsValues' => [
-                    'res_id'       => $args['clientDocId'],
+                    'res_id'       => $resLetterbox['res_id'],
                     'type'         => 'SIGN',
                     'docserver_id' => $storeResult['docserver_id'],
                     'path'         => $storeResult['destination_dir'],
@@ -703,11 +703,11 @@ class FastParapheurSmtpController
             ResModel::update([
                 'set' => ['status' => 'COU'],
                 'where' => ['res_id = ?'],
-                'data' => [$args['clientDocId']]
+                'data' => [$resLetterbox['res_id']]
             ]);
             HistoryController::add([
                 'tableName' => 'res_letterbox',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $resLetterbox['res_id'],
                 'eventType' => 'UP',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
                 'eventId'   => 'fromFastParapheurSmtp'
