@@ -552,36 +552,53 @@ class FastParapheurSmtpController
         }
 
         if ($args['clientDocType'] == 'mainDocument') {
-            
+            $resLetterbox = ResModel::get([
+                'select' => ['*'],
+                'where'  => ['res_id = ?'],
+                'data'   => [$args['clientDocId']]
+            ])[0];
+            if (empty($resLetterbox)) {
+                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+            }
+
             ResModel::update([
                 'set' => ['status' => 'COU'],
                 'where' => ['res_id = ?'],
-                'data' => [$args['clientDocId']]
+                'data' => [$resLetterbox['res_id']]
             ]);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $resLetterbox['res_id'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_ERROR_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
         } elseif ($args['clientDocType'] == 'attachment') {
+            $fetchedAttachment = AttachmentModel::get([
+                'select'  => ['*'],
+                'where'   => ['res_id = ?'],
+                'data'    => [$args['clientDocId']]
+            ])[0];
+            if (empty($fetchedAttachment)) {
+                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+            }
+
             ListInstanceModel::update([
                 'set' => ['process_date' => null],
                 'where' => ['res_id = ?', 'difflist_type = ?'],
-                'data' => [$value['clientDocId'], 'VISA_CIRCUIT']
+                'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
                 'set'     => ['status' => 'A_TRA'],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$fetchedAttachment['res_id']]
             ]);
             HistoryController::add([
                 'tableName' => 'res_attachment',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_ERROR_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
@@ -597,35 +614,52 @@ class FastParapheurSmtpController
         }
 
         if ($args['clientDocType'] == 'mainDocument') {
+            $resLetterbox = ResModel::get([
+                'select' => ['*'],
+                'where'  => ['res_id = ?'],
+                'data'   => [$args['clientDocId']]
+            ])[0];
+            if (empty($resLetterbox)) {
+                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+            }
+
             ResModel::update([
                 'set' => ['status' => 'COU'],
                 'where' => ['res_id = ?'],
-                'data' => [$args['clientDocId']]
+                'data' => [$resLetterbox['res_id']]
             ]);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $resLetterbox['res_id'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_REFUSED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         } elseif ($args['clientDocType'] == 'attachment') {
-
+            $fetchedAttachment = AttachmentModel::get([
+                'select'  => ['*'],
+                'where'   => ['res_id = ?'],
+                'data'    => [$args['clientDocId']]
+            ])[0];
+            if (empty($fetchedAttachment)) {
+                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+            }
+            
             ListInstanceModel::update([
                 'set' => ['process_date' => null],
                 'where' => ['res_id = ?', 'difflist_type = ?'],
-                'data' => [$value['clientDocId'], 'VISA_CIRCUIT']
+                'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
                 'set'     => ['status' => 'A_TRA'],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$fetchedAttachment['res_id']]
             ]);
             HistoryController::add([
                 'tableName' => 'res_attachment',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_REFUSED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
@@ -696,6 +730,9 @@ class FastParapheurSmtpController
                 'where'   => ['res_id = ?'],
                 'data'    => [$args['clientDocId']]
             ])[0];
+            if (empty($fetchedAttachment)) {
+                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+            }
 
             DatabaseModel::delete([
                 'table' => 'res_attachments',
@@ -741,8 +778,8 @@ class FastParapheurSmtpController
             ]);
 
             HistoryController::add([
-                'tableName' => 'res_attachment',
-                'recordId'  => $storeControllerId,
+                'tableName' => 'res_letterbox',
+                'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
