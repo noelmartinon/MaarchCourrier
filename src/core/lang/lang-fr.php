@@ -296,6 +296,7 @@ define('_DOCUMENT_WITH_NOTES', 'Document annoté');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Accusé de réception (Archivage)");
 define("_REPLY_RECORD_MANAGEMENT", "Réponse au transfert (Archivage)");
 define("_RESPONSE_JSON", "Json de réponse");
+define("_REQUEST_JSON", "Json de demande");
 
 define('_SUMMARY_SHEET', 'Fiche de liaison');
 define('_UNDEFINED', 'Non défini');

@@ -296,6 +296,7 @@ define('_DOCUMENT_WITH_NOTES', 'Document with notes');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Acknowledgement receipt (Record management)");
 define("_REPLY_RECORD_MANAGEMENT", "Transfer reply (Record management)");
 define("_RESPONSE_JSON", "Response json");
+define("_REQUEST_JSON", "Request json");
 
 define('_SUMMARY_SHEET', 'Summary sheet');
 define('_UNDEFINED', 'Undefined');

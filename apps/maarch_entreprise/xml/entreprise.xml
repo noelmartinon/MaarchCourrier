@@ -46,6 +46,10 @@
             <label>_REPLY_RECORD_MANAGEMENT</label>
         </type>
         <type show="false" with_chrono="true" icon="" sign="false">
+            <id>request_json</id>
+            <label>_REQUEST_JSON</label>
+        </type>
+        <type show="false" with_chrono="true" icon="" sign="false">
             <id>response_json</id>
             <label>_RESPONSE_JSON</label>
         </type>
