@@ -538,6 +538,7 @@ class FastParapheurSmtpController
             $res = FastParapheurSmtpController::documentSignedState([
                 'clientDocId'   => $body['metadata']['clientDocId'],
                 'clientDocType' => $body['metadata']['clientDocType'],
+                'encodedFile'   => $body['encodedFile'],
                 'info'          => $historyInfo
             ]);
             if (!empty($res['error'])) {
@@ -712,8 +713,9 @@ class FastParapheurSmtpController
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         } elseif ($args['clientDocType'] == 'attachment') {
+
             $fetchedAttachment = AttachmentModel::get([
-                'setect'  => ['*'],
+                'select'  => ['*'],
                 'where'   => ['res_id = ?'],
                 'data'    => [$args['clientDocId']]
             ])[0];
@@ -725,44 +727,45 @@ class FastParapheurSmtpController
             ]);
 
             $newAttachmentData = [
-                'encodedFile'   => '',
-                'format'        => '',
-                'resIdMaster'   => '',
-                'type'          => '',
-                'status'        => '',
-                'encodedFile' => '',
-                'encodedFile' => '',
+                'resIdMaster'               => $fetchedAttachment['res_id_master'],
+                'title'                     => $fetchedAttachment['title'],
+                'chrono'                    => $fetchedAttachment['identifier'],
+                'recipientId'               => $fetchedAttachment['recipient_id'],
+                'recipientType'             => $fetchedAttachment['recipient_type'],
+                'typist'                    => $fetchedAttachment['typist'],
+                'format'                    => 'PDF',
+                'type'                      => 'signed_response',
+                'status'                    => 'TRA',
+                'encodedFile'               => $args['encodedFile'],
+                'inSignatureBook'           => true,
+                'originId'                  => $fetchedAttachment['res_id'],
+                'signatory_user_serial_id'  => $fetchedAttachment['signatory_user_serial_id'] ?? null
             ];
             $control = AttachmentController::controlAttachment(['body' => $newAttachmentData]);
             if (!empty($control['errors'])) {
-                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+                return ['error' => $control['errors'], 'code' => 400];
             }
 
-            $id = StoreController::storeAttachment($newAttachmentData);
-            if (empty($id) || !empty($id['errors'])) {
-                return $response->withStatus(500)->withJson(['errors' => '[AttachmentController create] ' . $id['errors']]);
+            $storeControllerId = StoreController::storeAttachment($newAttachmentData);
+            if (empty($storeControllerId) || !empty($storeControllerId['errors'])) {
+                return ['error' => '[FastParapheurSmtp -> AttachmentController create] ' . $storeControllerId['errors'], 'code' => 400];
             }
 
             ConvertPdfController::convert([
-                'resId'     => $id,
+                'resId'     => $storeControllerId,
                 'collId'    => 'attachments_coll'
             ]);
 
-            // ListInstanceModel::update([
-            //     'set' => ['process_date' => null],
-            //     'where' => ['res_id = ?', 'difflist_type = ?'],
-            //     'data' => [$value['clientDocId'], 'VISA_CIRCUIT']
-            // ]);
-
             AttachmentModel::update([
-                'set'     => ['status' => 'A_TRA'],
+                'set'     => ['status' => 'SIGN', 'in_signature_book' => 'false'],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$storeControllerId]
             ]);
+
             HistoryController::add([
                 'tableName' => 'res_attachment',
-                'recordId'  => $args['clientDocId'],
+                'recordId'  => $storeControllerId,
                 'eventType' => 'UP',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . ' : ' .$args['info'],
                 'eventId'   => 'fromFastParapheurSmtp'
