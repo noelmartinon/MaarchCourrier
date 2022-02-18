@@ -104,6 +104,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
     summarySheetUnits: any = [];
 
+    correspondents: any[] = [];
+
+    msgToDisplay: string = '';
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -608,6 +612,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         if (index >= 0) {
             this[type].splice(index, 1);
         }
+
+        if (this.recipients.length === 0) {
+            this.msgToDisplay = '';
+        }
     }
 
     initEmailsList() {
@@ -719,6 +727,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         if (item.type === 'contactGroup') {
             this.http.get(`../rest/contactsGroups/${item.id}/correspondents?limit=none`).pipe(
                 map((data: any) => {
+                    this.correspondents = data.correspondents;
                     data = data.correspondents.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
                         label: contact.contact,
                         email: contact.email
@@ -729,6 +738,12 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     if (this.functions.empty(data)) {
                         this.notify.error(this.translate.instant('lang.emptyEmails'));
                     } else {
+                        const emptyMails: number = this.correspondents.filter((contact: any) => this.functions.empty(contact.email)).length;
+                        if (emptyMails > 0) {
+                            this.msgToDisplay = this.translate.instant('lang.correspondentEmptyEmails', {nbr: emptyMails});
+                        } else {
+                            this.msgToDisplay = '';
+                        }
                         this[type] = this[type].concat(data);
                     }
                 }),
