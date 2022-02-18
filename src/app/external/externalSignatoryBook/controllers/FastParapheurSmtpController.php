@@ -27,14 +27,9 @@ use SrcCore\models\DatabaseModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
-use Doctype\models\DoctypeModel;
 use Resource\models\ResModel;
 use Resource\controllers\StoreController;
 use User\models\UserModel;
-use SrcCore\models\PasswordModel;
-use SrcCore\models\CurlModel;
-use Group\controllers\PrivilegeController;
-use Resource\controllers\ResourceControlController;
 use Respect\Validation\Validator;
 use Docserver\controllers\DocserverController;
 use Entity\models\ListInstanceModel;
@@ -568,7 +563,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id_master'],
                 'typist'        => $resLetterbox['typist'],
                 'metadata'      => $args['metadata'],
@@ -602,7 +597,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
                 'metadata'      => $args['metadata'],
@@ -658,7 +653,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
                 'metadata'      => $args['metadata'],
@@ -691,7 +686,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
                 'metadata'      => $args['metadata'],
@@ -748,7 +743,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
                 'metadata'      => $args['metadata'],
@@ -806,7 +801,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
             }
 
-            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+            $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
                 'metadata'      => $args['metadata'],
@@ -876,7 +871,7 @@ class FastParapheurSmtpController
      * @param   array   $args   metadata(array) encodedFile(string) resIdMaster(int) typist(int)
      * @return  array   attachment id && original
      */
-    public static function makeJsonResonse(array $args)
+    public static function makeJsonResponse(array $args)
     {
         if (!Validator::arrayType()->notEmpty()->validate($args['metadata'])) {
             return ['error' => 'Body metadata is missing or not an array', 'code' => 400];
@@ -904,7 +899,7 @@ class FastParapheurSmtpController
 
         $id = StoreController::storeAttachment($body);
         if (empty($id) || !empty($id['errors'])) {
-            return ['error' => '[FastParapheurSmtpController makeJsonResonse] ' . $id['errors'], 'code' => 400];
+            return ['error' => '[FastParapheurSmtpController makeJsonResponse] ' . $id['errors'], 'code' => 400];
         }
 
         return [
