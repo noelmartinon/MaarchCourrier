@@ -2580,5 +2580,6 @@
     "uploadNewVersion": "Téléverser une nouvelle version du document",
     "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
     "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant.",
-    "emptyEmails": "Les correspondants du groupe ne contiennent pas d'adresses e-mail"
+    "emptyEmails": "Les correspondants du groupe ne contiennent pas d'adresses e-mail",
+    "correspondentEmptyEmails": "<b>Attention ! Seuls les correspondants avec des adresses e-mail sont repris.</b> <br><br><ul><li>Nombre de correspondants sans adresse e-mail : {{nbr}}</li></ul>"
 }
