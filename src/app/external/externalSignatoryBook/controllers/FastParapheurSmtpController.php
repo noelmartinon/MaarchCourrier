@@ -37,6 +37,7 @@ use Group\controllers\PrivilegeController;
 use Resource\controllers\ResourceControlController;
 use Respect\Validation\Validator;
 use Docserver\controllers\DocserverController;
+use Entity\models\ListInstanceModel;
 
 /**
     * @codeCoverageIgnore
@@ -393,7 +394,7 @@ class FastParapheurSmtpController
     }
 
     /**
-     * Create response json
+     * Create json request
      * 
      * @param   array   $args   resIdMaster(int) res_id(int) circuitId subscriberId
      * @return  array   attachment id && original
@@ -504,8 +505,8 @@ class FastParapheurSmtpController
         if ($body['metadata']['status']['type'] == $config['data']['errorState']) {
 
             $res = FastParapheurSmtpController::documentErrorState([
-                'clientDocId'   => $body['metadata']['clientDocId'],
-                'clientDocType' => $body['metadata']['clientDocType']
+                'metadata'      => $body['metadata'],
+                'encodedFile'   => $body['encodedFile']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -515,8 +516,8 @@ class FastParapheurSmtpController
         } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
 
             $res = FastParapheurSmtpController::documentRefusedState([
-                'clientDocId'   => $body['metadata']['clientDocId'],
-                'clientDocType' => $body['metadata']['clientDocType']
+                'metadata'      => $body['metadata'],
+                'encodedFile'   => $body['encodedFile']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -526,8 +527,7 @@ class FastParapheurSmtpController
         } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
 
             $res = FastParapheurSmtpController::documentSignedState([
-                'clientDocId'   => $body['metadata']['clientDocId'],
-                'clientDocType' => $body['metadata']['clientDocType'],
+                'metadata'      => $body['metadata'],
                 'encodedFile'   => $body['encodedFile']
             ]);
             if (!empty($res['error'])) {
@@ -542,23 +542,40 @@ class FastParapheurSmtpController
         return $response->withStatus($result['code'])->withJson($result['info']);
     }
 
-
+    /**
+     * Change letterbox/attachment document state and notify the user
+     * 
+     * @param   array   $args   metadata(array) encodedFile(string)
+     * @return  void|array      return an array if an error occurs
+     */
     public static function documentErrorState(array $args) {
 
-        if (!Validator::stringType()->notEmpty()->validate($args['clientDocId'])) {
+        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
             return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['clientDocType'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
             return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
+            return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
         }
 
-        if ($args['clientDocType'] == 'mainDocument') {
+        if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
                 'where'  => ['res_id = ?'],
-                'data'   => [$args['clientDocId']]
+                'data'   => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($resLetterbox)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $resLetterbox['res_id_master'],
+                'typist'        => $resLetterbox['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
             ResModel::update([
@@ -575,14 +592,24 @@ class FastParapheurSmtpController
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
-        } elseif ($args['clientDocType'] == 'attachment') {
+        } elseif ($args['metadata']['clientDocType'] == 'attachment') {
             $fetchedAttachment = AttachmentModel::get([
                 'select'  => ['*'],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($fetchedAttachment)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $fetchedAttachment['res_id_master'],
+                'typist'        => $fetchedAttachment['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
             ListInstanceModel::update([
@@ -597,7 +624,7 @@ class FastParapheurSmtpController
                 'data'    => [$fetchedAttachment['res_id']]
             ]);
             HistoryController::add([
-                'tableName' => 'res_attachment',
+                'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_ERROR_FROM_SB,
@@ -606,21 +633,39 @@ class FastParapheurSmtpController
         }
     }
 
+    /**
+     * Change letterbox/attachment document state and notify the user
+     * 
+     * @param   array   $args   metadata(array) encodedFile(string)
+     * @return  void|array      return an array if an error occurs
+     */
     public static function documentRefusedState(array $args) {
-        if (!Validator::stringType()->notEmpty()->validate($args['clientDocId'])) {
+        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
             return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['clientDocType'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
             return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
+            return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
         }
 
-        if ($args['clientDocType'] == 'mainDocument') {
+        if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
                 'where'  => ['res_id = ?'],
-                'data'   => [$args['clientDocId']]
+                'data'   => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($resLetterbox)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $resLetterbox['res_id'],
+                'typist'        => $resLetterbox['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
             ResModel::update([
@@ -636,14 +681,24 @@ class FastParapheurSmtpController
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_REFUSED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
-        } elseif ($args['clientDocType'] == 'attachment') {
+        } elseif ($args['metadata']['clientDocType'] == 'attachment') {
             $fetchedAttachment = AttachmentModel::get([
                 'select'  => ['*'],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($fetchedAttachment)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $fetchedAttachment['res_id_master'],
+                'typist'        => $fetchedAttachment['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
             
             ListInstanceModel::update([
@@ -658,7 +713,7 @@ class FastParapheurSmtpController
                 'data'    => [$fetchedAttachment['res_id']]
             ]);
             HistoryController::add([
-                'tableName' => 'res_attachment',
+                'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_REFUSED_FROM_SB,
@@ -668,23 +723,39 @@ class FastParapheurSmtpController
         }
     }
 
+    /**
+     * Create new signed letterbox/attachment document, change the state and notify the user
+     * 
+     * @param   array   $args   metadata(array) encodedFile(string)
+     * @return  void|array      return an array if an error occurs
+     */
     public static function documentSignedState(array $args) {
-        if (!Validator::stringType()->notEmpty()->validate($args['clientDocId'])) {
+        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
             return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['clientDocType'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
             return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
         } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
             return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
         }
 
-        if ($args['clientDocType'] == 'mainDocument') {
+        if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
                 'where'  => ['res_id = ?'],
-                'data'   => [$args['clientDocId']]
+                'data'   => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($resLetterbox)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $resLetterbox['res_id'],
+                'typist'        => $resLetterbox['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
             DatabaseModel::delete([
@@ -716,6 +787,7 @@ class FastParapheurSmtpController
                 'where' => ['res_id = ?'],
                 'data' => [$resLetterbox['res_id']]
             ]);
+            
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $resLetterbox['res_id'],
@@ -723,15 +795,25 @@ class FastParapheurSmtpController
                 'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_SIGNED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
-        } elseif ($args['clientDocType'] == 'attachment') {
+        } elseif ($args['metadata']['clientDocType'] == 'attachment') {
 
             $fetchedAttachment = AttachmentModel::get([
                 'select'  => ['*'],
                 'where'   => ['res_id = ?'],
-                'data'    => [$args['clientDocId']]
+                'data'    => [$args['metadata']['clientDocId']]
             ])[0];
             if (empty($fetchedAttachment)) {
-                return ['error' => 'client document id \'' . $args['clientDocId'] . '\' does not exist!'];
+                return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!'];
+            }
+
+            $jsonResponse = FastParapheurSmtpController::makeJsonResonse([
+                'resIdMaster'   => $fetchedAttachment['res_id_master'],
+                'typist'        => $fetchedAttachment['typist'],
+                'metadata'      => $args['metadata'],
+                'encodedFile'   => $args['encodedFile'],
+            ]);
+            if (empty($jsonResponse['error'])) {
+                return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
             DatabaseModel::delete([
@@ -788,4 +870,46 @@ class FastParapheurSmtpController
 
     }
 
+    /**
+     * Create json response
+     * 
+     * @param   array   $args   metadata(array) encodedFile(string) resIdMaster(int) typist(int)
+     * @return  array   attachment id && original
+     */
+    public static function makeJsonResonse(array $args)
+    {
+        if (!Validator::arrayType()->notEmpty()->validate($args['metadata'])) {
+            return ['error' => 'Body metadata is missing or not an array', 'code' => 400];
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
+            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
+        } elseif (!Validator::intVal()->notEmpty()->validate($args['resIdMaster'])) {
+            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
+        } elseif (!Validator::intVal()->notEmpty()->validate($args['typist'])) {
+            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
+        }
+
+        $jsonRequest = [
+            "metadata"   => $args['metadata'],
+            "encodedFile" => $args['encodedFile']
+        ];
+
+        $body = [
+            'title'         => 'response',
+            'resIdMaster'   => $args['resIdMaster'],
+            'type'          => 'response_json',
+            'format'        => 'JSON',
+            'typist'        => $args['typist'],
+            'encodedFile'   => base64_encode(json_encode($jsonRequest, JSON_PRETTY_PRINT))
+        ];
+
+        $id = StoreController::storeAttachment($body);
+        if (empty($id) || !empty($id['errors'])) {
+            return ['error' => '[FastParapheurSmtpController makeJsonResonse] ' . $id['errors'], 'code' => 400];
+        }
+
+        return [
+            "id" => $id,
+            "original" => true
+        ];
+    }
 }
