@@ -123,15 +123,13 @@ class FastParapheurSmtpController
      * @param   array   $args   metadata(array) encodedFile(string)
      * @return  void|array      return an array if an error occurs
      */
-    public static function documentErrorState(array $args) {
-
-        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
-            return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
-            return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
-            return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        }
+    public static function documentErrorState(array $args) 
+    {
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::arrayType($args, ['metadata']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocId']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocType']);
+        ValidatorModel::stringType($args, ['encodedFile']);
 
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
@@ -214,14 +212,13 @@ class FastParapheurSmtpController
      * @param   array   $args   metadata(array) encodedFile(string)
      * @return  void|array      return an array if an error occurs
      */
-    public static function documentRefusedState(array $args) {
-        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
-            return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
-            return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
-            return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        }
+    public static function documentRefusedState(array $args) 
+    {
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::arrayType($args, ['metadata']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocId']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocType']);
+        ValidatorModel::stringType($args, ['encodedFile']);
 
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
@@ -304,14 +301,13 @@ class FastParapheurSmtpController
      * @param   array   $args   metadata(array) encodedFile(string)
      * @return  void|array      return an array if an error occurs
      */
-    public static function documentSignedState(array $args) {
-        if (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocId'])) {
-            return ['error' => 'Body metadata clientDocId is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['metadata']['clientDocType'])) {
-            return ['error' => 'Body metadata clientDocType is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
-            return ['error' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        }
+    public static function documentSignedState(array $args) 
+    {
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::arrayType($args, ['metadata']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocId']);
+        ValidatorModel::stringType($args['metadata'], ['clientDocType']);
+        ValidatorModel::stringType($args, ['encodedFile']);
 
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
@@ -453,15 +449,11 @@ class FastParapheurSmtpController
      */
     public static function makeJsonResponse(array $args)
     {
-        if (!Validator::arrayType()->notEmpty()->validate($args['metadata'])) {
-            return ['error' => 'Body metadata is missing or not an array', 'code' => 400];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['encodedFile'])) {
-            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::intVal()->notEmpty()->validate($args['resIdMaster'])) {
-            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        } elseif (!Validator::intVal()->notEmpty()->validate($args['typist'])) {
-            return ['errors' => 'Body encodedFile is missing, empty or not a string', 'code' => 400];
-        }
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile', 'resIdMaster', 'typist']);
+        ValidatorModel::arrayType($args, ['metadata']);
+        ValidatorModel::stringType($args, ['resIdMaster']);
+        ValidatorModel::stringType($args, ['typist']);
+        ValidatorModel::stringType($args, ['encodedFile']);
 
         $jsonRequest = [
             "metadata"   => $args['metadata'],
@@ -487,7 +479,7 @@ class FastParapheurSmtpController
             "original" => true
         ];
     }
-    
+
     /**
      * Prepare data before sending to Fast Parapheur via email
      * 
@@ -540,7 +532,7 @@ class FastParapheurSmtpController
             'config'        => $config, 
             'smtpConfig'    => $smtpConfig,
             'resIdMaster'   => $args['resIdMaster'], 
-            'businessId'    => $config['data']['subscriberId'], 
+            'businessId'    => $config['data']['subscriberId'],     // to check if POC is valid
             'circuitId'     => $user['user_id'],
             'label'         => $redactor['short_label'],
             'note'         => $args['note'],
