@@ -26,7 +26,8 @@
         "validatedStatusOnlyVisa": "EENV",
         "refusedStatus": "REJ_SIGN",
         "validatedStatusAnnot": "COU",
-        "refusedStatusAnnot": "RET"
+        "refusedStatusAnnot": "RET",
+        "errorStatus": "REJ_SIGN"
     },
     "exportSeda": {
         "sae": "MaarchRM",
