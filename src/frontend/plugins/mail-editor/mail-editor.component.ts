@@ -718,7 +718,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 map((data: any) => {
                     this.correspondents = data.correspondents;
                     data = data.correspondents.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
-                        label: contact.contact,
+                        label: contact.name,
                         email: contact.email
                     }));
                     return data;
