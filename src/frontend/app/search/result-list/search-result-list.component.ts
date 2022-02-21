@@ -177,7 +177,6 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         if (this.functions.empty(this.linkedRes)) {
-
             if (!this.functions.empty(this.searchTerm)) {
                 this.initSearch = true;
                 this.criteria = {
@@ -209,14 +208,14 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 this.listProperties.criteria.meta = this.criteria.meta;
             }
         } else {
-            this.data = this.processPostData(this.linkedRes);
             this.resultsLength = this.linkedRes['resources'].length;
             this.allResInBasket = this.linkedRes['resources'].map((item: any) => item.resId);
-            this.data = this.linkedRes['resources'];
             this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
             this.paginatorLength = this.linkedRes['resources'].length > 10000 ? 10000 : this.linkedRes['resources'].length;
             this.dataFilters = this.linkedRes['filters'];
             this.templateColumns = this.linkedRes['templateColumns'];
+            const processData: any[] = this.processPostData(this.linkedRes);
+            this.data = processData['resources'];
             this.isLoadingResults = false;
             this.hideFilter = true;
         }
@@ -493,7 +492,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {
                     key.event = true;
                     if (key.displayValue.length > 1) {
-                        key.displayTitle = key.displayValue.join(' - ');
+                        key.displayTitle = Array.isArray(key.displayValue) ? key.displayValue.join(' - ') : key.displayValue;
                         key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.translate.instant('lang.contactsAlt');
                     } else if (key.displayValue.length === 1) {
                         key.displayValue = key.displayValue[0];
