@@ -187,10 +187,9 @@ class FolderPrintControllerTest extends TestCase
         ];
 
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
         $response     = $folderPrintController->generateFile($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame(400, $response->getStatusCode());
         $this->assertSame('No document to merge', $responseBody['errors']);
 
         // Attachment errors

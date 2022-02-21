@@ -20,7 +20,6 @@ class VersionUpdateControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
         $response       = $versionUpdateController->get($request, new \Slim\Http\Response());
         $responseBody   = json_decode((string)$response->getBody());
-
         $this->assertIsString($responseBody->currentVersion);
         $this->assertNotNull($responseBody->currentVersion);
         $this->assertMatchesRegularExpression('/^\d{2}\.\d{2}\.\d+$/', $responseBody->currentVersion, 'Invalid current version');

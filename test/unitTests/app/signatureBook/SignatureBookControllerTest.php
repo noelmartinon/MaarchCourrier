@@ -688,7 +688,7 @@ class SignatureBookControllerTest extends TestCase
 
         $this->assertSame('Nulle pierre ne peut être polie sans friction, nul homme ne peut parfaire son expérience sans épreuve.', $responseBody['title']);
         $this->assertSame('signed_response', $responseBody['type']);
-        $this->assertSame('A_TRA', $responseBody['status']);
+        $this->assertSame('TRA', $responseBody['status']);
         $this->assertSame(1, $responseBody['relation']);
 
         $response = $attachmentController->getByResId($request, new \Slim\Http\Response(), ['resId' => self::$resId]);
