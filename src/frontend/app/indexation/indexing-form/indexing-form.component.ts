@@ -478,9 +478,9 @@ export class IndexingFormComponent implements OnInit {
                         }
                     }),
                     tap(() => {
+                        this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'), true);
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.translate.instant('lang.dataUpdated'));
-                        this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'), true);
                         resolve(true);
                     }),
                     catchError((err: any) => {
