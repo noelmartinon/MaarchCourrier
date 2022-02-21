@@ -299,6 +299,15 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         this.onTouched = fn;
     }
 
+    getLabel(value: any) {
+        if (Array.isArray(value)) {
+            const ids: any = value.map((item: any) => item.id);
+            return this.datas.filter((item: any) => ids.indexOf(item.id) > -1).map((item: any) => item.label.replace(/&nbsp;/g, '')).filter(Boolean).join(', ');
+        } else {
+            return this.datas?.find((item: any) => item.id === value)?.label?.replaceAll(/&nbsp;/g, '');
+        }
+    }
+
     /**
      * Focuses the search input field
      * @private
@@ -444,9 +453,5 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     emptyData() {
         return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
-    }
-
-    getLabel(id: any) {
-        return this.datas?.find((item: any) => item.id === id)?.label?.replaceAll('&nbsp;', '');
     }
 }
