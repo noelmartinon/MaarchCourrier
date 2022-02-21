@@ -423,12 +423,13 @@ class FastParapheurSmtpController
                 'typist'                    => $fetchedAttachment['typist'],
                 'format'                    => 'PDF',
                 'type'                      => 'signed_response',
-                'status'                    => 'SIGN',
+                'status'                    => 'TRA',
                 'encodedFile'               => $args['encodedFile'],
                 'inSignatureBook'           => true,
                 'originId'                  => $fetchedAttachment['res_id'],
                 'signatory_user_serial_id'  => $fetchedAttachment['signatory_user_serial_id'] ?? null
             ];
+
             $control = AttachmentController::controlAttachment(['body' => $newAttachmentData]);
             if (!empty($control['errors'])) {
                 return ['error' => $control['errors'], 'code' => 400];
