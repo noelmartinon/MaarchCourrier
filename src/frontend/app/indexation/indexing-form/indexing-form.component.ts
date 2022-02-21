@@ -481,6 +481,7 @@ export class IndexingFormComponent implements OnInit {
                         }
                     }),
                     tap(() => {
+                        this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'), true);
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.translate.instant('lang.dataUpdated'));
                         resolve(true);
@@ -1272,46 +1273,53 @@ export class IndexingFormComponent implements OnInit {
         return items.filter((item: any) => item.id === selectedItemId)[0].label;
     }
 
-    setAllowedValues(field: any) {
+    setAllowedValues(field: any, afterSaveEvent: boolean = false) {
         if (!this.functions.empty(field.allowedValues)) {
             field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
                 item.disabled = field.allowedValues.indexOf(item.id) === -1;
             });
         }
         if (!this.adminMode && field.identifier === 'doctype') {
-            this.checkDisabledValues(field);
+            this.checkDisabledValues(field, afterSaveEvent);
         }
     }
 
-    checkDisabledValues(field: any) {
-        this.http.get(`../rest/resources/${this.resId}`).pipe(
-            tap ((data: any) => {
-                if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
-                    field.values.find((item: any) => item.id === data['doctype']).disabled = false;
-                }
-            }),
-            finalize(() => {
-                let disabledItems: number[] = [];
-                // CHECK SECOND LEVEL
-                disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
-                field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
-
-
-                // CHECK FIRST LEVEL
-                field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
-                    if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
-                        disabledItems.push(item.id);
+    checkDisabledValues(field: any, afterSaveEvent: boolean = false) {
+        if (!this.functions.empty(this.resId) && !afterSaveEvent) {
+            this.http.get(`../rest/resources/${this.resId}`).pipe(
+                tap ((data: any) => {
+                    if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                        field.values.find((item: any) => item.id === data['doctype']).disabled = false;
                     }
-                });
-                field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
-
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                }),
+                finalize(() => {
+                    this.formatData(field);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.formatData(field);
+        }
     }
+
+    formatData(field: any) {
+        let disabledItems: number[] = [];
+        // CHECK SECOND LEVEL
+        disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+
+        // CHECK FIRST LEVEL
+        field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
+            if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
+                disabledItems.push(item.id);
+            }
+        });
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+    }
+
 
     openValuesSelector(field: any) {
         const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
