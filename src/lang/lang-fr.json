@@ -2633,5 +2633,7 @@
     "goToNextDocument": "Forcer le passage au document suivant quand le document sort du périmètre de la bannette",
     "uploadNewVersion": "Téléverser une nouvelle version du document",
     "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
-    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant."
+    "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
 }
