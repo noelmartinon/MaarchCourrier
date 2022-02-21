@@ -61,6 +61,13 @@ class FastParapheurSmtpController
             }
         }
 
+        $loadedJson = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        if (empty($loadedJson)) {
+            return $response->withStatus(404)->withJson(['Global configuration is missing!']);
+        }
+        $signatureBookConfig = $loadedJson['signatureBook'];
+
+
         if (empty($body)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
         } elseif (!Validator::arrayType()->notEmpty()->validate($body['metadata'])) {
@@ -187,7 +194,7 @@ class FastParapheurSmtpController
                 'metadata'      => $args['metadata'],
                 'encodedFile'   => $args['encodedFile'],
             ]);
-            if (empty($jsonResponse['error'])) {
+            if (!empty($jsonResponse['error'])) {
                 return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
@@ -275,7 +282,7 @@ class FastParapheurSmtpController
                 'metadata'      => $args['metadata'],
                 'encodedFile'   => $args['encodedFile'],
             ]);
-            if (empty($jsonResponse['error'])) {
+            if (!empty($jsonResponse['error'])) {
                 return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
             
@@ -379,7 +386,7 @@ class FastParapheurSmtpController
                 'where'   => ['res_id = ?'],
                 'data'    => [$args['metadata']['clientDocId']]
             ])[0];
-            if (empty($fetchedAttachment)) {
+            if (!empty($fetchedAttachment)) {
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
