@@ -165,12 +165,12 @@ define('_LINK_ADDED_TAG', 'Liaison de mot-clé ajoutée');
 define('_LINK_DELETED_TAG', 'Liaison de mot-clé supprimée');
 define('_LOGIN', 'Connexion de l\'utilisateur');
 define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (par email)');
-define('_MAIN_DOCUMENT_SIGNED_FROM_SB', 'Le document principal a été signé depuis le parapheur externe');
-define('_MAIN_DOCUMENT_REFUSED_FROM_SB', 'Le document principal a été refusé depuis le parapheur externe');
-define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'Le document principal a été en erreur depuis le parapheur externe');
-define('_ATTACHMENT_SIGNED_FROM_SB', 'La pièce jointe a été signé depuis le parapheur externe');
-define('_ATTACHMENT_REFUSED_FROM_SB', 'La pièce jointe a été refusé depuis le parapheur externe');
-define('_ATTACHMENT_ERROR_FROM_SB', 'La pièce jointe a été en erreur depuis le parapheur externe');
+define('_MAIN_DOCUMENT_SIGNED_FROM_SB', 'Le document principal a été signé dans le parapheur externe');
+define('_MAIN_DOCUMENT_REFUSED_FROM_SB', 'Le document principal a été refusé dans le parapheur externe');
+define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'Le document principal a été en erreur dans le parapheur externe');
+define('_ATTACHMENT_SIGNED_FROM_SB', 'La pièce jointe a été signé dans le parapheur externe');
+define('_ATTACHMENT_REFUSED_FROM_SB', 'La pièce jointe a été refusé dans le parapheur externe');
+define('_ATTACHMENT_ERROR_FROM_SB', 'La pièce jointe a été en erreur dans le parapheur externe');
 
 // ADMINISTRATION
 define('_USERS', 'Utilisateurs');
