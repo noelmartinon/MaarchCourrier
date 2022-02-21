@@ -457,8 +457,8 @@ class FastParapheurSmtpController
     {
         ValidatorModel::notEmpty($args, ['metadata', 'encodedFile', 'resIdMaster', 'typist']);
         ValidatorModel::arrayType($args, ['metadata']);
-        ValidatorModel::stringType($args, ['resIdMaster']);
-        ValidatorModel::stringType($args, ['typist']);
+        ValidatorModel::intVal($args, ['resIdMaster']);
+        ValidatorModel::intVal($args, ['typist']);
         ValidatorModel::stringType($args, ['encodedFile']);
 
         $jsonRequest = [
