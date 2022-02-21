@@ -284,6 +284,7 @@ define('_FOR_ENTITY', 'pour l\'entité :');
 define('_NO_ENTITY', 'Pas d\'entité associée au courrier');
 define('_RECONCILE_RESOURCE', 'Réconcilier un courrier');
 define('_RECONCILE_RESOURCE_DESC', "Ajoute le fichier principal du courrier à un autre courrier");
+define('_EMAIL_SEND_SUCCESS', 'emails ont été envoyés avec succès');
 
 //ATTACHMENT TYPES
 define("_RESPONSE_PROJECT", "Projet de réponse");

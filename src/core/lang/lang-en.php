@@ -171,7 +171,7 @@ define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'The main document was in error from the 
 define('_ATTACHMENT_SIGNED_FROM_SB', 'The attachment has been refused from the external signature book');
 define('_ATTACHMENT_REFUSED_FROM_SB', 'The attachment has been refused from the external signature book');
 define('_ATTACHMENT_ERROR_FROM_SB', 'The attachment was in error from the external signature book');
-
+define('_EMAIL_SEND_SUCCESS', 'email(s) was send successfully');
 
 // ADMINISTRATION
 define('_USERS', 'Users');
