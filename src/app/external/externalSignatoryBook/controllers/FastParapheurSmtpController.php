@@ -65,7 +65,7 @@ class FastParapheurSmtpController
         if (empty($loadedJson)) {
             return $response->withStatus(404)->withJson(['Global configuration is missing!']);
         }
-        $signatureBookConfig = $loadedJson['signatureBook'];
+        $signatoryBookConfig = $loadedJson['signatureBook'];
 
 
         if (empty($body)) {
@@ -93,8 +93,9 @@ class FastParapheurSmtpController
         if ($body['metadata']['status']['type'] == $config['data']['errorState']) {
 
             $res = FastParapheurSmtpController::documentErrorState([
-                'metadata'      => $body['metadata'],
-                'encodedFile'   => $body['encodedFile']
+                'metadata'              => $body['metadata'],
+                'encodedFile'           => $body['encodedFile'],
+                'signatoryBookConfig'   => $signatoryBookConfig
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -104,8 +105,9 @@ class FastParapheurSmtpController
         } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
 
             $res = FastParapheurSmtpController::documentRefusedState([
-                'metadata'      => $body['metadata'],
-                'encodedFile'   => $body['encodedFile']
+                'metadata'              => $body['metadata'],
+                'encodedFile'           => $body['encodedFile'],
+                'signatoryBookConfig'   => $signatoryBookConfig
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -115,8 +117,9 @@ class FastParapheurSmtpController
         } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
 
             $res = FastParapheurSmtpController::documentSignedState([
-                'metadata'      => $body['metadata'],
-                'encodedFile'   => $body['encodedFile']
+                'metadata'              => $body['metadata'],
+                'encodedFile'           => $body['encodedFile'],
+                'signatoryBookConfig'   => $signatoryBookConfig
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
@@ -138,7 +141,7 @@ class FastParapheurSmtpController
      */
     public static function documentErrorState(array $args) 
     {
-        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile', 'signatoryBookConfig']);
         ValidatorModel::arrayType($args, ['metadata']);
         ValidatorModel::intVal($args['metadata'], ['clientDocId']);
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
@@ -165,7 +168,7 @@ class FastParapheurSmtpController
             }
 
             ResModel::update([
-                'set' => ['status' => 'COU'],
+                'set' => ['status' => $signatoryBookConfig['errorStatus']],
                 'where' => ['res_id = ?'],
                 'data' => [$resLetterbox['res_id']]
             ]);
@@ -204,7 +207,7 @@ class FastParapheurSmtpController
                 'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
-                'set'     => ['status' => 'A_TRA'],
+                'set'     => ['status' => $signatoryBookConfig['errorStatus']],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
                 'data'    => [$fetchedAttachment['res_id']]
@@ -227,7 +230,7 @@ class FastParapheurSmtpController
      */
     public static function documentRefusedState(array $args) 
     {
-        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile', 'signatoryBookConfig']);
         ValidatorModel::arrayType($args, ['metadata']);
         ValidatorModel::intVal($args['metadata'], ['clientDocId']);
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
@@ -254,7 +257,7 @@ class FastParapheurSmtpController
             }
 
             ResModel::update([
-                'set' => ['status' => 'COU'],
+                'set' => ['status' => $signatoryBookConfig['refusedStatus']],
                 'where' => ['res_id = ?'],
                 'data' => [$resLetterbox['res_id']]
             ]);
@@ -292,7 +295,7 @@ class FastParapheurSmtpController
                 'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
-                'set'     => ['status' => 'A_TRA'],
+                'set'     => ['status' => $signatoryBookConfig['refusedStatus']],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
                 'data'    => [$fetchedAttachment['res_id']]
@@ -316,7 +319,7 @@ class FastParapheurSmtpController
      */
     public static function documentSignedState(array $args) 
     {
-        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile']);
+        ValidatorModel::notEmpty($args, ['metadata', 'encodedFile', 'signatoryBookConfig']);
         ValidatorModel::arrayType($args, ['metadata']);
         ValidatorModel::intVal($args['metadata'], ['clientDocId']);
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
@@ -367,10 +370,12 @@ class FastParapheurSmtpController
             ]);
 
             ResModel::update([
-                'set' => ['status' => 'COU'],
+                'set' => ['status' => $signatoryBookConfig['validatedStatus']],
                 'where' => ['res_id = ?'],
                 'data' => [$resLetterbox['res_id']]
             ]);
+
+            FastParapheurSmtpController::processVisaWorkflow(['res_id' => $resLetterbox['res_id'], 'processSignatory' => true]);
             
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -396,7 +401,7 @@ class FastParapheurSmtpController
                 'metadata'      => $args['metadata'],
                 'encodedFile'   => $args['encodedFile'],
             ]);
-            if (empty($jsonResponse['error'])) {
+            if (!empty($jsonResponse['error'])) {
                 return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
 
@@ -443,6 +448,8 @@ class FastParapheurSmtpController
                 'data'    => [$storeControllerId]
             ]);
 
+            FastParapheurSmtpController::processVisaWorkflow(['res_id_master' => $fetchedAttachment['res_id_master'], 'processSignatory' => true]);
+
             HistoryController::add([
                 'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
@@ -452,6 +459,43 @@ class FastParapheurSmtpController
             ]);
         }
 
+    }
+
+    /**
+     * Valide the signatory user workflow
+     * 
+     * @param   array   $args   processSignatory(bool) res_id_master(int) OR res_id(int)
+     * @return  void
+     */
+    public static function processVisaWorkflow(array $args = [])
+    {
+        ValidatorModel::notEmpty($args, ['processSignatory']);
+        ValidatorModel::boolType($args, ['metadata']);
+
+        $resIdMaster = $args['res_id_master'] ?? $args['res_id'];
+
+        $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$resIdMaster, 'FRZ']]);
+        if ((count($attachments) < 2 && $args['processSignatory']) || !$args['processSignatory']) {
+            $visaWorkflow = ListInstanceModel::get([
+                'select'  => ['listinstance_id', 'requested_signature'],
+                'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
+                'data'    => [$resIdMaster, 'VISA_CIRCUIT'],
+                'orderBY' => ['ORDER BY listinstance_id ASC']
+            ]);
+    
+            if (!empty($visaWorkflow)) {
+                foreach ($visaWorkflow as $listInstance) {
+                    if ($listInstance['requested_signature']) {
+                        // Stop to the first signatory user
+                        if ($args['processSignatory']) {
+                            ListInstanceModel::update(['set' => ['signatory' => 'true', 'process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        }
+                        break;
+                    }
+                    ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                }
+            }
+        }
     }
 
     /**
