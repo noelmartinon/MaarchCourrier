@@ -461,7 +461,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB . ,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         }
