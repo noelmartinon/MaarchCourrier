@@ -95,42 +95,45 @@ class FastParapheurSmtpController
             $res = FastParapheurSmtpController::documentErrorState([
                 'metadata'              => $body['metadata'],
                 'encodedFile'           => $body['encodedFile'],
-                'signatoryBookConfig'   => $signatoryBookConfig
+                'signatoryBookConfig'   => $signatoryBookConfig,
+                'message'               => $body['metadata']['status']['message']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
             }
-            $result = ['code' => 200];
+            $result = ['info' => 'Document updated to error!', 'code' => 200];
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['refusedState']) {
 
             $res = FastParapheurSmtpController::documentRefusedState([
                 'metadata'              => $body['metadata'],
                 'encodedFile'           => $body['encodedFile'],
-                'signatoryBookConfig'   => $signatoryBookConfig
+                'signatoryBookConfig'   => $signatoryBookConfig,
+                'message'               => $body['metadata']['status']['message']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
             }
-            $result = ['code' => 200];
+            $result = ['info' => 'Document updated to refused!', 'code' => 200];
 
         } elseif ($body['metadata']['status']['type'] == $config['data']['signedState']) {
 
             $res = FastParapheurSmtpController::documentSignedState([
                 'metadata'              => $body['metadata'],
                 'encodedFile'           => $body['encodedFile'],
-                'signatoryBookConfig'   => $signatoryBookConfig
+                'signatoryBookConfig'   => $signatoryBookConfig,
+                'message'               => $body['metadata']['status']['message']
             ]);
             if (!empty($res['error'])) {
                 return $response->withStatus($res['code'])->withJson(['errors' => $res['error']]);
             }
-            $result = ['code' => 201];
+            $result = ['info' => 'Document updated to singed!', 'code' => 201];
         }
         else {
             return $response->withStatus(400)->withJson(['errors' => 'Unknown status type.']);
         }
 
-        return $response->withStatus($result['code']);
+        return $response->withStatus($result['code'])->withJson(['info' => $result['info']]);
     }
 
     /**
@@ -173,7 +176,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $resLetterbox['res_id'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_ERROR_FROM_SB,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_ERROR_FROM_SB . '. ' . $args['message'],
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
@@ -213,7 +216,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_ERROR_FROM_SB,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_ERROR_FROM_SB . '. ' . $args['message'],
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);         
         }
@@ -265,7 +268,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $resLetterbox['res_id'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_REFUSED_FROM_SB,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _MAIN_DOCUMENT_REFUSED_FROM_SB . '. ' . $args['message'],
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         } elseif ($args['metadata']['clientDocType'] == 'attachment') {
@@ -304,7 +307,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_REFUSED_FROM_SB,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_REFUSED_FROM_SB . '. ' . $args['message'],
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
 
@@ -458,7 +461,7 @@ class FastParapheurSmtpController
                 'tableName' => 'res_letterbox',
                 'recordId'  => $fetchedAttachment['res_id_master'],
                 'eventType' => 'ACTION#1',
-                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB,
+                'info'      => _RECEIVE_FROM_EXTERNAL . ' - ' . _FAST_PARAPHEUR_SMTP . " : " . _ATTACHMENT_SIGNED_FROM_SB . ,
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);
         }
