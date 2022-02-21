@@ -158,7 +158,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
-            $resIdMaster = $resLetterbox['res_id_master'];
+            $resIdMaster = $resLetterbox['res_id'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
