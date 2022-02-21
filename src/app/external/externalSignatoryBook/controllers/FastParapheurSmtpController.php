@@ -147,6 +147,7 @@ class FastParapheurSmtpController
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
         ValidatorModel::stringType($args, ['encodedFile']);
 
+        $resIdMaster = 0;
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
@@ -157,8 +158,9 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
+            $resIdMaster = $resLetterbox['res_id_master'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
-                'resIdMaster'   => $resLetterbox['res_id_master'],
+                'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
                 'metadata'      => $args['metadata'],
                 'encodedFile'   => $args['encodedFile'],
@@ -166,12 +168,6 @@ class FastParapheurSmtpController
             if (!empty($jsonResponse['error'])) {
                 return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
-
-            ResModel::update([
-                'set' => ['status' => $signatoryBookConfig['errorStatus']],
-                'where' => ['res_id = ?'],
-                'data' => [$resLetterbox['res_id']]
-            ]);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -191,6 +187,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
+            $resIdMaster = $fetchedAttachment['res_id_master'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
@@ -207,7 +204,7 @@ class FastParapheurSmtpController
                 'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
-                'set'     => ['status' => $signatoryBookConfig['errorStatus']],
+                'set'     => ['status' => 'A_TRA'],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
                 'data'    => [$fetchedAttachment['res_id']]
@@ -220,6 +217,12 @@ class FastParapheurSmtpController
                 'eventId'   => 'fromFastParapheurSmtp'
             ]);         
         }
+
+        ResModel::update([
+            'set' => ['status' => $args['signatoryBookConfig']['errorStatus']],
+            'where' => ['res_id = ?'],
+            'data' => [$resIdMaster]
+        ]);
     }
 
     /**
@@ -236,6 +239,7 @@ class FastParapheurSmtpController
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
         ValidatorModel::stringType($args, ['encodedFile']);
 
+        $resIdMaster = 0;
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
@@ -245,7 +249,8 @@ class FastParapheurSmtpController
             if (empty($resLetterbox)) {
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
-
+            
+            $resIdMaster = $resLetterbox['res_id'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
@@ -255,12 +260,6 @@ class FastParapheurSmtpController
             if (!empty($jsonResponse['error'])) {
                 return ['error' => $jsonResponse['error'], 'code' => $jsonResponse['code']];
             }
-
-            ResModel::update([
-                'set' => ['status' => $signatoryBookConfig['refusedStatus']],
-                'where' => ['res_id = ?'],
-                'data' => [$resLetterbox['res_id']]
-            ]);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -279,6 +278,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
+            $resIdMaster = $fetchedAttachment['res_id_master'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
@@ -295,7 +295,7 @@ class FastParapheurSmtpController
                 'data' => [$fetchedAttachment['res_id'], 'VISA_CIRCUIT']
             ]);
             AttachmentModel::update([
-                'set'     => ['status' => $signatoryBookConfig['refusedStatus']],
+                'set'     => ['status' => 'A_TRA'],
                 'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
                 'where'   => ['res_id = ?'],
                 'data'    => [$fetchedAttachment['res_id']]
@@ -309,6 +309,12 @@ class FastParapheurSmtpController
             ]);
 
         }
+
+        ResModel::update([
+            'set' => ['status' => $args['signatoryBookConfig']['refusedStatus']],
+            'where' => ['res_id = ?'],
+            'data' => [$resIdMaster]
+        ]);
     }
 
     /**
@@ -325,6 +331,7 @@ class FastParapheurSmtpController
         ValidatorModel::stringType($args['metadata'], ['clientDocType']);
         ValidatorModel::stringType($args, ['encodedFile']);
 
+        $resIdMaster = 0;
         if ($args['metadata']['clientDocType'] == 'mainDocument') {
             $resLetterbox = ResModel::get([
                 'select' => ['*'],
@@ -335,6 +342,7 @@ class FastParapheurSmtpController
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
+            $resIdMaster = $resLetterbox['res_id'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $resLetterbox['res_id'],
                 'typist'        => $resLetterbox['typist'],
@@ -369,12 +377,6 @@ class FastParapheurSmtpController
                 ]
             ]);
 
-            ResModel::update([
-                'set' => ['status' => $signatoryBookConfig['validatedStatus']],
-                'where' => ['res_id = ?'],
-                'data' => [$resLetterbox['res_id']]
-            ]);
-
             FastParapheurSmtpController::processVisaWorkflow(['res_id' => $resLetterbox['res_id'], 'processSignatory' => true]);
             
             HistoryController::add([
@@ -391,10 +393,11 @@ class FastParapheurSmtpController
                 'where'   => ['res_id = ?'],
                 'data'    => [$args['metadata']['clientDocId']]
             ])[0];
-            if (!empty($fetchedAttachment)) {
+            if (empty($fetchedAttachment)) {
                 return ['error' => 'client document id \'' . $args['metadata']['clientDocId'] . '\' does not exist!', 'code' => 400];
             }
 
+            $resIdMaster = $fetchedAttachment['res_id_master'];
             $jsonResponse = FastParapheurSmtpController::makeJsonResponse([
                 'resIdMaster'   => $fetchedAttachment['res_id_master'],
                 'typist'        => $fetchedAttachment['typist'],
@@ -420,7 +423,7 @@ class FastParapheurSmtpController
                 'typist'                    => $fetchedAttachment['typist'],
                 'format'                    => 'PDF',
                 'type'                      => 'signed_response',
-                'status'                    => 'TRA',
+                'status'                    => 'SIGN',
                 'encodedFile'               => $args['encodedFile'],
                 'inSignatureBook'           => true,
                 'originId'                  => $fetchedAttachment['res_id'],
@@ -459,6 +462,11 @@ class FastParapheurSmtpController
             ]);
         }
 
+        ResModel::update([
+            'set' => ['status' => $args['signatoryBookConfig']['validatedStatus']],
+            'where' => ['res_id = ?'],
+            'data' => [$resIdMaster]
+        ]);
     }
 
     /**
