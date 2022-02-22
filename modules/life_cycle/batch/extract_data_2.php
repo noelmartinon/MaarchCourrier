@@ -280,6 +280,14 @@ while($selectedFile = $stmt->fetchObject()) {
         $iivarExpediteur++;
     }
 
+    /**** "Date d'envoi en visa" ****/
+    $stmtVisa = Bt_doQuery(
+        $GLOBALS['db'],
+        "SELECT event_date FROM history WHERE (event_type = 'ACTION#38' OR event_type = 'ACTION#78') and record_id = ? LIMIT 1",   
+        array($selectedFile->res_id)
+    );
+    $line["Date d'envoi en visa"] = $stmtVisa->fetchObject()->event_date;
+
     /**** "Nombre de réponses" ****/
     $sqlCountAttachments = "select count(*) as count from res_attachments where attachment_type = 'response_project' and status <> 'DEL' and status <> 'OBS' and res_id_master = $selectedFile->res_id;";
     $stmtCountAttachments = Bt_doQuery($GLOBALS['db'], $sqlCountAttachments);

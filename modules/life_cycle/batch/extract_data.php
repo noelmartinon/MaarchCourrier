@@ -285,7 +285,7 @@ while($selectedFile = $stmt->fetchObject()) {
         $line["Département"] = retrieveDepartment($dptExp);
     }
 
-    /**** "Nombre de réponses" ****/
+    /**** "Date d'envoi en visa" ****/
     $stmtVisa = Bt_doQuery(
             $GLOBALS['db'],
             "SELECT event_date FROM history WHERE (event_type = 'ACTION#38' OR event_type = 'ACTION#78') and record_id = ? LIMIT 1",   
