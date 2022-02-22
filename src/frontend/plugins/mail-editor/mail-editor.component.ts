@@ -104,6 +104,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
     summarySheetUnits: any = [];
 
+    correspondents: any[] = [];
+
+    msgToDisplay: string = '';
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -597,6 +601,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         if (index >= 0) {
             this[type].splice(index, 1);
         }
+
+        if (this.recipients.length === 0) {
+            this.msgToDisplay = '';
+        }
     }
 
     initEmailsList() {
@@ -706,16 +714,27 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         this[type].splice(this[type].length - 1, 1);
 
         if (item.type === 'contactGroup') {
-            this.http.get(`../rest/contactsGroups/${item.id}`).pipe(
+            this.http.get(`../rest/contactsGroups/${item.id}/correspondents?limit=none`).pipe(
                 map((data: any) => {
-                    data = data.contactsGroup.contacts.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
-                        label: contact.contact,
+                    this.correspondents = data.correspondents;
+                    data = data.correspondents.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
+                        label: contact.name,
                         email: contact.email
                     }));
                     return data;
                 }),
                 tap((data: any) => {
-                    this[type] = this[type].concat(data);
+                    if (this.functions.empty(data)) {
+                        this.notify.error(this.translate.instant('lang.emptyEmails'));
+                    } else {
+                        const emptyMails: number = this.correspondents.filter((contact: any) => this.functions.empty(contact.email)).length;
+                        if (emptyMails > 0) {
+                            this.msgToDisplay = this.translate.instant('lang.correspondentEmptyEmails', {nbr: emptyMails});
+                        } else {
+                            this.msgToDisplay = '';
+                        }
+                        this[type] = this[type].concat(data);
+                    }
                 }),
                 catchError((err) => {
                     this.notify.handleSoftErrors(err);

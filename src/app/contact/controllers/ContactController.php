@@ -1798,6 +1798,7 @@ class ContactController
         $contactToDisplay = trim($contactName . $company);
 
         $sector = $args['contact']['sector'];
+        $email  = $args['contact']['email'];
         $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}" . (!empty($sector) ? " - {$sector}" : '');
         $contact = [
             'type'          => 'contact',
@@ -1807,7 +1808,8 @@ class ContactController
             'sector'        => $sector,
             'idToDisplay'   => "{$contactToDisplay}<br/>{$address}",
             'otherInfo'     => $otherInfo,
-            'thresholdLevel' => $thresholdLevel
+            'thresholdLevel' => $thresholdLevel,
+            'email'         => $email
         ];
 
         return ['contact' => $contact];
