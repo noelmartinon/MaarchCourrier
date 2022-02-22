@@ -8,7 +8,7 @@
             <div class="indexing-form-container">
                 <app-indexing-form *ngIf="currentIndexingModel.id !== undefined" #indexingForm
                     [groupId]="currentGroupId" [indexingFormId]="currentIndexingModel.id"
-                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (resourceToLinkEvent)="resourceToLink = $event"></app-indexing-form>
             </div>
             <div class="actions-indexing-form">
                 <ng-container

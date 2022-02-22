@@ -43,6 +43,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     @Input() hideFilter: boolean = false;
     @Input() appCriteriaTool: CriteriaToolComponent;
     @Input() sidenavRight: MatSidenav;
+    @Input() linkedRes: any[] = [];
 
     @Output() loadingResult = new EventEmitter<boolean>();
 
@@ -142,7 +143,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     constructor(
         private _activatedRoute: ActivatedRoute,
         public translate: TranslateService,
-        private router: Router,
+        public router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
         public dialog: MatDialog,
@@ -175,36 +176,50 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (!this.functions.empty(this.searchTerm)) {
-            this.initSearch = true;
-            this.criteria = {
-                meta: {
-                    values: this.searchTerm
-                }
-            };
+        if (this.functions.empty(this.linkedRes)) {
+            if (!this.functions.empty(this.searchTerm)) {
+                this.initSearch = true;
+                this.criteria = {
+                    meta: {
+                        values: this.searchTerm
+                    }
+                };
+            }
+            this.headerService.sideBarAdmin = true;
+
+            this.isLoadingResults = false;
+
+            if (this.toolTemplate !== undefined) {
+                this.headerService.initTemplate(this.toolTemplate, this.viewContainerRef, 'toolTemplate');
+            }
+
+            if (this.panelTemplate !== undefined && this.sidenavRight !== undefined) {
+                this.headerService.initTemplate(this.panelTemplate, this.viewContainerRef, 'panelTemplate');
+            }
+
+            if (this.filterTemplate !== undefined && !this.hideFilter) {
+                this.headerService.initTemplate(this.filterTemplate, this.viewContainerRef, 'filterTemplate');
+            }
+
+            this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
+
+            if (!this.functions.empty(this.searchTerm)) {
+                this.listProperties.criteria = {};
+                this.listProperties.criteria.meta = this.criteria.meta;
+            }
+        } else {
+            this.resultsLength = this.linkedRes['resources'].length;
+            this.allResInBasket = this.linkedRes['resources'].map((item: any) => item.resId);
+            this.selectedRes = this.linkedRes['resources'].filter((item: any) => item.checked).map((el: any) => el.resId);
+            this.paginatorLength = this.linkedRes['resources'].length > 10000 ? 10000 : this.linkedRes['resources'].length;
+            this.dataFilters = this.linkedRes['filters'];
+            this.templateColumns = this.linkedRes['templateColumns'];
+            const processData: any[] = this.processPostData(this.linkedRes);
+            this.data = processData['resources'];
+            this.isLoadingResults = false;
+            this.hideFilter = true;
         }
-        this.headerService.sideBarAdmin = true;
 
-        this.isLoadingResults = false;
-
-        if (this.toolTemplate !== undefined) {
-            this.headerService.initTemplate(this.toolTemplate, this.viewContainerRef, 'toolTemplate');
-        }
-
-        if (this.panelTemplate !== undefined && this.sidenavRight !== undefined) {
-            this.headerService.initTemplate(this.panelTemplate, this.viewContainerRef, 'panelTemplate');
-        }
-
-        if (this.filterTemplate !== undefined && !this.hideFilter) {
-            this.headerService.initTemplate(this.filterTemplate, this.viewContainerRef, 'filterTemplate');
-        }
-
-        this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
-
-        if (!this.functions.empty(this.searchTerm)) {
-            this.listProperties.criteria = {};
-            this.listProperties.criteria.meta = this.criteria.meta;
-        }
 
         this.loading = false;
     }
@@ -417,14 +432,24 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     viewThumbnail(row: any) {
         if (row.hasDocument) {
             this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
-            $('#viewThumbnail').show();
+            $('#viewThumbnailDoc').show();
             $('#listContent').css({ 'overflow': 'hidden' });
         }
     }
 
     closeThumbnail() {
-        $('#viewThumbnail').hide();
+        $('#viewThumbnailDoc').hide();
         $('#listContent').css({ 'overflow': 'auto' });
+    }
+
+    getTitle(row: any) {
+        if (!row.hasDocument) {
+            return this.translate.instant('lang.noDocument');
+        } else if (row.hasDocument && row.canConvert) {
+            return this.translate.instant('lang.viewResource');
+        } else if (row.hasDocument && !row.canConvert) {
+            return this.translate.instant('lang.noAvailablePreview');
+        }
     }
 
     processPostData(data: any) {
@@ -467,7 +492,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {
                     key.event = true;
                     if (key.displayValue.length > 1) {
-                        key.displayTitle = key.displayValue.join(' - ');
+                        key.displayTitle = Array.isArray(key.displayValue) ? key.displayValue.join(' - ') : key.displayValue;
                         key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.translate.instant('lang.contactsAlt');
                     } else if (key.displayValue.length === 1) {
                         key.displayValue = key.displayValue[0];
@@ -689,16 +714,28 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     viewDocument(row: any) {
-        this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
-            tap((data: any) => {
-                const file = new Blob([data], { type: 'application/pdf' });
-                const fileURL = URL.createObjectURL(file);
-                const newWindow = window.open();
-                newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
-                newWindow.document.title = row.chrono;
+        this.http.get(`../rest/resources/${row.resId}/fileInformation`).pipe(
+            tap((res: any) => {
+                if (res.information.canConvert) {
+                    this.http.get(`../rest/resources/${row.resId}/content?mode=view`, { responseType: 'blob' }).pipe(
+                        tap((data: any) => {
+                            const file = new Blob([data], { type: 'application/pdf' });
+                            const fileURL = URL.createObjectURL(file);
+                            const newWindow = window.open();
+                            newWindow.document.write(`<iframe style="width: 100%;height: 100%;margin: 0;padding: 0;" src="${fileURL}" frameborder="0" allowfullscreen></iframe>`);
+                            newWindow.document.title = row.chrono;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleBlobErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.notify.handleSoftErrors(this.translate.instant('lang.noAvailablePreview'));
+                }
             }),
             catchError((err: any) => {
-                this.notify.handleBlobErrors(err);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

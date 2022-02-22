@@ -2637,5 +2637,7 @@
     "fileNotConvertible": "Only convertible files are allowed",
     "warningNote": "Please note that your comment must be neutral, factual, objective and respectful of the people concerned, never excessive or insulting.",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "hasLinkedRes": "At least one mail registered in the last {{nbDays}} day(s) is assigned to the same contact.",
+    "seeMore": "See more !"
 }

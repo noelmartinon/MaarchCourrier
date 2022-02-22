@@ -501,7 +501,6 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 //Search
 $app->post('/search', \Search\controllers\SearchController::class . ':get');
 $app->get('/search/configuration', \Search\controllers\SearchController::class . ':getConfiguration');
-
 $app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
 $app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');
 $app->delete('/searchTemplates/{id}', \Search\controllers\SearchTemplateController::class . ':delete');

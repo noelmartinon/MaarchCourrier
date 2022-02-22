@@ -2635,5 +2635,7 @@
     "fileNotConvertible": "Seuls les fichiers convertibles sont autorisés",
     "warningNote": "Attention votre commentaire doit être neutre, factuel, objectif et respectueux des personnes concernées, jamais excessif ou insultant.",
     "showPassword": "Afficher le mot de passe",
-    "hidePassword": "Masquer le mot de passe"
+    "hidePassword": "Masquer le mot de passe",
+    "hasLinkedRes": "Au moins un courrier enregistré dans les {{nbDays}} derniers jour(s) est affecté au même contact.",
+    "seeMore": "Voir !"
 }

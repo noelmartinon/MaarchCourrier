@@ -681,3 +681,13 @@
         left: 0px;
     }
 }
+
+.linkRes {
+    display: inline-flex;
+    font-size: 15px;
+    text-align: center;
+    color: var(--maarch-color-danger);
+    padding-top: 10px;
+    overflow-x: hidden;
+    font-weight: bold;
+}

@@ -196,7 +196,8 @@
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
                                     <app-contact-autocomplete [id]="field.identifier"
                                         [control]="arrFormControl[field.identifier]" style="width:100%;"
-                                        (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                        (retrieveDocumentEvent)="retrieveDocumentEvent.emit()"
+                                        (afterContactSelected)="selectedContact($event, field.identifier)" (removeContactEvent)="checkRemovedItem($event)">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">
@@ -250,6 +251,9 @@
                                 <i class="fas fa-check fieldFull"
                                     *ngIf="!adminMode && arrFormControl[field.identifier].valid && !isEmptyField(field)"></i>
                             </div>
+                        </div>
+                        <div class="linkRes" *ngIf="hasLinkedRes && field.identifier === 'senders'">
+                            {{msgToDisplay}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{'lang.seeMore' | translate}}</a></ng-container>
                         </div>
                         <div
                             *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">

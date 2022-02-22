@@ -136,7 +136,7 @@
                 <app-indexing-form *ngIf="currentTool === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [resId]="currentResourceInformations.resId" [indexingFormId]="currentResourceInformations.modelId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
-                    (loadingFormEndEvent)="triggerProcessAction()"
+                    (loadingFormEndEvent)="triggerProcessAction()" (reloadBadge)="refreshBadge(1,'linkedResources')"
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
@@ -381,7 +381,7 @@
                 <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
-                    (loadingFormEndEvent)="triggerProcessAction()"
+                    (loadingFormEndEvent)="triggerProcessAction()" (reloadBadge)="refreshBadge(1,'linkedResources')"
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
