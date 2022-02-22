@@ -345,7 +345,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
             }
         } else {
             $entity['short_label'] = $entity['entity_id'];
-            $entity['entity_type'] = 'Service';
+            $entity['entity_type'] = 'Direction';
 
             $maarchEntityParent = \Entity\models\EntityModel::get(['select' => ['id'], 'where' => ['entity_id = ?'], 'data' => [$entity['parent_entity_id']]]);
 
