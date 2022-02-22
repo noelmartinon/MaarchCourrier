@@ -11,8 +11,15 @@
                             type="text">
                     </mat-form-field>
                     <mat-form-field *ngIf="['cas', 'keycloak', 'sso', 'azure_saml'].indexOf(authService.authMode) === -1" class="input-row" appearance="outline">
-                        <input id="password" name="password" matInput [placeholder]="'lang.password' | translate" type="password"
+                        <input id="password" name="password" matInput [placeholder]="'lang.password' | translate"
+                            [type]="hidePassword ? 'password' : 'text'"
                             formControlName="password" autocomplete="off">
+                        <button type="button" color="primary" matSuffix mat-icon-button style="cursor: pointer; margin-right: 2px;"
+                        (click)="$event.stopPropagation(); hidePassword = !hidePassword;" [title]="(hidePassword ? 'lang.showPassword' : 'lang.hidePassword') | translate">
+                            <mat-icon color="primary" class="fa fa-2x"
+                                [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']">
+                            </mat-icon>
+                        </button>
                         <mat-hint align="end" *ngIf="authService.authMode === 'standard'"><a
                                  style="cursor: pointer;" (click)="goTo('/forgot-password')" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
                         <mat-hint align="end" *ngIf="authService.authMode === 'ldap'"><span

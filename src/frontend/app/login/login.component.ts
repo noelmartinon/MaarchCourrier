@@ -28,6 +28,7 @@ export class LoginComponent implements OnInit {
     applicationName: string = '';
     loginMessage: string = '';
     applicationVersion: string = '';
+    hidePassword: boolean = true;
 
     constructor(
         public translate: TranslateService,
