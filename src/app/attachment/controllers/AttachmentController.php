@@ -931,7 +931,7 @@ class AttachmentController
         return true;
     }
 
-    private static function controlAttachment(array $args)
+    public static function controlAttachment(array $args)
     {
         $body = $args['body'];
 

@@ -775,7 +775,6 @@ export class IndexingFormComponent implements OnInit {
                 this.setAllowedValues(elem);
             }));
         }));
-
         if (this.resId !== null) {
 
             await this.setResource(saveResourceState);
@@ -789,7 +788,26 @@ export class IndexingFormComponent implements OnInit {
             field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
                 item.disabled = field.allowedValues.indexOf(item.id) === -1;
             });
-        }        
+        }
+        if (!this.adminMode && field.identifier === 'doctype') {
+            this.checkDisabledValues(field);
+        }  
+    }
+
+    checkDisabledValues(field: any) {
+        let disabledItems: number[] = [];
+        // CHECK SECOND LEVEL
+        disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+
+
+        // CHECK FIRST LEVEL
+        field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
+            if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
+                disabledItems.push(item.id);
+            }
+        });
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
     }
 
     setResource(saveResourceState: boolean = true) {

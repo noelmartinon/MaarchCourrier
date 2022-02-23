@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.21_TMA1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.24_TMA1' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -208,8 +208,10 @@ DO $$ BEGIN
 END$$;
 
 /* GROUPBASKET */
-UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
-UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+/* SGAMI SO FIX 75 */
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+/* END SGAMI SO FIX 75 */
 UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 
 /* TEMPLATES */
@@ -217,6 +219,7 @@ ALTER TABLE templates DROP COLUMN IF EXISTS subject;
 ALTER TABLE templates ADD COLUMN subject character varying(255);
 
 UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = 'true';
+
 
 /* REGISTERED MAIL */
 DROP TABLE IF EXISTS registered_mail_issuing_sites;
@@ -286,6 +289,9 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistribut
 DELETE FROM status WHERE id = 'PND' OR id = 'DSTRIBUTED';
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('PND', 'AR Non distribué', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
+-- SGAMI requalification courrier
+UPDATE status set can_be_modified = 'Y' WHERE id = 'RES';
+-- END SGAMI
 DELETE FROM parameters WHERE id = 'registeredMailImportedStatus';
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
 
@@ -360,7 +366,9 @@ ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
 DROP TYPE IF EXISTS custom_fields_modes;
 CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
 ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT 'form';
-
+-- SGAMI fix 88
+ALTER TABLE custom_fields ALTER COLUMN actived SET DEFAULT 'Y';
+-- END SGAMI
 ALTER TABLE listinstance DROP COLUMN IF EXISTS delegate;
 ALTER TABLE listinstance ADD COLUMN delegate INTEGER;
 

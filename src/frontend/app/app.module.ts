@@ -45,6 +45,7 @@ import { MaarchParaphComponent } from './actions/send-external-signatory-book-ac
 import { IParaphComponent } from './actions/send-external-signatory-book-action/i-paraph/i-paraph.component';
 import { IxbusParaphComponent } from './actions/send-external-signatory-book-action/ixbus-paraph/ixbus-paraph.component';
 import { FastParaphComponent } from './actions/send-external-signatory-book-action/fast-paraph/fast-paraph.component';
+import { FastParaphSmtpComponent } from './actions/send-external-signatory-book-action/fast-paraph-smtp/fast-paraph-smtp.component';
 import { ViewDocActionComponent } from './actions/view-doc-action/view-doc-action.component';
 import { RedirectActionComponent } from './actions/redirect-action/redirect-action.component';
 import { SendShippingActionComponent } from './actions/send-shipping-action/send-shipping-action.component';
@@ -216,6 +217,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         XParaphComponent,
         MaarchParaphComponent,
         FastParaphComponent,
+        FastParaphSmtpComponent,
         IxbusParaphComponent,
         IParaphComponent,
         ViewDocActionComponent,

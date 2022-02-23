@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { tap, catchError, filter } from 'rxjs/operators';
+import { tap, catchError, filter, finalize } from 'rxjs/operators';
 import { PrivilegeService } from '@service/privileges.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
@@ -59,6 +59,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     leftDocumentDisplay : boolean = false;
     letIconDisplay: boolean = false;
     // END
+    //SGAMI-SO #75
+    basket: any = null
+    //SGAMI-SO #75
 
     subscription: Subscription;
     currentResourceLock: any = null;
@@ -66,6 +69,10 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     leftContentWidth: string = '44%';
     rightContentWidth: string = '44%';
     dialogRef: MatDialogRef<any>;
+
+    pathToRedirect: string = '';
+
+    allResources: number[] = [];
 
     processTool: any[] = [
         {
@@ -144,7 +151,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.signatureBook = data;
-                    console.dir("this.signatureBook", this.signatureBook);
                     this.canUpdateDocument = data.canUpdateDocuments;
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
@@ -194,7 +200,18 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }, 0);
                     this.loadBadges();
                     this.loadActions();
-                    
+
+                    const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
+                    this.http.get(`../rest/${path}`).pipe(
+                        tap((data: any) => {
+                            this.allResources = data.allResources;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+
                     if (this.appDocumentViewer !== undefined) {
                         this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ?  'mainDocument' : 'attachment');
                     }
@@ -211,7 +228,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     loadActions() {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-                this.signatureBook.actions = data.actions;
+                this.signatureBook.actions = data.actions;               
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -296,12 +313,76 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
-            await this.appVisaWorkflow.saveVisaWorkflow();
+            await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
+                let assignedBasket: any;
+                this.http.get('../rest/home').pipe(
+                    tap((data: any) => {
+                        assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);                        
+                    }),
+                    finalize(() => {   
+                        if (this.canChange(assignedBasket)) {
+                            this.goToNextDocument()
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();             
+            });
             this.loadBadges();
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
             this.loadBadges();
         }
+    }
+
+    canChange(assignedBasket: any) {
+        const usersHasNotSigned: any[] = this.appVisaWorkflow.getWorkflow().filter((user: any) => this.functions.empty(user.process_date));
+        if (assignedBasket === undefined) {
+            return usersHasNotSigned[0].item_id !== this.headerService.user.id;
+        } else {
+            return (this.userId === this.headerService.user.id && usersHasNotSigned[0].item_id !== this.headerService.user.id) || (this.userId !== this.headerService.user.id && assignedBasket.owner_user_id !== usersHasNotSigned[0].item_id);
+        }
+    }
+
+    goToNextDocument() {
+        this.pathToRedirect = '';                     
+        this.actionService.stopRefreshResourceLock();
+        const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
+        this.http.get(`../rest/${path}`).pipe(
+            tap((data: any) => {
+                if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
+                    if (data.count > 0) {
+                        let index: number;
+                        if (data.allResources.indexOf(this.resId) > -1) {
+                            index = data.allResources.indexOf(this.resId);
+                        } else {
+                            if (this.allResources.length > 2 && this.allResources.indexOf(this.resId) !== this.allResources.length - 1) {
+                                index = this.allResources.indexOf(this.resId) + 1;
+                            } else {
+                                index = 0;
+                            }
+                        }
+                        this.pathToRedirect = `/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[index]}`;
+                        this.router.navigate([this.pathToRedirect]);
+                    } else {
+                        this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
+                        this.router.navigate([this.pathToRedirect]);
+                    }
+                    // this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                } else {
+                    if (data.allResources.indexOf(this.resId) === -1) {
+                        this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
+                        this.router.navigate([this.pathToRedirect]);
+                    }
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     openConfirmModification() {
@@ -582,7 +663,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     async changeLocation(resId: number, origin: string) {
         if (resId !== this.resId) {
             const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
-
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
                 if (!this.actionService.actionEnded) { 
@@ -623,14 +703,52 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     loadBadges() {
+        
         this.http.get(`../rest/resources/${this.resId}/items`).pipe(
             tap((data: any) => {
+                console.debug(data)
                 this.processTool.forEach(element => {
                     element.count = data[element.id] !== undefined ? data[element.id] : 0;
                 });
             }),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                /**
+                * SGAMI-SO #75
+                */
+                 console.debug("sgami load badges")
+                 /**SGAMO-SO #75 */
+                 this.actionService.nameBasket(this.basketId,this.userId)
+                 this.basket = this.actionService.basket
+                 console.debug('this.basket',this.basket)
+                 //SGAMI-SO FIN 
+                if( String(this.basket) == 'EvisBasket' || String(this.basket) == 'EsigBasket') {                    
+                  
+                    this.actionService.stopRefreshResourceLock();
+                    /*if (!this.actionService.actionEnded) { 
+                        this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                    }*/
+                    let path
+                    if(this.actionService.sgami75.length > 0) {
+                        path  = '/signatureBook/users/'+this.userId+'/groups/'+this.groupId+'/baskets/'+this.basketId+'/resources/' + this.actionService.sgami75[0]
+                        
+                    }else{
+                        path = '/home'
+                    }
+                    this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
+                    setTimeout(() => {
+                        this.router.navigate([path]);
+                    }, 2000);
+                   
+                    
+                    return of(true);
+                    
+                } else {
+                    this.notify.handleSoftErrors(err);
+                }
+                /**
+                 * SGAMI-SO FIN
+                 */
+               
                 return of(false);
             })
         ).subscribe();
@@ -696,7 +814,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         this.actionService.stopRefreshResourceLock();
 
         if (!this.actionService.actionEnded) {
-            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId], this.pathToRedirect);
         }
 
         // unsubscribe to ensure no memory leaks

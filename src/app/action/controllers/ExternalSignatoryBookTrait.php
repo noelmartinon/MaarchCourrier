@@ -17,6 +17,7 @@ use Attachment\models\AttachmentModel;
 use ExternalSignatoryBook\controllers\IxbusController;
 use ExternalSignatoryBook\controllers\IParapheurController;
 use ExternalSignatoryBook\controllers\FastParapheurController;
+use ExternalSignatoryBook\controllers\FastParapheurSmtpController;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
 use ExternalSignatoryBook\controllers\XParaphController;
 use Resource\models\ResModel;
@@ -87,6 +88,12 @@ trait ExternalSignatoryBookTrait
                     'config'      => $config,
                     'resIdMaster' => $args['resId']
                 ]);
+            } elseif ($config['id'] == 'fastParapheurSmtp') {
+                $sentInfo = FastParapheurSmtpController::sendDatas([
+                    'config'        => $config,
+                    'resIdMaster'   => $args['resId'],
+                    'note'          => $args['note']['content'] ?? null
+                ]);                
             } elseif ($config['id'] == 'iParapheur') {
                 $sentInfo = IParapheurController::sendDatas([
                     'config'      => $config,

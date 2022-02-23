@@ -158,9 +158,12 @@ define('_LINK_ADDED', 'Link added');//TRANSLATE
 define('_LINK_DELETED', 'Link deleted');//TRANSLATE
 define('_DOCUMENT_SIGNED', 'Document signed');//TRANSLATE
 define('_DOCUMENT_UNSIGNED', 'Document unsigned');//TRANSLATE
+define('_DOCUMENT_REFUSED', 'Document geweigerd');
+define('_DOCUMENT_ERROR', 'Document fout');
 define('_LINK_ADDED_TAG', 'Tag link added');//TRANSLATE
 define('_LINK_DELETED_TAG', 'Tag link deleted');//TRANSLATE
 define('_LOGIN', 'User connection');
+define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (per email)');
 
 // ADMINISTRATION
 define('_USERS', 'Gebruikers');
@@ -214,6 +217,7 @@ define('_CLOSE_FOLDER', 'De map afsluiten');
 define('_TAG_DEFAULT', 'Sleutelwoord');
 define('_PRIVATE_TAGS', 'De sleutelwoorden verbinden met de eenheid van de gebruiker (Directieniveau)');
 define('_PRIVATE_TAGS_DESC', 'De gebruiker zal enkel de sleutelwoorden zien die beperkt werden tot zijn directie (de toevoeging / wijziging zal het sleutelwoord automatisch aan zijn directie koppelen).');
+define('_RECEIVE_FROM_EXTERNAL', "Gegevens ontvangen uit een extern handtekeningenboek");
 
 // ACTIONS
 define('_REDIRECTION', 'Doorsturen');

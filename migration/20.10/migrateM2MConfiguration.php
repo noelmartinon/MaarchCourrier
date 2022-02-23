@@ -1,6 +1,6 @@
 <?php
 
-require '../../../vendor/autoload.php';
+require '../../vendor/autoload.php';
 
 /**
  * Optional : when migrating, you can give a path of a mapping file to migrate contacts' M2M communication_means
@@ -31,7 +31,7 @@ if ($cmd > 0) {
     }
 }
 
-chdir('../../..');
+chdir('../..');
 
 $customs = scandir('custom');
 
