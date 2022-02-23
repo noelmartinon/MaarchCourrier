@@ -1368,6 +1368,7 @@ CREATE TABLE custom_fields
     type character varying(256) NOT NULL,
     mode custom_fields_modes NOT NULL DEFAULT 'form',
     values jsonb,
+    actived character varying(1) DEFAULT 'Y',
     CONSTRAINT custom_fields_pkey PRIMARY KEY (id),
     CONSTRAINT custom_fields_unique_key UNIQUE (label)
 )

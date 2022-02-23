@@ -51,6 +51,26 @@ foreach ($customs as $custom) {
                 ]);
             }            
         }
+
+        $indexer= \Action\models\ActionModel::get([
+            'select' => ['id'] ,
+            'where' => $where,
+            'data' => ['Indexer un document']
+        ]);
+
+        if($indexer[0]['id'] > 0 ) {
+            //update notifications where  eventId 'Valider un document'
+            $notifications = \Notification\models\NotificationModel::get();
+            foreach ($notifications as $notification) {
+                //$event_id = json_decode($notification['event_id'], true);
+                if ($element === $notification['event_id']) {
+                    \Notification\models\NotificationModel::update([
+                        'event_id' => $indexer[0]['id'],
+                        'notification_sid' => $notification['notification_sid']
+                    ]);
+                }
+            }
+        }
         
         $bool = true;
     }

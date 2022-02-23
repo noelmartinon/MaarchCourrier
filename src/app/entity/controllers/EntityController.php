@@ -709,13 +709,13 @@ class EntityController
             }
         }
 
-        $csvHead = array_map(function ($field) { return utf8_decode($field); }, array_column($fields, 'label'));
+        $csvHead = array_map(function ($field) { return $field; }, array_column($fields, 'label'));
         fputcsv($file, $csvHead, $delimiter);
 
         foreach ($entities as $entity) {
             $entityValues = [];
             foreach ($fields as $field) {
-                $entityValues[] = utf8_decode($entity[$allowedFields[$field['value']]]);
+                $entityValues[] = $entity[$allowedFields[$field['value']]];
             }
             fputcsv($file, $entityValues, $delimiter);
         }

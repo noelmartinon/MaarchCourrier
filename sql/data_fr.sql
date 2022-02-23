@@ -960,7 +960,9 @@ INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, ca
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('SIGN', 'PJ signée', 'Y', 'fa-check', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('STDBY', 'Clôturé avec suivi', 'Y', 'fm-letter-status-wait', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('ENVDONE', 'Courrier envoyé', 'Y', 'fm-letter-status-aenv', 'apps', 'Y', 'Y');
---INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('AR_OK', 'Accusé de réception créé', 'Y', 'fa-mail-bulk', 'apps', 'Y', 'Y');
+-- SGAMI requalification courrier
+INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('RES', 'A requalifier', 'Y', 'fm-letter-status-info', 'apps', 'Y', 'Y');
+-- END SGAMI
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('REJ_SIGN', 'Signature refusée sur la tablette (MP)', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('PND', 'AR Non distribué', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
@@ -1667,11 +1669,13 @@ Select setval('shipping_templates_id_seq', (select max(id)+1 from shipping_templ
 
 /* Champs customs */
 TRUNCATE TABLE custom_fields;
-INSERT INTO custom_fields (id, label, type, "values") VALUES (1, 'Date de fin de contrat', 'date', '[]');
-INSERT INTO custom_fields (id, label, type, "values") VALUES (2, 'Adresse d''intervention', 'banAutocomplete', '[]');
-INSERT INTO custom_fields (id, label, type, values) VALUES (3, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Fax", "Chronopost", "Fedex", "Courrier AR", "Coursier", "Pli numérique", "Autre"]');
-INSERT INTO custom_fields (id, label, type, "values") VALUES (4, 'Référence courrier expéditeur', 'string', '[]');
-INSERT INTO custom_fields (id, label, type, "values") VALUES (5, 'Num recommandé', 'string', '[]');
+-- SGAMI SO add actived Column
+INSERT INTO custom_fields (id, label, type, "values", actived) VALUES (1, 'Date de fin de contrat', 'date', '[]', 'N');
+INSERT INTO custom_fields (id, label, type, "values", actived) VALUES (2, 'Adresse d''intervention', 'banAutocomplete', '[]', 'N');
+INSERT INTO custom_fields (id, label, type, values, actived) VALUES (3, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Fax", "Chronopost", "Fedex", "Courrier AR", "Coursier", "Pli numérique", "Autre"]','Y');
+INSERT INTO custom_fields (id, label, type, "values", actived) VALUES (4, 'Référence courrier expéditeur', 'string', '[]', 'Y');
+INSERT INTO custom_fields (id, label, type, "values", actived) VALUES (5, 'Num recommandé', 'string', '[]', 'N');
+-- SGAMI SO END
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
 /* Modèles d'enregistrement */

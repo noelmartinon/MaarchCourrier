@@ -7,6 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { XParaphComponent } from './x-paraph/x-paraph.component';
 import { MaarchParaphComponent } from './maarch-paraph/maarch-paraph.component';
 import { FastParaphComponent } from './fast-paraph/fast-paraph.component';
+import { FastParaphSmtpComponent } from './fast-paraph-smtp/fast-paraph-smtp.component';
 import { IParaphComponent } from './i-paraph/i-paraph.component';
 import { IxbusParaphComponent } from './ixbus-paraph/ixbus-paraph.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
@@ -18,7 +19,6 @@ import { of } from 'rxjs';
 })
 export class SendExternalSignatoryBookActionComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     additionalsInfos: any = {
@@ -48,6 +48,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
     @ViewChild('maarchParapheur', { static: false }) maarchParapheur: MaarchParaphComponent;
     @ViewChild('fastParapheur', { static: false }) fastParapheur: FastParaphComponent;
+    @ViewChild('fastParapheurSmtp', { static: false }) fastParapheurSmtp: FastParaphSmtpComponent;
     @ViewChild('iParapheur', { static: false }) iParapheur: IParaphComponent;
     @ViewChild('ixbus', { static: false }) ixbus: IxbusParaphComponent;
 
@@ -106,7 +107,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
 
         realResSelected = this[this.signatoryBookEnabled].getRessources();
         datas = this[this.signatoryBookEnabled].getDatas();
-        
+
         this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(
             tap((data: any) => {
                 if (!data) {

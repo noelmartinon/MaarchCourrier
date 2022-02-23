@@ -159,9 +159,19 @@ define('_LINK_ADDED', 'Link added');
 define('_LINK_DELETED', 'Link deleted');
 define('_DOCUMENT_SIGNED', 'Document signed');
 define('_DOCUMENT_UNSIGNED', 'Document unsigned');
+define('_DOCUMENT_REFUSED', 'Document refused');
+define('_DOCUMENT_ERROR', 'Document in error');
 define('_LINK_ADDED_TAG', 'Tag link added');
 define('_LINK_DELETED_TAG', 'Tag link deleted');
 define('_LOGIN', 'User connection');
+define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (by email)');
+define('_MAIN_DOCUMENT_SIGNED_FROM_SB', 'The main document has been signed from the external signature book');
+define('_MAIN_DOCUMENT_REFUSED_FROM_SB', 'The main document has been refused from the external signature book');
+define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'The main document was in error from the external signature book');
+define('_ATTACHMENT_SIGNED_FROM_SB', 'The attachment has been refused from the external signature book');
+define('_ATTACHMENT_REFUSED_FROM_SB', 'The attachment has been refused from the external signature book');
+define('_ATTACHMENT_ERROR_FROM_SB', 'The attachment was in error from the external signature book');
+define('_EMAIL_SEND_SUCCESS', 'email(s) was send successfully');
 
 // ADMINISTRATION
 define('_USERS', 'Users');
@@ -217,6 +227,7 @@ define("_CLOSE_FOLDER", "Close the folder");
 define("_TAG_DEFAULT", "Tag");
 define("_PRIVATE_TAGS", "Associate Tag to the user's entity (Direction level)");
 define("_PRIVATE_TAGS_DESC", "User will only see Tag restricted to user's direction (adding / updating will automatically associate the word to user's direction).");
+define('_RECEIVE_FROM_EXTERNAL', 'Receive data from external signature book');
 
 // ACTIONS
 define('_REDIRECTION', 'Redirection');
@@ -291,6 +302,8 @@ define('_ASSIGNEE', 'Assignee');
 define('_DOCUMENT_WITH_NOTES', 'Document with notes');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Acknowledgement receipt (Record management)");
 define("_REPLY_RECORD_MANAGEMENT", "Transfer reply (Record management)");
+define("_RESPONSE_JSON", "Response json");
+define("_REQUEST_JSON", "Request json");
 
 define('_SUMMARY_SHEET', 'Summary sheet');
 define('_UNDEFINED', 'Undefined');
@@ -429,7 +442,7 @@ define("_UPDATE_LISTINSTANCE", "Diffusion list updated");
 define("_UPDATE_LISTINSTANCE_DEST", "Diffusion list recipient updated");
 define("_UPDATE_VISA_CIRCUIT", "Visa workflow updated");
 define("_UPDATE_AVIS_CIRCUIT", "Opinion workflow updated");
-
+define("_CONFIGURE_VISA_CIRCUIT", "Please configure the 'Visa workflow'");
 define("_VISA_CIRCUIT_DELETED", "Visa workflow deleted");
 define("_AVIS_CIRCUIT_DELETED", "Opinion workflow updated");
 

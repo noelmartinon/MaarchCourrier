@@ -271,10 +271,10 @@ class ReceiveMessageExchangeController
                     'collId'    => 'letterbox_coll',
                     'version'   => 1
                 ]);
-    
+
                 $customId = CoreConfigModel::getCustomId();
                 $customId = empty($customId) ? 'null' : $customId;
-                exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$resId} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
+                exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$storeResource} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
             }
             ResourceContactModel::create(['res_id' => $storeResource, 'item_id' => $aArgs['contact']['id'], 'type' => 'contact', 'mode' => 'sender']);
         }

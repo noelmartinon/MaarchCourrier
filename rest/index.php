@@ -117,6 +117,9 @@ $app->get('/autocomplete/contacts/m2m', \SrcCore\controllers\AutoCompleteControl
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');
 $app->post('/baskets', \Basket\controllers\BasketController::class . ':create');
 $app->get('/baskets/{id}', \Basket\controllers\BasketController::class . ':getById');
+/** SGAMI SO - #75*/
+$app->get('/basket/{id}/users/{userId}', \Basket\controllers\BasketController::class . ':getId');
+/** */
 $app->put('/baskets/{id}', \Basket\controllers\BasketController::class . ':update');
 $app->delete('/baskets/{id}', \Basket\controllers\BasketController::class . ':delete');
 $app->get('/baskets/{id}/groups', \Basket\controllers\BasketController::class . ':getGroups');
@@ -425,7 +428,6 @@ $app->delete('/resources/{resId}/linkedResources/{id}', \Resource\controllers\Li
 $app->delete('/resources/{resId}/circuits/{type}', \Entity\controllers\ListInstanceController::class . ':deleteCircuit');
 $app->get('/resources/{resId}/fileInformation', \Resource\controllers\ResController::class . ':getResourceFileInformation');
 $app->get('/resources/{resId}/baskets', \Resource\controllers\UserFollowedResourceController::class . ':getBaskets');
-
 $app->put('/res/resource/status', \Resource\controllers\ResController::class . ':updateStatus');
 $app->post('/res/list', \Resource\controllers\ResController::class . ':getList');
 $app->put('/res/externalInfos', \Resource\controllers\ResController::class . ':updateExternalInfos');
@@ -473,7 +475,6 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 //Search
 $app->post('/search', \Search\controllers\SearchController::class . ':get');
 $app->get('/search/configuration', \Search\controllers\SearchController::class . ':getConfiguration');
-
 $app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
 $app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');
 $app->delete('/searchTemplates/{id}', \Search\controllers\SearchTemplateController::class . ':delete');
@@ -611,7 +612,7 @@ $app->get('/documents/{id}/maarchParapheurWorkflow', \ExternalSignatoryBook\cont
 $app->get('/maarchParapheur/user/{id}/picture', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getUserPicture');
 $app->get('/externalSignatureBooks/enabled', \ExternalSignatoryBook\controllers\ExternalSignatureBookController::class . ':getEnabledSignatureBook');
 $app->get('/externalSummary/{resId}', \ExternalSummary\controllers\SummaryController::class . ':getByResId');
-
+$app->post('/fast2maarch', \ExternalSignatoryBook\controllers\FastParapheurSmtpController::class . ':createDocument');
 $app->get('/externalConnectionsEnabled', \SrcCore\controllers\CoreController::class . ':externalConnectionsEnabled');
 
 //Alfresco

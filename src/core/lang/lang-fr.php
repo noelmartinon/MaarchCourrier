@@ -159,9 +159,18 @@ define('_LINK_ADDED', 'Liaison ajoutée');
 define('_LINK_DELETED', 'Liaison supprimée');
 define('_DOCUMENT_SIGNED', 'Document signé');
 define('_DOCUMENT_UNSIGNED', 'Document dé-signé');
+define('_DOCUMENT_REFUSED', 'Document refusé');
+define('_DOCUMENT_ERROR', 'Document en erreur');
 define('_LINK_ADDED_TAG', 'Liaison de mot-clé ajoutée');
 define('_LINK_DELETED_TAG', 'Liaison de mot-clé supprimée');
 define('_LOGIN', 'Connexion de l\'utilisateur');
+define('_FAST_PARAPHEUR_SMTP', 'Fast-Parapheur (par email)');
+define('_MAIN_DOCUMENT_SIGNED_FROM_SB', 'Le document principal a été signé dans le parapheur externe');
+define('_MAIN_DOCUMENT_REFUSED_FROM_SB', 'Le document principal a été refusé dans le parapheur externe');
+define('_MAIN_DOCUMENT_ERROR_FROM_SB', 'Le document principal a été en erreur dans le parapheur externe');
+define('_ATTACHMENT_SIGNED_FROM_SB', 'La pièce jointe a été signé dans le parapheur externe');
+define('_ATTACHMENT_REFUSED_FROM_SB', 'La pièce jointe a été refusé dans le parapheur externe');
+define('_ATTACHMENT_ERROR_FROM_SB', 'La pièce jointe a été en erreur dans le parapheur externe');
 
 // ADMINISTRATION
 define('_USERS', 'Utilisateurs');
@@ -217,6 +226,7 @@ define("_CLOSE_FOLDER", "Clôturer le dossier");
 define("_TAG_DEFAULT", "Mot-clé");
 define("_PRIVATE_TAGS", "Lier les Mots-clé à l'entité de l'utilisateur (Niveau direction)");
 define("_PRIVATE_TAGS_DESC", "L'utilisateur ne verra que les Mots-clé qui ont été restreints à sa direction (l'ajout / modification associera le mot clé automatiquement à sa direction).");
+define('_RECEIVE_FROM_EXTERNAL', "Recevoir des données d'un parapheur externe");
 
 // ACTIONS
 define('_REDIRECTION', 'Rediriger');
@@ -274,6 +284,7 @@ define('_FOR_ENTITY', 'pour l\'entité :');
 define('_NO_ENTITY', 'Pas d\'entité associée au courrier');
 define('_RECONCILE_RESOURCE', 'Réconcilier un courrier');
 define('_RECONCILE_RESOURCE_DESC', "Ajoute le fichier principal du courrier à un autre courrier");
+define('_EMAIL_SEND_SUCCESS', 'emails ont été envoyés avec succès');
 
 //ATTACHMENT TYPES
 define("_RESPONSE_PROJECT", "Projet de réponse");
@@ -291,6 +302,8 @@ define('_ASSIGNEE', 'Attributaire');
 define('_DOCUMENT_WITH_NOTES', 'Document annoté');
 define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Accusé de réception (Archivage)");
 define("_REPLY_RECORD_MANAGEMENT", "Réponse au transfert (Archivage)");
+define("_RESPONSE_JSON", "Json de réponse");
+define("_REQUEST_JSON", "Json de demande");
 
 define('_SUMMARY_SHEET', 'Fiche de liaison');
 define('_UNDEFINED', 'Non défini');
@@ -429,7 +442,7 @@ define("_UPDATE_LISTINSTANCE", "Liste de diffusion mise à jour");
 define("_UPDATE_LISTINSTANCE_DEST", "Destinataire de la liste de diffusion mis à jour");
 define("_UPDATE_VISA_CIRCUIT", "Circuit de visa mis à jour");
 define("_UPDATE_AVIS_CIRCUIT", "Circuit d'avis mis à jour");
-
+define("_CONFIGURE_VISA_CIRCUIT", "Veuillez configurer le 'Circuit de visa'");
 define("_VISA_CIRCUIT_DELETED", "Circuit de visa supprimé");
 define("_AVIS_CIRCUIT_DELETED", "Circuit d'avis supprimé");
 
