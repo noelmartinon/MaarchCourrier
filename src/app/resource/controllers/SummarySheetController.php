@@ -403,6 +403,7 @@ class SummarySheetController
                             $value = $customFieldsValues[$customFieldsId] ? '<b>' . $customFieldsValues[$customFieldsId] . '</b>' : '<i>' . _UNDEFINED . '</i>';
                         }
 
+                        $pdf->SetFont('', '', 8);
                         $nextLine = ($nextLine + 1) % 2;
                         $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
                         $pdf->SetFont('', '', 10);
