@@ -432,8 +432,7 @@ class ResourceControlController
                         return ['errors' => "Body customFields[{$customFieldId}] is not a number"];
                     } elseif ($customField['type'] == 'date' && !Validator::date()->notEmpty()->validate($body['customFields'][$customFieldId])) {
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
-                    } 
-                    elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
+                    } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
                         if(!empty($args['oldDoctypeId']) && $body['customFields'][$customFieldId] == $args['oldDoctypeId']) {
                             continue;
                         }
@@ -444,8 +443,7 @@ class ResourceControlController
                 continue;
             } elseif ($indexingModelField['mandatory'] && !isset($body[$indexingModelField['identifier']])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not set"];
-            } 
-            elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
+            } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
                 if(!empty($args['oldDoctypeId']) && $body[$indexingModelField['identifier']] == $args['oldDoctypeId']) {
                     continue;
                 }
