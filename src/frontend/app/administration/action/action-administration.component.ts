@@ -142,7 +142,7 @@ export class ActionAdministrationComponent implements OnInit {
                     .subscribe(async (data: any) => {
                         this.action = data.action;
                         const currentAction = this.actionPagesService.getActionPageByComponent(this.action.component);
-                        this.action.actionPageId = currentAction.id;
+                        this.action.actionPageId = currentAction?.id;
                         this.selectActionPageId.setValue(this.action.actionPageId);
                         this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
@@ -199,7 +199,7 @@ export class ActionAdministrationComponent implements OnInit {
 
     getCustomFields() {
         this.action.actionPageId = this.selectActionPageId.value;
-        this.action.actionPageGroup = this.actionPages.filter(action => action.id === this.action.actionPageId)[0].category;
+        this.action.actionPageGroup = this.actionPages.filter(action => action.id === this.action.actionPageId)[0]?.category;
 
         if (this.action.actionPageGroup === 'registeredMail') {
             this.action.actionCategories = ['registeredMail'];
