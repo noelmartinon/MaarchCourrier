@@ -128,6 +128,7 @@ class StoreController
                 $data['path']           = $storeResult['directory'];
                 $data['fingerprint']    = $storeResult['fingerPrint'];
                 $data['format']         = $args['format'];
+                $data['doctype']        = $args['doctype'];
             }
 
             if (empty($args['id'])) {
@@ -400,6 +401,7 @@ class StoreController
             'attachment_type'       => $args['type'],
             'validation_date'       => $args['validationDate'] ?? null,
             'effective_date'        => $args['effectiveDate'] ?? null,
+            'doctype'               => $args['doctype'] ?? null,
             'modified_by'           => $GLOBALS['id'],
             'modification_date'     => 'CURRENT_TIMESTAMP'
         ];

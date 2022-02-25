@@ -89,7 +89,7 @@ class AttachmentController
         $attachment = AttachmentModel::getById([
             'id'        => $args['id'],
             'select'    => [
-                'res_id as "resId"', 'res_id_master as "resIdMaster"', 'status', 'title', 'identifier as chrono', 'typist', 'modified_by as "modifiedBy"', 'relation', 'attachment_type as type',
+                'res_id as "resId"', 'res_id_master as "resIdMaster"', 'status', 'title', 'doctype', 'identifier as chrono', 'typist', 'modified_by as "modifiedBy"', 'relation', 'attachment_type as type',
                 'recipient_id as "recipientId"', 'recipient_type as "recipientType"', 'origin_id as "originId"', 'creation_date as "creationDate"', 'modification_date as "modificationDate"',
                 'validation_date as "validationDate"', 'format', 'fulltext_result as "fulltextResult"', 'in_signature_book as "inSignatureBook"', 'in_send_attach as "inSendAttach"'
             ]
@@ -168,6 +168,8 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
+        } elseif (!Validator::intType()->notEmpty()->validate($body['doctype'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body doctype is empty or not an integer']);
         }
 
         $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
