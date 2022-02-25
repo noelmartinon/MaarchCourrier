@@ -372,6 +372,15 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
     }
 
+    getLabel(value: any) {
+        if (Array.isArray(value)) {
+            const ids: any = value.map((item: any) => item.id);
+            return this.datas.filter((item: any) => ids.indexOf(item.id) > -1).map((item: any) => item.label.replace(/&nbsp;/g, '')).filter(Boolean).join(', ');
+        } else {
+            return this.datas?.find((item: any) => item.id === value)?.label?.replaceAll(/&nbsp;/g, '');
+        }
+    }
+
     /**
      * Sets the overlay class  to correct offsetY
      * so that the selected option is at the position of the select box when opening
