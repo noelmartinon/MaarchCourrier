@@ -24,6 +24,25 @@
                 </ng-template>
                 <div style="height:100%;overflow: auto;">
                     <div class="attachment-form col-md-3 col-sm-12" *ngIf="!loading">
+                        <!-- Doctype field -->
+                        <div class="attachment-form-item">
+                            <plugin-select-search 
+                                [label]="lang.doctype"
+                                [placeholderLabel]="lang.doctype"
+                                [datas]="doctypeField"
+                                [formControlSelect]="attachment['doctype']"
+                                style="width:100%;">
+                            </plugin-select-search>
+                            <div class="fieldState">
+                                <i class="fas fa-asterisk fieldRequired"
+                                    *ngIf="attachment['doctype'].hasError('required') && attachment['doctype'].untouched"></i>
+                                <i class="fas fa-exclamation-triangle fieldError"
+                                    *ngIf="attachment['doctype'].touched && attachment['doctype'].hasError('required')"></i>
+                                <i class="fas fa-check fieldFull"
+                                    *ngIf="attachment['doctype'].valid && !isEmptyField(attachment['doctype'])"></i>
+                            </div>
+                        </div>
+                        <!-- / -->
                         <div class="attachment-form-item">
                             <plugin-select-search [label]="lang.type" [placeholderLabel]="lang.type"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
@@ -38,6 +57,7 @@
                                     *ngIf="attachment['type'].valid && !isEmptyField(attachment['type'])"></i>
                             </div>
                         </div>
+                        
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
                                 <input matInput placeholder="{{lang.subject}}" [formControl]="attachment['title']">

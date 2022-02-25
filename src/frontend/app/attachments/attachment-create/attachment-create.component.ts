@@ -53,6 +53,8 @@ export class AttachmentCreateComponent implements OnInit {
 
     selectedContact = new FormControl();
 
+    doctypeField: any[] = [];
+
     loadingContact: boolean = false;
 
     @Input('resId') resId: number = null;
@@ -76,8 +78,8 @@ export class AttachmentCreateComponent implements OnInit {
     async ngOnInit(): Promise<void> {
 
         await this.loadAttachmentTypes();
-
         await this.loadResource();
+        await this.setDoctypeField();
 
         this.loading = false;
     }
@@ -132,7 +134,8 @@ export class AttachmentCreateComponent implements OnInit {
                         type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
                         validationDate: new FormControl({ value: '', disabled: false }),
                         format: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                        encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required])
+                        encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
+                        doctype: new FormControl({ value: '', disabled: false }, [Validators.required]),
                     });
                     setTimeout(() => {
                         this.getAttachType('response_project', 0);
@@ -253,7 +256,8 @@ export class AttachmentCreateComponent implements OnInit {
                 recipientType: element.recipient.value.length > 0 ? element.recipient.value[0].type : null,
                 validationDate: element.validationDate.value !== '' ? element.validationDate.value : null,
                 encodedFile: element.encodedFile.value,
-                format: element.format.value
+                format: element.format.value,
+                doctype: element.doctype.value
             });
         });
 
@@ -401,7 +405,8 @@ export class AttachmentCreateComponent implements OnInit {
             type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
             validationDate: new FormControl({ value: null, disabled: false }),
             encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
-            format: new FormControl({ value: '', disabled: false }, [Validators.required])
+            format: new FormControl({ value: '', disabled: false }, [Validators.required]),
+            doctype: new FormControl({ value: '', disabled: false }, [Validators.required])
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
         this.indexTab = this.attachments.length - 1;
@@ -479,5 +484,49 @@ export class AttachmentCreateComponent implements OnInit {
             }
 
         }
+    }
+
+    // get doctype values
+    setDoctypeField() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../../rest/doctypes`).pipe(
+                tap((data: any) => {
+                    let arrValues: any[] = [];
+                    data.structure.forEach((doctype: any) => {
+                        if (doctype['doctypes_second_level_id'] === undefined) {
+                            arrValues.push({
+                                id: doctype.doctypes_first_level_id,
+                                label: doctype.doctypes_first_level_label,
+                                title: doctype.doctypes_first_level_label,
+                                disabled: true,
+                                isTitle: true,
+                                color: doctype.css_style
+                            });
+                            data.structure.filter((info: any) => info.doctypes_first_level_id === doctype.doctypes_first_level_id && info.doctypes_second_level_id !== undefined && info.description === undefined).forEach((secondDoctype: any) => {
+                                arrValues.push({
+                                    id: secondDoctype.doctypes_second_level_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;' + secondDoctype.doctypes_second_level_label,
+                                    title: secondDoctype.doctypes_second_level_label,
+                                    disabled: true,
+                                    isTitle: true,
+                                    color: secondDoctype.css_style
+                                });
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
+                                    return {
+                                        id: infoType.type_id,
+                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                        title: infoType.description,
+                                        disabled: false,
+                                        isTitle: false,
+                                    };
+                                }));
+                            });
+                        }
+                    });
+                    this.doctypeField = arrValues;
+                    resolve(true);
+                })
+            ).subscribe();
+        });
     }
 }
