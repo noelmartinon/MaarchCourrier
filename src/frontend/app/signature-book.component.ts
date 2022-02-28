@@ -313,22 +313,30 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
-            await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
-                let assignedBasket: any;
-                this.http.get('../rest/home').pipe(
-                    tap((data: any) => {
-                        assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);                        
-                    }),
-                    finalize(() => {   
-                        if (this.canChange(assignedBasket)) {
-                            this.goToNextDocument()
-                        }
-                    }),
-                    catchError((err: any) => {
-                        this.notify.handleSoftErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();             
+            if (this.appVisaWorkflow.getWorkflow().filter((user: any) => this.functions.empty(user.process_date))[0]?.item_id !== this.headerService.user.id) {
+                this.actionService.stopRefreshResourceLock();
+                this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+            }
+            await this.appVisaWorkflow.saveVisaWorkflow().then((res: any) => {
+                if (res) {
+                    let assignedBasket: any;
+                    this.http.get('../rest/home').pipe(
+                        tap((data: any) => {
+                            assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);                        
+                        }),
+                        finalize(() => {   
+                            if (this.canChange(assignedBasket)) {
+                                this.goToNextDocument()
+                            }
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();             
+                } else {
+                    this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                }
             });
             this.loadBadges();
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
@@ -348,7 +356,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     goToNextDocument() {
         this.pathToRedirect = '';                     
-        this.actionService.stopRefreshResourceLock();
         const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
         this.http.get(`../rest/${path}`).pipe(
             tap((data: any) => {
