@@ -24,9 +24,9 @@ export class GroupAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('paginatorBaskets', { static: false }) paginatorBaskets: MatPaginator;
-    @ViewChild('sortBaskets', { static: true }) sortBaskets: MatSort;
+    @ViewChild('sortBaskets', { static: false }) sortBaskets: MatSort;
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild('sortUsers', { static: true }) sortUsers: MatSort;
+    @ViewChild('sortUsers', { static: false }) sortUsers: MatSort;
 
     loading: boolean = false;
     paramsLoading: boolean = false;
