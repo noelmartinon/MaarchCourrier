@@ -2637,5 +2637,7 @@
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "hasLinkedRes": "Au moins un courrier enregistré dans les {{nbDays}} derniers jour(s) est affecté au même contact.",
-    "seeMore": "Voir !"
+    "seeMore": "Voir !",
+    "emptyEmails": "Les correspondants du groupe ne contiennent pas d'adresses e-mail",
+    "correspondentEmptyEmails": "<b>Attention ! Seuls les correspondants avec des adresses e-mail sont repris.</b> <br><br><ul><li>Nombre de correspondants sans adresse e-mail : {{nbr}}</li></ul>"
 }

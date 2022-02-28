@@ -2,6 +2,7 @@
     <div class="loading" *ngIf="loading">
         <mat-spinner style="margin:auto;opacity: 0.2;" diameter="20"></mat-spinner>
     </div>
+    <app-maarch-message *ngIf="msgToDisplay !== ''" [mode]="'danger'" [content]="msgToDisplay"></app-maarch-message>
     <mat-form-field>
         <span matPrefix class="mailLabel">{{'lang.senderShort' | translate}}&nbsp;:&nbsp;</span>
         <input *ngIf="senderDisabled" matInput [value]="currentSender.email" disabled>
