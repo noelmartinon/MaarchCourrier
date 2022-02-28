@@ -135,7 +135,7 @@ export class AttachmentCreateComponent implements OnInit {
                         validationDate: new FormControl({ value: '', disabled: false }),
                         format: new FormControl({ value: '', disabled: false }, [Validators.required]),
                         encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                        doctype: new FormControl({ value: '', disabled: false }, [Validators.required]),
+                        doctype: new FormControl({ value: null, disabled: false }),
                     });
                     setTimeout(() => {
                         this.getAttachType('response_project', 0);
@@ -406,7 +406,7 @@ export class AttachmentCreateComponent implements OnInit {
             validationDate: new FormControl({ value: null, disabled: false }),
             encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
             format: new FormControl({ value: '', disabled: false }, [Validators.required]),
-            doctype: new FormControl({ value: '', disabled: false }, [Validators.required])
+            doctype: new FormControl({ value: null, disabled: false })
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
         this.indexTab = this.attachments.length - 1;

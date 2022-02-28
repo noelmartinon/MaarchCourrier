@@ -135,7 +135,7 @@ export class AttachmentPageComponent implements OnInit {
                         signedResponse: new FormControl({ value: data.signedResponse, disabled: false }),
                         encodedFile: new FormControl({ value: '_CURRENT_FILE', disabled: !this.editMode }, [Validators.required]),
                         format: new FormControl({ value: data.format, disabled: true }, [Validators.required]),
-                        doctype: new FormControl({ value: data.doctype, disabled: false }, [Validators.required]),
+                        doctype: new FormControl({ value: data.doctype, disabled: false }),
                     };
 
                     this.versions = data.versions;

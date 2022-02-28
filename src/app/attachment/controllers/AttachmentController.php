@@ -168,7 +168,7 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
-        } elseif (!Validator::intType()->notEmpty()->validate($body['doctype'])) {
+        } elseif (!empty($body['doctype']) && !Validator::intVal()->validate($body['doctype'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body doctype is empty or not an integer']);
         }
 
@@ -884,6 +884,8 @@ class AttachmentController
             return ['errors' => 'Body type is empty or not a string'];
         } elseif (isset($body['status']) && !in_array($body['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
             return ['errors' => 'Body type is empty or not a string'];
+        } elseif (!empty($body['doctype']) && !Validator::intVal()->validate($body['doctype'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body doctype is empty or not an integer']);
         }
 
         if (!ResController::hasRightByResId(['resId' => [$body['resIdMaster']], 'userId' => $GLOBALS['id']])) {

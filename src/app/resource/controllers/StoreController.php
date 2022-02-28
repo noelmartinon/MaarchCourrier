@@ -128,7 +128,6 @@ class StoreController
                 $data['path']           = $storeResult['directory'];
                 $data['fingerprint']    = $storeResult['fingerPrint'];
                 $data['format']         = $args['format'];
-                $data['doctype']        = $args['doctype'];
             }
 
             if (empty($args['id'])) {
@@ -379,7 +378,8 @@ class StoreController
             'in_signature_book'     => $inSignatureBook ? 'true' : 'false',
             'external_id'           => $externalId,
             'creation_date'         => 'CURRENT_TIMESTAMP',
-            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null
+            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null,
+            'doctype'               => $args['doctype']
         ];
 
         return $preparedData;
