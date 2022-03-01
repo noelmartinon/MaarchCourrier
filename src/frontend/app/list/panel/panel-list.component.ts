@@ -5,6 +5,7 @@ import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { NotesListComponent } from '../../notes/notes-list.component';
 import { AttachmentsListComponent } from '../../attachments/attachments-list.component';
+import { SentResourceListComponent } from '@appRoot/sentResource/sent-resource-list.component';
 
 declare let $: any;
 
@@ -17,12 +18,14 @@ export class PanelListComponent implements OnInit {
 
     @Output() refreshBadgeNotes = new EventEmitter<string>();
     @Output() refreshBadgeAttachments = new EventEmitter<string>();
+    @Output() refreshBadgeSentResource = new EventEmitter<string>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
     @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
     @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
     @ViewChild('appAttachmentsList', { static: false }) appAttachmentsList: AttachmentsListComponent;
+    @ViewChild('sentResourceListComponent', { static: false }) sentResourceListComponent: SentResourceListComponent;
 
     loading: boolean = false;
 
@@ -71,6 +74,12 @@ export class PanelListComponent implements OnInit {
                 this.icon = 'fa-paperclip';
                 this.appAttachmentsList.loadAttachments(this.currentResource.resId);
             }, 0);
+        } else if (mode === 'sentResources') {
+            this.mode = '';
+            setTimeout(() => {
+                this.mode = 'sentResources';
+                this.icon = 'fa-envelope';
+            }, 0);
         }
     }
 
@@ -80,5 +89,9 @@ export class PanelListComponent implements OnInit {
 
     reloadBadgeAttachments(nb: any) {
         this.refreshBadgeAttachments.emit(nb);
+    }
+
+    reloadBadgeSentResources(nb: any) {
+        this.refreshBadgeSentResource.emit(nb);
     }
 }

@@ -148,6 +148,13 @@
                                             [class.undefined]="row.subject == ('lang.undefined' | translate)"
                                             title="{{row.subject}}" (click)="launch(defaultAction,row);">{{row.subject | shorten: 150: '...'}}</span>
                                         <span class="main-info-action">
+                                            <button mat-icon-button title="{{'lang.mailsSentAlt' | translate}}"
+                                                (click)="$event.stopPropagation();togglePanel('sentResources',row)"
+                                                [class.noData]="row.countSentResources == 0">
+                                                <mat-icon matBadgeHidden="{{row.countSentResources == 0}}" fontSet="fas"
+                                                    matBadge="{{row.countSentResources}}" fontIcon="fa-envelope fa-2x" [color]="snav2.opened && row.checked && currentMode == 'sentResources' ? 'primary' : ''">
+                                                </mat-icon>
+                                            </button>
                                             <button mat-icon-button title="{{'lang.notes' | translate}}"
                                                 (click)="$event.stopPropagation();togglePanel('note',row)"
                                                 [class.noData]="row.countNotes == 0">
@@ -206,7 +213,11 @@
                     <mat-icon class="fa fa-arrow-right"></mat-icon>
                 </button>
             </div>
-            <app-panel-list #appPanelList (refreshBadgeNotes)="refreshBadgeNotes($event)" (refreshBadgeAttachments)="refreshBadgeAttachments($event)"></app-panel-list>
+            <app-panel-list #appPanelList
+                (refreshBadgeNotes)="refreshBadgeNotes($event)"
+                (refreshBadgeAttachments)="refreshBadgeAttachments($event)"
+                (refreshBadgeSentResource)="refreshBadgeSentResource($event)">
+            </app-panel-list>
             <mat-divider></mat-divider>
         </mat-sidenav>
     </mat-sidenav-container>

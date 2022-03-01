@@ -214,6 +214,13 @@
                         </button>
                     </span>
                     <span *ngIf="sidenavRight !== undefined" class="main-info-action">
+                        <button mat-icon-button title="{{'lang.mailsSentAlt' | translate}}"
+                            (click)="$event.stopPropagation();togglePanel('sentResources',row)"
+                            [class.noData]="row.countSentResources == 0">
+                            <mat-icon matBadgeHidden="{{row.countSentResources == 0}}" fontSet="fas"
+                                matBadge="{{row.countSentResources}}" fontIcon="fa-envelope fa-2x" [color]="sidenavRight.opened && row.checked && currentMode == 'sentResources' ? 'primary' : ''">
+                            </mat-icon>
+                        </button>
                         <button mat-icon-button [class.highlightResultIcon]="row.inNotes"
                             title="{{'lang.notes' | translate}}"
                             (click)="$event.stopPropagation();togglePanel('note',row)"
@@ -283,8 +290,10 @@
             <mat-icon class="fa fa-arrow-right"></mat-icon>
         </button>
     </div>
-    <app-panel-list #appPanelList (refreshBadgeNotes)="refreshBadgeNotes($event)"
-        (refreshBadgeAttachments)="refreshBadgeAttachments($event)"></app-panel-list>
+    <app-panel-list #appPanelList
+        (refreshBadgeNotes)="refreshBadgeNotes($event)"
+        (refreshBadgeAttachments)="refreshBadgeAttachments($event)"
+        (refreshBadgeSentResource)="refreshBadgeSentResource($event)"></app-panel-list>
     <mat-divider></mat-divider>
 </ng-template>
 <app-followed-action-list #actionsListContext *ngIf="actionMode" [contextMode]="true" [currentFolderInfo]="folderInfo"

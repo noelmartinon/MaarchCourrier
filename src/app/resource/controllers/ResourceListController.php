@@ -32,6 +32,10 @@ use Entity\models\ListInstanceModel;
 use Folder\models\FolderModel;
 use Group\models\GroupModel;
 use Note\models\NoteModel;
+use Email\models\EmailModel;
+use Shipping\models\ShippingModel;
+use MessageExchange\models\MessageExchangeModel;
+use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Priority\models\PriorityModel;
 use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
@@ -917,6 +921,27 @@ class ResourceListController
                 }
             }
             $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => [$resource['res_id']], 'userId' => $args['userId']])[$resource['res_id']];
+            $acknowledgementReceipts = count(AcknowledgementReceiptModel::get([
+                'select' => ['*'],
+                'where'  => ['res_id = ?'],
+                'data'   => [$resource['res_id']]
+            ]));
+            $messagesExchange = count(MessageExchangeModel::get([
+                'select' => ['*'],
+                'where'  => ['res_id_master = ?', "(type = 'ArchiveTransfer' or reference like '%_ReplySent')"],
+                'data'   => [$resource['res_id']]
+            ]));
+            $shippings = count(ShippingModel::get([
+                'select' => ['*'],
+                'where'  => ['document_id = ? and document_type = ?'],
+                'data'   => [$resource['res_id'], 'resource']
+            ]));
+            $emails = count(EmailModel::get([
+                'select' => ['*'],
+                'where'  => ["document->>'id' = ?", "(status != 'DRAFT' or (status = 'DRAFT' and user_id = ?))"],
+                'data'   => [$resource['res_id'], $args['userId']],
+            ]));
+            $formattedResources[$key]['countSentResources'] = $acknowledgementReceipts + $messagesExchange + $shippings + $emails;
 
             if (!empty($args['checkLocked'])) {
                 $isLocked = true;

@@ -289,6 +289,10 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
         this.currentResource.countAttachments = nb;
     }
 
+    refreshBadgeSentResource(nb: number) {
+        this.currentResource.countSentResources = nb;
+    }
+
     refreshDao() {
         this.paginator.pageIndex = this.listProperties.page;
         this.filtersChange.emit();
