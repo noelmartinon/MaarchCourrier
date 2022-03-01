@@ -345,6 +345,9 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.headerService.nbResourcesFollowed--;
                 this.initResultList();
+                if (row.checked) {
+                    this.sidenavRight.close();
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
