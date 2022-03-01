@@ -169,12 +169,12 @@ while($selectedFile = $stmt->fetchObject()) {
         $customfields_array = json_decode($customfield['custom_fields']);
     }
     foreach ($customfields_array as $key => $value) {
-/*         if ($key==3){
+/*      if ($key==3){
             if($value <> ""){
                 $department_name = $value . " - " .\Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$value];
             }
             $line["Département"]= $department_name; 
-        } */
+        }*/
         if ($key==1){
             $line["Nature"]= $value; 
         }
@@ -186,7 +186,6 @@ while($selectedFile = $stmt->fetchObject()) {
             $index =count($value);
             foreach ($value as $key => $value) {
                 $contact = NomPrenomContact($value->id);
-                $dptcontact = retrieveDepartment($value->id);
                 $line["Tiers Bénéficiaires"].= $contact;
                 if ($key < $index -1){
                     $line["Tiers Bénéficiaires"].= ", \n";
