@@ -877,7 +877,6 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (24, 'indexing', 'Send back in validation', 'CTRLCAB', 'N', 'validate_mail', 'Y', 'v1Action');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (36, '', 'Ask for instruction', 'EAVIS', 'N','send_docs_to_recommendation', 'Y', 'v1Action');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (37, '', 'Give an instruction', '_NOSTATUS_', 'N','avis_workflow_simple', 'Y', 'v1Action');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (100, '', 'View document', '', 'N', 'view', 'N', 'viewDoc');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (101, '', 'Send for visa', 'VIS', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (114, '', 'Mark as read', '', 'N', 'mark_as_read', 'N', 'resMarkAsReadAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (122, '', 'Send to service', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
