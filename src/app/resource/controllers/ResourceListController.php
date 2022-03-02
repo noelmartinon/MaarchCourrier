@@ -922,22 +922,22 @@ class ResourceListController
             }
             $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => [$resource['res_id']], 'userId' => $args['userId']])[$resource['res_id']];
             $acknowledgementReceipts = count(AcknowledgementReceiptModel::get([
-                'select' => ['*'],
+                'select' => [1],
                 'where'  => ['res_id = ?'],
                 'data'   => [$resource['res_id']]
             ]));
             $messagesExchange = count(MessageExchangeModel::get([
-                'select' => ['*'],
+                'select' => [1],
                 'where'  => ['res_id_master = ?', "(type = 'ArchiveTransfer' or reference like '%_ReplySent')"],
                 'data'   => [$resource['res_id']]
             ]));
             $shippings = count(ShippingModel::get([
-                'select' => ['*'],
+                'select' => [1],
                 'where'  => ['document_id = ? and document_type = ?'],
                 'data'   => [$resource['res_id'], 'resource']
             ]));
             $emails = count(EmailModel::get([
-                'select' => ['*'],
+                'select' => [1],
                 'where'  => ["document->>'id' = ?", "(status != 'DRAFT' or (status = 'DRAFT' and user_id = ?))"],
                 'data'   => [$resource['res_id'], $args['userId']],
             ]));
