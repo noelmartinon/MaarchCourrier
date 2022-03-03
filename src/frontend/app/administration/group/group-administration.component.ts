@@ -46,9 +46,9 @@ export class GroupAdministrationComponent implements OnInit {
     panelMode = 'keywordInfos';
 
     @ViewChild('paginatorBaskets', { static: false }) paginatorBaskets: MatPaginator;
-    @ViewChild('sortBaskets', { static: true }) sortBaskets: MatSort;
+    @ViewChild('sortBaskets', { static: false }) sortBaskets: MatSort;
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild('sortUsers', { static: true }) sortUsers: MatSort;
+    @ViewChild('sortUsers', { static: false }) sortUsers: MatSort;
 
 
     applyFilter(filterValue: string) {
