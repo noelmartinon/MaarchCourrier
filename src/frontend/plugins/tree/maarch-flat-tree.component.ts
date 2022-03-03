@@ -5,6 +5,7 @@ import { SortPipe } from '../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { tap, debounceTime } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
+import { FunctionsService } from '@service/functions.service';
 
 
 /** Flat node with expandable and level information */
@@ -50,6 +51,7 @@ export class MaarchFlatTreeComponent implements OnInit {
     temp: any = {};
 
     constructor(
+        public functions: FunctionsService,
         private sortPipe: SortPipe,
         private latinisePipe: LatinisePipe,
     ) { }
@@ -158,6 +160,15 @@ export class MaarchFlatTreeComponent implements OnInit {
         this.initLastNodes(nestedData);
 
         // Set data to tree
+        /**
+         * In case where we have a single root node with no parent
+         * it becomes the only nested root data
+         * instead of taking all root nodes without checking if they have parent nodes
+         **/
+        const parentNode: any[] = this.rawData.filter((item: any) => this.functions.empty(item.parent_id) || item.parent_id === '#');
+        if (parentNode.length === 1) {
+            nestedData = parentNode;
+        }
         this.dataSource.data = nestedData;
         this.treeControl.dataNodes = nestedData;
 
