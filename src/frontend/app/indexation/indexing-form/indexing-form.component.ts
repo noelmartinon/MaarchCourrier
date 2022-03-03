@@ -263,6 +263,9 @@ export class IndexingFormComponent implements OnInit {
 
     isPrivate: boolean = false;
 
+    indexingModelClone: any;
+    resDataClone: any;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -784,6 +787,7 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
+                    this.resDataClone = JSON.parse(JSON.stringify(data));
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
                         // this.fieldCategories.forEach(async element => {
@@ -842,6 +846,21 @@ export class IndexingFormComponent implements OnInit {
                     }));
                     this.arrFormControl['mail­tracking'].setValue(data.followed);
                     if (saveResourceState) {
+                        this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
+                    }
+
+                    if (this.indexingModelClone.master === null) {
+                        const mandatoryFields: any[] = this.indexingModelClone.fields.filter((item: any) => !item.mandatory && !this.functions.empty(item.default_value) && item.identifier !== 'documentDate');
+                        mandatoryFields.forEach((element: any) => {
+                            if (this.functions.empty(this.resDataClone[element.identifier]) && !element.identifier.includes('CustomField')) {
+                                this.arrFormControl[element.identifier].setValue(this.resDataClone[element.identifier]);
+                            } else if (element.identifier.includes('CustomField')) {
+                                const customFieldId: number = +element.identifier.substr(element.identifier.indexOf('_') + 1);
+                                if (this.functions.empty(this.resDataClone.customFields[customFieldId])) {
+                                    this.arrFormControl[element.identifier].setValue('');
+                                }
+                            }
+                        });
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                     }
                     resolve(true);
@@ -975,6 +994,7 @@ export class IndexingFormComponent implements OnInit {
                         }
 
                     });
+                    this.indexingModelClone = JSON.parse(JSON.stringify(data.indexingModel));
                 }
 
                 await this.initElemForm(saveResourceState);
