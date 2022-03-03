@@ -857,7 +857,7 @@ export class IndexingFormComponent implements OnInit {
                             } else if (element.identifier.includes('CustomField')) {
                                 const customFieldId: number = +element.identifier.substr(element.identifier.indexOf('_') + 1);
                                 if (this.functions.empty(this.resDataClone.customFields[customFieldId])) {
-                                    this.arrFormControl[element.identifier].setValue(this.resDataClone.customFields[customFieldId]);
+                                    this.arrFormControl[element.identifier].setValue('');
                                 }
                             }
                         });
