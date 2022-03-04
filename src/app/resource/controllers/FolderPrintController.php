@@ -599,8 +599,8 @@ class FolderPrintController
 
                 // delete all tmp email_*.pdf, attachment_*.pdf, summarySheet_*.pdf, convertedAr_*.pdf and listNotes_*.pdf after merged is complete
                 foreach ($documentPaths as $documentPath) {
-                    if(strpos($documentPath, "email_") !== false || strpos($documentPath, "attachment_") !== false || strpos($documentPath, "summarySheet_") !== false 
-                    || strpos($documentPath, "convertedAr_") !== false || strpos($documentPath, "listNotes_") !== false) {
+                    if (strpos($documentPath, "email_") !== false           || strpos($documentPath, "attachment_") !== false || strpos($documentPath, "summarySheet_") !== false 
+                        || strpos($documentPath, "convertedAr_") !== false  || strpos($documentPath, "listNotes_") !== false) {
                         unlink($documentPath);
                     }
                 }
