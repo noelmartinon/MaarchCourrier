@@ -831,6 +831,11 @@ class AlfrescoController
                     if ($alfrescoParameter == 'typeLabel') {
                         $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
                         $properties[$key] = $attachmentsTypes[$attachment['attachment_type']]['label'];
+                    } elseif ($alfrescoParameter == 'doctypeLabel') {
+                        if (!empty($attachment['doctype'])) {
+                            $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $attachment['doctype']]);
+                        }
+                        $properties[$key] = $doctype['description'] ?? '';
                     } else {
                         $properties[$key] = $attachment[$alfrescoParameter];
                     }
