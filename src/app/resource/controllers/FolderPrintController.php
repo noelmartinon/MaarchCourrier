@@ -600,8 +600,8 @@ class FolderPrintController
 
                 // delete all tmp email_*.pdf, attachment_*.pdf, summarySheet_*.pdf, convertedAr_*.pdf and listNotes_*.pdf after merged is complete
                 foreach ($documentPaths as $documentPath) {
-                    if (strpos($documentPath, "email_") !== false           || strpos($documentPath, "attachment_") !== false || strpos($documentPath, "summarySheet_") !== false 
-                        || strpos($documentPath, "convertedAr_") !== false  || strpos($documentPath, "listNotes_") !== false) {
+                    if (strpos($documentPath, "email_") !== false           || strpos($documentPath, "attachment_") !== false   || strpos($documentPath, "summarySheet_") !== false 
+                        || strpos($documentPath, "convertedAr_") !== false  || strpos($documentPath, "listNotes_") !== false    || strpos($documentPath, "convertedPdfVersion_") !== false) {
                         unlink($documentPath);
                     }
                 }
@@ -716,7 +716,8 @@ class FolderPrintController
 
         if ((float) $documentPdfVersion > 1.4) {
 
-            $tmpFilename =  str_replace('//', '/', $tmpDir) . "tmpFile_" . $GLOBALS['id'] . "_" . rand() . ".pdf";
+            $tmpFilename =  str_replace('//', '/', $tmpDir) . "convertedPdfVersion_" . rand() . "_" . $GLOBALS['id'] . ".pdf";
+
             $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o {$tmpFilename} {$pathToDocument} 2>&1";
             exec($command, $output, $return);
 
