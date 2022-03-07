@@ -590,7 +590,7 @@ class FolderPrintController
                 // delete all tmp email_*.pdf, attachment_*.pdf, summarySheet_*.pdf, convertedAr_*.pdf and listNotes_*.pdf after merged is complete
                 foreach ($documentPaths as $documentPath) {
                     if (strpos($documentPath, "email_") !== false           || strpos($documentPath, "attachment_") !== false   || strpos($documentPath, "summarySheet_") !== false 
-                        || strpos($documentPath, "convertedAr_") !== false  || strpos($documentPath, "listNotes_") !== false    || strpos($documentPath, "convertedPdfVersion_") !== false) {
+                        || strpos($documentPath, "convertedAr_") !== false  || strpos($documentPath, "listNotes_") !== false) {
                         unlink($documentPath);
                     }
                 }
@@ -609,42 +609,40 @@ class FolderPrintController
 
             $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
             return $response->withHeader('Content-Type', $mimeType);
-        } else {
-            $filePathOnTmp = str_replace('//', '/', $tmpDir) . 'folderPrint.zip';
-            if (file_exists($filePathOnTmp)) {
-                unlink($filePathOnTmp);
-            }
-
-            $zip = new \ZipArchive;
-            if ($zip->open($filePathOnTmp, \ZipArchive::CREATE) !== TRUE) {
-                return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
-            }
-            foreach ($folderPrintPaths as $folderPrintPath) {
-                $zip->addFile($folderPrintPath, basename($folderPrintPath));
-            }
-            $zip->close();
-
-            if (!file_exists($filePathOnTmp)) {
-                return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
-            }
-
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $fileContent = file_get_contents($filePathOnTmp);
-            $mimeType = $finfo->buffer($fileContent);
-
-            $response->write($fileContent);
-
-            // delete tmp files, partly to avoid filling an existing ZIP and sending more than was requested
+        }
+        
+        $filePathOnTmp = str_replace('//', '/', $tmpDir) . 'folderPrint.zip';
+        if (file_exists($filePathOnTmp)) {
             unlink($filePathOnTmp);
-            foreach ($folderPrintPaths as $folderPrintPath) {
-                unlink($folderPrintPath);
-            }
-
-            $response = $response->withAddedHeader('Content-Disposition', 'inline; filename=maarch.zip');
-            return $response->withHeader('Content-Type', $mimeType);
         }
 
-        return $response->withStatus(400)->withJson(['errors' => 'No document to merge']);
+        $zip = new \ZipArchive;
+        if ($zip->open($filePathOnTmp, \ZipArchive::CREATE) !== TRUE) {
+            return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
+        }
+        foreach ($folderPrintPaths as $folderPrintPath) {
+            $zip->addFile($folderPrintPath, basename($folderPrintPath));
+        }
+        $zip->close();
+
+        if (!file_exists($filePathOnTmp)) {
+            return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $fileContent = file_get_contents($filePathOnTmp);
+        $mimeType = $finfo->buffer($fileContent);
+
+        $response->write($fileContent);
+
+        // delete tmp files, partly to avoid filling an existing ZIP and sending more than was requested
+        unlink($filePathOnTmp);
+        foreach ($folderPrintPaths as $folderPrintPath) {
+            unlink($folderPrintPath);
+        }
+
+        $response = $response->withAddedHeader('Content-Disposition', 'inline; filename=maarch.zip');
+        return $response->withHeader('Content-Type', $mimeType);
     }
 
     private static function getDocumentFilePath(array $args)
@@ -687,35 +685,6 @@ class FolderPrintController
             return ['errors' => 'Fingerprints do not match', 'code' => 400];
         }
 
-        // check pdf version
-        $command = "pdfinfo '" . $pathToDocument . "' | grep 'PDF version'";
-        exec($command . ' 2>&1', $outputPdfVersion, $returnPdfVersion);
-        
-        if (empty($outputPdfVersion)) {
-            return ['errors' => 'Unable to check pdf version : ' . implode(",", $outputPdfVersion), 'code' => 400];
-        }
-
-        $documentPdfVersion = explode(":", $outputPdfVersion[0])[1];
-        if (!Validator::floatVal()->notEmpty()->validate($documentPdfVersion)) {
-            return ['errors' => "The document pdf version is unknown '$documentPdfVersion'", 'code' => 400];
-        }
-
-        // convert pdf version to tmp
-        $tmpDir = CoreConfigModel::getTmpPath();
-
-        if ((float) $documentPdfVersion > 1.4) {
-
-            $tmpFilename =  str_replace('//', '/', $tmpDir) . "convertedPdfVersion_" . rand() . "_" . $GLOBALS['id'] . ".pdf";
-
-            $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o {$tmpFilename} {$pathToDocument} 2>&1";
-            exec($command, $output, $return);
-
-            if (!empty($output)) {
-                return ['errors' => implode(",", $output), 'code' => 400];
-            }
-            $pathToDocument = $tmpFilename;
-        }
-        
         return $pathToDocument;
     }
 
