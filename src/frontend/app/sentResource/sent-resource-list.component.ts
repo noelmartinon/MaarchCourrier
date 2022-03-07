@@ -24,6 +24,7 @@ export class SentResourceListComponent implements OnInit {
     @Input() currentUserId: number = null;
     @Input() currentGroupId: number = null;
     @Input() currentBasketId: number = null;
+    @Input() injectDatas: any;
 
     @Output() reloadBadgeSentResource = new EventEmitter<string>();
 
@@ -280,6 +281,7 @@ export class SentResourceListComponent implements OnInit {
                 filter((data: any) => data.state === 'success' || data === 'success'),
                 tap(() => {
                     this.refreshEmailList();
+                    this.reloadBadgeSentResource.emit(`${this.sentResources.length}`);
                     setTimeout(() => {
                         this.refreshWaitingElements(1);
                         setTimeout(() => {
@@ -317,6 +319,7 @@ export class SentResourceListComponent implements OnInit {
                     return of(false);
                 })
             ).subscribe();
+            this.reloadBadgeSentResource.emit(`${this.sentResources.length}`);
         }
     }
 
@@ -374,6 +377,7 @@ export class SentResourceListComponent implements OnInit {
                 tap((data: any) => {
                     const sentResourcesNoEmails = this.sentResources.filter(elem => elem.type !== 'email');
                     this.sentResources = sentResourcesNoEmails.concat(data);
+                    this.reloadBadgeSentResource.emit(`${this.sentResources.length}`);
                     setTimeout(() => {
                         this.dataSource = new MatTableDataSource(this.sentResources);
                         this.dataSource.sort = this.sort;

@@ -132,3 +132,10 @@
     cursor: not-allowed;
     background: var(--maarch-color-primary-opacity-10);
 }
+
+.emptyResource {
+    text-align: center;
+    font-weight: bold;
+    font-size: 24px;
+    opacity:0.3;
+}

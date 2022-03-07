@@ -2641,6 +2641,7 @@
     "hasLinkedRes": "At least one mail registered in the last {{nbDays}} day(s) is assigned to the same contact.",
     "seeMore": "See more !",
     "emptyEmails": "The correspondents of the group do not contain email addresses",
-    "correspondentEmptyEmails": "<b>Warning ! Only correspondents with e-mail addresses are included.</b> <br><br><ul><li>Number of correspondents without an email address : {{nbr}}</li></ul>"
+    "correspondentEmptyEmails": "<b>Warning ! Only correspondents with e-mail addresses are included.</b> <br><br><ul><li>Number of correspondents without an email address : {{nbr}}</li></ul>",
+    "noSentResource": "No element sent"
 
 }

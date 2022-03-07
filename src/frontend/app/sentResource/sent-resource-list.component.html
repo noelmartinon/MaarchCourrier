@@ -4,6 +4,9 @@
     </div>
 </ng-container>
 <ng-template #elseLoading>
+    <div *ngIf="sentResources.length == 0" class="emptyResource">
+        {{'lang.noSentResource' | translate}}
+    </div>
     <div class="row" style="margin: 0px;">
         <div class="col-md-12" style="padding-bottom: 10px;">
             <mat-button-toggle-group *ngIf="sentResources.length > 0" class="filterTypes" (change)="filterType($event)">

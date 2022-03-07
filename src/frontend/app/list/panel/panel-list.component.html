@@ -27,4 +27,8 @@
         (reloadBadgeNotes)="reloadBadgeNotes($event)"></app-notes-list>
     <app-attachments-list #appAttachmentsList *ngIf="this.mode == 'attachment'" [injectDatas]="injectDatasParam"
         (reloadBadgeAttachments)="reloadBadgeAttachments($event)"></app-attachments-list>
+    <app-sent-resource-list #sentResourceListComponent *ngIf="this.mode == 'sentResources'"
+        [editMode]="true" [injectDatas]="injectDatasParam" [resId]="currentResource.resId"
+        (reloadBadgeSentResource)="reloadBadgeSentResources($event)">
+    </app-sent-resource-list>
 </ng-container>

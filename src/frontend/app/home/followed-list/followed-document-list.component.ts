@@ -237,6 +237,10 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
         this.currentResource.countAttachments = nb;
     }
 
+    refreshBadgeSentResource(nb: number) {
+        this.currentResource.countSentResources = nb;
+    }
+
     refreshDao() {
         this.paginator.pageIndex = this.listProperties.page;
         this.filtersChange.emit();
@@ -341,6 +345,9 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.headerService.nbResourcesFollowed--;
                 this.initResultList();
+                if (row.checked) {
+                    this.sidenavRight.close();
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
