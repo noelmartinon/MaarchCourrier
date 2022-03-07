@@ -2642,6 +2642,9 @@
     "seeMore": "See more !",
     "emptyEmails": "The correspondents of the group do not contain email addresses",
     "correspondentEmptyEmails": "<b>Warning ! Only correspondents with e-mail addresses are included.</b> <br><br><ul><li>Number of correspondents without an email address : {{nbr}}</li></ul>",
-    "noSentResource": "No element sent"
-
+    "noSentResource": "No element sent",
+    "chooseValues": "Choose the values",
+    "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
+    "allDoctypes": "Add all doctypes",
+    "allDoctypesDesc": "This option enabled automatically adds new types to the list below"
 }

@@ -23,6 +23,7 @@ use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
+use Doctype\models\DoctypeModel;
 use Resource\controllers\IndexingController;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
@@ -36,6 +37,7 @@ use User\models\UserModel;
 class IndexingModelController
 {
     const INDEXABLE_DATES = ['documentDate', 'departureDate', 'arrivalDate', 'processLimitDate'];
+    const ALLOWED_VALUES_ALL_DOCTYPES = '_ALL_DOCTYPES_';
 
     public function get(Request $request, Response $response)
     {
@@ -73,12 +75,21 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         }
 
-        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
         $destination = '';
         foreach ($fields as $key => $value) {
             $fields[$key]['default_value'] = json_decode($value['default_value'], true);
+            $fields[$key]['allowedValues'] = json_decode($value['allowed_values'], true);
+            unset($fields[$key]['allowed_values']);
             if ($value['identifier'] == 'destination') {
                 $destination = $value['default_value'];
+            } elseif ($value['identifier'] == 'doctype') {
+                if ($fields[$key]['allowedValues'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES) {
+                    $model['allDoctypes'] = true;
+                    $fields[$key]['allowedValues'] = array_column(DoctypeModel::get(['select' => ['type_id']]), 'type_id');
+                } else {
+                    $model['allDoctypes'] = false;
+                }
             } elseif ($value['identifier'] == 'diffusionList') {
                 foreach ($fields[$key]['default_value'] as $itemKey => $item) {
                     if ($item['type'] == 'entity') {
@@ -248,13 +259,17 @@ class IndexingModelController
                     $field['default_value'] = $date->format('Y-m-d');
                 }
             }
+            if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
+                $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+            }
             IndexingModelFieldModel::create([
                 'model_id'      => $modelId,
                 'identifier'    => $field['identifier'],
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                 'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                'unit'          => $field['unit']
+                'unit'          => $field['unit'],
+                'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
 
@@ -384,13 +399,17 @@ class IndexingModelController
                             $field['default_value'] = $date->format('Y-m-d');
                         }
                     }
+                    if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
+                        $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+                    }
                     IndexingModelFieldModel::create([
                         'model_id'      => $child['id'],
                         'identifier'    => $field['identifier'],
                         'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                         'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                         'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                        'unit'          => $field['unit']
+                        'unit'          => $field['unit'],
+                        'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
                     ]);
                 }
 
@@ -451,13 +470,17 @@ class IndexingModelController
                     $field['default_value'] = $date->format('Y-m-d');
                 }
             }
+            if ($field['identifier'] == 'doctype' && !empty($body['allDoctypes'])) {
+                $field['allowedValues'] = IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES;
+            }
             IndexingModelFieldModel::create([
                 'model_id'      => $args['id'],
                 'identifier'    => $field['identifier'],
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                 'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                'unit'          => $field['unit']
+                'unit'          => $field['unit'],
+                'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
 

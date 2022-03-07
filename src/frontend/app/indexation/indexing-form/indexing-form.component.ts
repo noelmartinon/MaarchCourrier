@@ -5,7 +5,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '@service/app.service';
-import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
+import { tap, catchError, exhaustMap, filter, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -17,6 +17,8 @@ import { IssuingSiteInputComponent } from '../../administration/registered-mail/
 import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
 import { Router } from '@angular/router';
 import { LinkResourceModalComponent } from '@appRoot/linkedResource/linkResourceModal/link-resource-modal.component';
+import { IndexingModelValuesSelectorComponent } from '@appRoot/administration/indexingModel/valuesSelector/values-selector.component';
+
 
 @Component({
     selector: 'app-indexing-form',
@@ -87,6 +89,8 @@ export class IndexingFormComponent implements OnInit {
     indexingModels_classementClone: any[] = [];
 
     indexingModelsCustomFields: any[] = [];
+
+    allowedValues: number[] = [];
 
     availableFields: any[] = [
         {
@@ -267,6 +271,7 @@ export class IndexingFormComponent implements OnInit {
     mustFixErrors: boolean = false;
 
     isPrivate: boolean = false;
+    allDoctypes: boolean = true;
 
     hasLinkedRes: boolean = false;
     linkedResources: any[] = [];
@@ -492,6 +497,9 @@ export class IndexingFormComponent implements OnInit {
                         }
                     }),
                     tap(() => {
+                        if (this.currentResourceValues.find((item: any) => item.identifier === 'doctype').default_value !== this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').default_value) {
+                            this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'), true);
+                        }
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.translate.instant('lang.dataUpdated'));
                         resolve(true);
@@ -713,10 +721,12 @@ export class IndexingFormComponent implements OnInit {
                                     title: secondDoctype.doctypes_second_level_label,
                                     disabled: true,
                                     isTitle: true,
-                                    color: secondDoctype.css_style
+                                    color: secondDoctype.css_style,
+                                    firstLevelId: doctype.doctypes_first_level_id
                                 });
                                 arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => ({
                                     id: infoType.type_id,
+                                    secondLevelId: secondDoctype.doctypes_second_level_id,
                                     label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
                                     title: infoType.description,
                                     disabled: false,
@@ -730,6 +740,7 @@ export class IndexingFormComponent implements OnInit {
                     if (!this.functions.empty(elem.default_value) && !this.adminMode) {
                         this.calcLimitDate(elem, elem.default_value);
                     }
+                    this.setAllowedValues(elem);
                     resolve(true);
                 })
             ).subscribe();
@@ -923,6 +934,10 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
+                this.allDoctypes = data.indexingModel.allDoctypes;
+                if (data.indexingModel.master !== null) {
+                    this.getAllowedValues(data.indexingModel.master);
+                }
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();
@@ -998,6 +1013,18 @@ export class IndexingFormComponent implements OnInit {
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getAllowedValues(id: number) {
+        this.http.get(`../rest/indexingModels/${id}`).pipe(
+            tap((data: any) => {
+                this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -1108,8 +1135,12 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-
-        if (this.arrFormControl[field.identifier].value === null) {
+        if (field.identifier === 'doctype') {
+            if (this.functions.empty(field.allowedValues)) {
+                field.allowedValues = this.allowedValues;
+                this.setAllowedValues(field);
+            }
+        } else if (this.arrFormControl[field.identifier].value === null) {
             return true;
 
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {
@@ -1261,6 +1292,82 @@ export class IndexingFormComponent implements OnInit {
 
     getCheckboxListLabel(selectedItemId: any, items: any) {
         return items.filter((item: any) => item.id === selectedItemId)[0].label;
+    }
+
+    setAllowedValues(field: any, afterSaveEvent: boolean = false) {
+        if (!this.functions.empty(field.allowedValues)) {
+            field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
+                item.disabled = field.allowedValues.indexOf(item.id) === -1;
+            });
+        }
+        if (!this.adminMode && field.identifier === 'doctype') {
+            this.checkDisabledValues(field, afterSaveEvent);
+        }
+    }
+
+    checkDisabledValues(field: any, afterSaveEvent: boolean = false) {
+        if (!this.functions.empty(this.resId) && !afterSaveEvent) {
+            this.http.get(`../rest/resources/${this.resId}`).pipe(
+                tap ((data: any) => {
+                    if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                        field.values.find((item: any) => item.id === data['doctype']).disabled = false;
+                    }
+                }),
+                finalize(() => {
+                    this.formatData(field);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.formatData(field);
+        }
+    }
+
+    formatData(field: any) {
+        let disabledItems: number[] = [];
+        // CHECK SECOND LEVEL
+        disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+
+        // CHECK FIRST LEVEL
+        field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
+            if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
+                disabledItems.push(item.id);
+            }
+        });
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+    }
+
+
+    openValuesSelector(field: any) {
+        const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            data: {...field, allDoctypes: this.allDoctypes}
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functions.empty(data)),
+            tap((result: any) => {
+                this.allDoctypes = result.allDoctypes;
+                field.values = result.values;
+                field.allowedValues = result.values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
+                // WORK AROUND UPDATING DATA
+                field.type = null;
+                setTimeout(() => {
+                    field.type = 'select';
+                }, 0);
+                if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
+                    this.arrFormControl[field.identifier].reset();
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     /**
