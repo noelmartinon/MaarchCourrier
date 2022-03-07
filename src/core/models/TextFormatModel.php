@@ -35,7 +35,7 @@ class TextFormatModel
         if (!empty($args['maxLength'])) {
             $args['filename'] = mb_substr($args['filename'], 0, $args['maxLength']);
         }
-        return preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', $args['filename']);
+        return preg_replace(utf8_decode('@[\\/:*?"\'<>|]@i'), '_', $args['filename']);
     }
 
     public static function formatDate($date, $format = null)
