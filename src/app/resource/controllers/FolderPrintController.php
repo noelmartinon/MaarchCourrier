@@ -561,6 +561,8 @@ class FolderPrintController
                 $documentPaths = array_merge($documentPaths, $linkedAttachmentPath);
             }
 
+            return $response->withStatus(500)->withJson(['errors' => $documentPaths]);
+
             if (!empty($documentPaths)) {
                 if (empty($resource['altIdentifier'] . $resource['subject'])) {
                     $document = ResModel::getById([
@@ -590,7 +592,6 @@ class FolderPrintController
                     unlink($filePathOnTmp);
                 }
                 $command = "pdfunite '" . implode("' '", $documentPaths) . "' '" . $filePathOnTmp . "'";
-
                 exec($command . ' 2>&1', $output, $return);
 
                 if (!file_exists($filePathOnTmp)) {
@@ -696,6 +697,35 @@ class FolderPrintController
         if ($document['fingerprint'] != $fingerprint) {
             return ['errors' => 'Fingerprints do not match', 'code' => 400];
         }
+
+        // check pdf version
+        $command = "pdfinfo '" . $pathToDocument . "' | grep 'PDF version'";
+        exec($command . ' 2>&1', $outputPdfVersion, $returnPdfVersion);
+        
+        if (empty($outputPdfVersion)) {
+            return ['errors' => 'Unable to check pdf version : ' . implode(",", $outputPdfVersion), 'code' => 400];
+        }
+
+        $documentPdfVersion = explode(":", $outputPdfVersion[0])[1];
+        if (!Validator::floatVal()->notEmpty()->validate($documentPdfVersion)) {
+            return ['errors' => "The document pdf version is unknown '$documentPdfVersion'", 'code' => 400];
+        }
+
+        // convert pdf version to tmp
+        $tmpDir = CoreConfigModel::getTmpPath();
+
+        if ((float) $documentPdfVersion > 1.4) {
+
+            $tmpFilename =  str_replace('//', '/', $tmpDir) . "tmpFile_" . $GLOBALS['id'] . "_" . rand() . ".pdf";
+            $command = "gs -dCompatibilityLevel=1.4 -q -sDEVICE=pdfwrite -dNOPAUSE -dQUIET -dBATCH -o {$tmpFilename} {$pathToDocument} 2>&1";
+            exec($command, $output, $return);
+
+            if (!empty($output)) {
+                return ['errors' => implode(",", $output), 'code' => 400];
+            }
+            $pathToDocument = $tmpFilename;
+        }
+
 
         return $pathToDocument;
     }
