@@ -286,28 +286,32 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                 this.actionService.stopRefreshResourceLock();
                 this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
             }
-            await this.appVisaWorkflow.saveVisaWorkflow().then((res: any) => {
-                if (res) {
-                    let assignedBasket: any;
-                    this.http.get('../rest/home').pipe(
-                        tap((data: any) => {
-                            assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);
-                        }),
-                        finalize(() => {
-                            if (this.canChange(assignedBasket)) {
-                                this.goToNextDocument();
-                            }
-                        }),
-                        catchError((err: any) => {
-                            this.notify.handleSoftErrors(err);
-                            return of(false);
-                        })
-                    ).subscribe();
-                } else {
-                    this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
-                }
-            });
+            const resWorkflow = await this.appVisaWorkflow.saveVisaWorkflow();
+            if (resWorkflow) {
+                let assignedBasket: any;
+                this.http.get('../rest/home').pipe(
+                    tap((data: any) => {
+                        assignedBasket = data.assignedBaskets.find((basket: any) =>
+                            basket.id.toString() === this.basketId &&
+                            basket.owner_user_id.toString() === this.userId &&
+                            basket.group_id.toString() === this.groupId
+                        );
+                    }),
+                    finalize(() => {
+                        if (this.canChange(assignedBasket)) {
+                            this.goToNextDocument();
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else {
+                this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+            }
             this.loadBadges();
+
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
             this.loadBadges();
