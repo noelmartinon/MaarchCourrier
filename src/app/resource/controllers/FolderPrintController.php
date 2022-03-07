@@ -561,7 +561,6 @@ class FolderPrintController
                 $documentPaths = array_merge($documentPaths, $linkedAttachmentPath);
             }
 
-            return $response->withStatus(500)->withJson(['errors' => $documentPaths]);
 
             if (!empty($documentPaths)) {
                 if (empty($resource['altIdentifier'] . $resource['subject'])) {
