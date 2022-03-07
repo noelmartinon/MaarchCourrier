@@ -1309,7 +1309,7 @@ export class IndexingFormComponent implements OnInit {
         if (!this.functions.empty(this.resId) && !afterSaveEvent) {
             this.http.get(`../rest/resources/${this.resId}`).pipe(
                 tap ((data: any) => {
-                    if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                    if (!this.functions.empty(data['doctype']) && field.allowedValues?.indexOf(data['doctype']) === -1) {
                         field.values.find((item: any) => item.id === data['doctype']).disabled = false;
                     }
                 }),
