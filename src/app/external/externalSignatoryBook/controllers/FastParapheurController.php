@@ -390,6 +390,11 @@ class FastParapheurController
             $user = UserModel::getById(['id' => $signatory['user_id'], 'select' => ['user_id']]);
         }
 
+        // check if circuidId is an email
+        if (preg_match("/^([a-zA-Z0-9\.\-]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/", $user['user_id'])) {
+            $user['user_id'] = explode("@", $user['user_id'])[0];
+        }
+
         return FastParapheurController::upload(['config' => $config, 'resIdMaster' => $aArgs['resIdMaster'], 'businessId' => $signatory['business_id'], 'circuitId' => $user['user_id'], 'label' => $redactor['short_label']]);
     }
 
