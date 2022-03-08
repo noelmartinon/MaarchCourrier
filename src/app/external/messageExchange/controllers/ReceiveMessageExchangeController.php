@@ -119,7 +119,9 @@ class ReceiveMessageExchangeController
                 if ($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]) {
                     $userGroups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
                     $basketRedirection = 'index.php#/basketList/users/'.$GLOBALS['id'].'/groups/'.$userGroups[0]['id'].'/baskets/'.$value['id'];
-                    $resource = ResModel::getById(['id' => $resLetterboxReturn]);
+                    //SGAMI-SO GEC#93
+                    $resource = ResModel::getById(['resId' => $resLetterboxReturn, 'select' => ['alt_identifier']]);
+                    //FIN SGAMI-SO
                     if (!empty($resource['alt_identifier'])) {
                         $basketRedirection .= '?chrono='.$resource['alt_identifier'];
                     }
