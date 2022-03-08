@@ -391,7 +391,7 @@ class FastParapheurController
         }
 
         // check if circuidId is an email
-        if (preg_match("/^([a-zA-Z0-9\.\-]+@+[a-zA-Z]+(\.)+[a-zA-Z]{2,3})$/", $user['user_id'])) {
+        if (Validator::email()->notEmpty()->validate($user['user_id'])) {
             $user['user_id'] = explode("@", $user['user_id'])[0];
         }
 
