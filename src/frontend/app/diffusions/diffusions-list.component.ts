@@ -528,7 +528,7 @@ export class DiffusionsListComponent implements OnInit {
     }
 
     hasEmptyDest() {
-        return this.diffList['dest'].items.length === 0;
+        return !this.functions.empty(this.diffList) && this.diffList['dest'].items.length === 0;
     }
 
     isEmptyList() {
