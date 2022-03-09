@@ -5,7 +5,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '@service/app.service';
-import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
+import { tap, catchError, exhaustMap, filter, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -260,6 +260,9 @@ export class IndexingFormComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    allowedValues: number[] = [];
+    allDoctypes: boolean = true;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -475,6 +478,9 @@ export class IndexingFormComponent implements OnInit {
                         }
                     }),
                     tap(() => {
+                        if (this.currentResourceValues.find((item: any) => item.identifier === 'doctype').default_value !== this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').default_value) {
+                            this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'), true);
+                        }
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.translate.instant('lang.dataUpdated'));
                         resolve(true);
@@ -718,6 +724,7 @@ export class IndexingFormComponent implements OnInit {
                     if (!this.functions.empty(elem.default_value) && !this.adminMode) {
                         this.calcLimitDate(elem, elem.default_value);
                     }
+                    this.setAllowedValues(elem);
                     resolve(true);
                 })
             ).subscribe();
@@ -772,7 +779,6 @@ export class IndexingFormComponent implements OnInit {
                     elem.event = 'getIssuingSites';
                     // await this.setDoctypeField(elem);
                 }
-                this.setAllowedValues(elem);
             }));
         }));
         if (this.resId !== null) {
@@ -783,23 +789,44 @@ export class IndexingFormComponent implements OnInit {
         this.loading = false;
     }
 
-    setAllowedValues(field: any) {
+    setAllowedValues(field: any, afterSaveEvent: boolean = false) {
         if (!this.functions.empty(field.allowedValues)) {
             field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
                 item.disabled = field.allowedValues.indexOf(item.id) === -1;
             });
         }
         if (!this.adminMode && field.identifier === 'doctype') {
-            this.checkDisabledValues(field);
+            this.checkDisabledValues(field, afterSaveEvent);
         }  
     }
 
-    checkDisabledValues(field: any) {
+    checkDisabledValues(field: any, afterSaveEvent: boolean = false) {
+        if (!this.functions.empty(this.resId) && !afterSaveEvent) {
+            this.http.get(`../rest/resources/${this.resId}`).pipe(
+                tap ((data: any) => {
+                    if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                        field.values.find((item: any) => item.id === data['doctype']).disabled = false;
+                    }
+                }),
+                finalize(() => {
+                    this.formatData(field);
+    
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.formatData(field);
+        }
+    }
+
+    formatData(field: any) {
         let disabledItems: number[] = [];
         // CHECK SECOND LEVEL
         disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
         field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
-
 
         // CHECK FIRST LEVEL
         field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
@@ -938,6 +965,10 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
+                this.allDoctypes = data.indexingModel.allDoctypes;
+                if (data.indexingModel.master !== null) {
+                    this.getAllowedValues(data.indexingModel.master);
+                }
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();
@@ -1034,17 +1065,30 @@ export class IndexingFormComponent implements OnInit {
         }
     }
 
+    getAllowedValues(id: number) {
+        this.http.get(`../rest/indexingModels/${id}`).pipe(
+            tap((data: any) => {
+                this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
     openValuesSelector(field: any) {
         const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
-            data: field
+            data: {...field, allDoctypes: this.allDoctypes}
         });
         dialogRef.afterClosed().pipe(
             filter((data: any) => !this.functions.empty(data)),
-            tap((values: any) => {
-                field.values = values;
-                field.allowedValues = values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
+            tap((result: any) => {
+                this.allDoctypes = result.allDoctypes;
+                field.values = result.values;
+                field.allowedValues = result.values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
                 // WORK AROUND UPDATING DATA
                 field.type = null;
                 setTimeout(() => {
@@ -1150,8 +1194,12 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-
-        if (this.arrFormControl[field.identifier].value === null) {
+        if (field.identifier === 'doctype') {
+            if (this.functions.empty(field.allowedValues)) {
+                field.allowedValues = this.allowedValues;
+                this.setAllowedValues(field);
+            }
+        } else if (this.arrFormControl[field.identifier].value === null) {
             return true;
 
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {

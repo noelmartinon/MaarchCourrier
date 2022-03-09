@@ -24,6 +24,7 @@ use Folder\controllers\FolderController;
 use Group\controllers\PrivilegeController;
 use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
+use IndexingModel\controllers\IndexingModelController;
 use Priority\models\PriorityModel;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -127,7 +128,7 @@ class ResourceControlController
             return ['errors' => 'Body is not set or empty'];
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid', 'filename']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['type_id', 'status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid', 'filename']]);
         if (empty($resource['status'])) {
             return ['errors' => 'Resource status is empty. It can not be modified'];
         }
@@ -187,7 +188,7 @@ class ResourceControlController
         if (empty($body['modelId'])) {
             $body['modelId'] = $resource['model_id'];
         }
-        $control = ResourceControlController::controlIndexingModelFields(['body' => $body, 'isUpdating' => true]);
+        $control = ResourceControlController::controlIndexingModelFields(['body' => $body, 'oldDoctypeId' => $resource['type_id'],  'isUpdating' => true]);
         if (!empty($control['errors'])) {
             return ['errors' => $control['errors']];
         }
@@ -378,6 +379,9 @@ class ResourceControlController
         foreach ($indexingModelFields as $indexingModelField) {
             $indexingModelField['default_value'] = json_decode($indexingModelField['default_value'], true);
             $indexingModelField['allowed_values'] = json_decode($indexingModelField['allowed_values'], true);
+            if ($indexingModelField['allowed_values'] == IndexingModelController::ALLOWED_VALUES_ALL_DOCTYPES) {
+                $indexingModelField['allowed_values'] = null; // setting to null so it is ignored in the rest of this function
+            }
             if (strpos($indexingModelField['identifier'], 'indexingCustomField_') !== false) {
                 $customFieldId = explode('_', $indexingModelField['identifier'])[1];
                 if ($indexingModelField['mandatory'] && empty($body['customFields'][$customFieldId])) {
@@ -421,6 +425,9 @@ class ResourceControlController
                     } elseif ($customField['type'] == 'date' && !Validator::date()->notEmpty()->validate($body['customFields'][$customFieldId])) {
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
                     } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
+                        if(!empty($args['oldDoctypeId']) && $body['customFields'][$customFieldId] == $args['oldDoctypeId']) {
+                            continue;
+                        }
                         return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
                     }
                 }
@@ -429,6 +436,9 @@ class ResourceControlController
             } elseif ($indexingModelField['mandatory'] && !isset($body[$indexingModelField['identifier']])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not set"];
             } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
+                if(!empty($args['oldDoctypeId']) && $body[$indexingModelField['identifier']] == $args['oldDoctypeId']) {
+                    continue;
+                }
                 return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
             }
         }
