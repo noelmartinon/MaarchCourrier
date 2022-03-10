@@ -16,6 +16,7 @@
             "polyfills": "src/frontend/polyfills.ts",
             "main": "src/frontend/main.ts",
             "tsConfig": "src/frontend/tsconfig.app.json",
+            "allowedCommonJsDependencies": ["pdfjs-dist/es5/web/pdf_viewer", "pdfjs-dist/es5/build/pdf", "papaparse/papaparse.min.js"],
             "styles": [
               {
                 "input": "./src/frontend/css/vars.scss",
