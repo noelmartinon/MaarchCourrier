@@ -295,6 +295,8 @@ INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, ca
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
 -- SGAMI requalification courrier
 UPDATE status set can_be_modified = 'Y' WHERE id = 'RES';
+--FIX_76
+UPDATE status set can_be_modified = 'Y' WHERE id = 'RET';
 -- END SGAMI
 DELETE FROM parameters WHERE id = 'registeredMailImportedStatus';
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
