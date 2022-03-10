@@ -886,6 +886,8 @@ export class IndexingFormComponent implements OnInit {
                         });
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                     }
+                    const priorityField: any = this.currentResourceValues.find((field: any) => field.identifier === 'priority')?.default_value;
+                    this.setPriorityColor(null, !this.functions.empty(priorityField) ? priorityField : '');
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -1043,7 +1045,7 @@ export class IndexingFormComponent implements OnInit {
                 this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
                 if (this.functions.empty(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues)) {
                     this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues = this.allowedValues;
-                    if (this.allowedValues.length > 0) {
+                    if (this.allowedValues?.length > 0) {
                         this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'));
                     }
                 }
