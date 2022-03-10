@@ -215,6 +215,7 @@ END$$;
 /* SGAMI SO FIX 75 */
 UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
 UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+update groupbasket SET list_event_data = jsonb_set(list_event_data, '{goToNextDocument}', 'true') WHERE list_event='signatureBookAction' and basket_id = 'EsigBasket';
 /* END SGAMI SO FIX 75 */
 UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 
