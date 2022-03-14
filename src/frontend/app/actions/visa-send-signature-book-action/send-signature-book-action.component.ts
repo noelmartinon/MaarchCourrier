@@ -20,6 +20,8 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
+    actionService: ActionsService; // To resolve circular dependencies
+
     loading: boolean = true;
 
     resourcesMailing: any[] = [];
@@ -48,7 +50,6 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         public dialogRef: MatDialogRef<SendSignatureBookActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService,
-        public actionService: ActionsService,
         public route: Router
     ) { }
 

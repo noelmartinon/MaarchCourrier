@@ -11,6 +11,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": ["pdfjs-dist/es5/web/pdf_viewer", "pdfjs-dist/es5/build/pdf", "papaparse/papaparse.min.js"],
             "outputPath": "dist",
             "index": "src/frontend/index.html",
             "polyfills": "src/frontend/polyfills.ts",

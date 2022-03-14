@@ -886,6 +886,8 @@ export class IndexingFormComponent implements OnInit {
                         });
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                     }
+                    const priorityField: any = this.currentResourceValues.find((field: any) => field.identifier === 'priority')?.default_value;
+                    this.setPriorityColor(null, !this.functions.empty(priorityField) ? priorityField : '');
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -1041,6 +1043,12 @@ export class IndexingFormComponent implements OnInit {
         this.http.get(`../rest/indexingModels/${id}`).pipe(
             tap((data: any) => {
                 this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+                if (this.functions.empty(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues)) {
+                    this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues = this.allowedValues;
+                    if (this.allowedValues?.length > 0) {
+                        this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'));
+                    }
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -1154,14 +1162,8 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-        if (field.identifier === 'doctype') {
-            if (this.functions.empty(field.allowedValues)) {
-                field.allowedValues = this.allowedValues;
-                this.setAllowedValues(field);
-            }
-        } else if (this.arrFormControl[field.identifier].value === null) {
+        if (this.arrFormControl[field.identifier].value === null) {
             return true;
-
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {
             if (this.arrFormControl[field.identifier].value.length > 0) {
                 return false;
