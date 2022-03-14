@@ -126,10 +126,10 @@ foreach ($baskets as $basket) {
         $entitiesId = explode(",", $notification['diffusion_properties']);
 
         foreach ($entitiesId as $entityId) {
-            $users_entities = \User\models\UserEntityModel::get(['select' => ['user_id', 'entity_id'], 'where' => ['entity_id = ?', 'users_entities.primary_entity = ?'], 'data' => [$entityId, 'Y']]);
+            $usersEntities = \User\models\UserEntityModel::get(['select' => ['user_id', 'entity_id'], 'where' => ['entity_id = ?', 'users_entities.primary_entity = ?'], 'data' => [$entityId, 'Y']]);
             
-            foreach ($users_entities as $user_entity) {
-                $tmpUsers = \User\models\UserModel::getById(['select' => ['users.user_id', 'users.id'], 'id' => $user_entity['user_id']]);
+            foreach ($usersEntities as $userEntity) {
+                $tmpUsers = \User\models\UserModel::getById(['select' => ['users.user_id', 'users.id'], 'id' => $userEntity['user_id']]);
 
                 // filter duplicate users in array
                 if (strpos(json_encode($users), json_encode($tmpUsers)) === false ) {
