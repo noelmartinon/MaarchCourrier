@@ -27,6 +27,7 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
 use User\models\UserModel;
+use Respect\Validation\Validator;
 
 /**
     * @codeCoverageIgnore
