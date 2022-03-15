@@ -43,17 +43,14 @@
                         </ng-container>
                     </div>
                 </app-maarch-message>
-                <app-maarch-message *ngIf="acknowledgement.sendEmail && !this.functions.empty(this.senders)" mode="success"
+                <app-maarch-message *ngIf="acknowledgement.sendEmail" mode="success"
                     [content]="'lang.readyToSendElectronicAr' | translate : {nb : acknowledgement.sendEmail}">
                 </app-maarch-message>
-                <app-maarch-message *ngIf="acknowledgement.sendPaper && !this.functions.empty(this.senders)" mode="success"
+                <app-maarch-message *ngIf="acknowledgement.sendPaper" mode="success"
                     [content]="'lang.readyToGeneratePaperAr' | translate : {nb : acknowledgement.sendPaper}">
                 </app-maarch-message>
-                <app-maarch-message *ngIf="!loading && this.functions.empty(this.senders) && !acknowledgement.noSendAR?.number" mode="danger" style="margin-top: 5%; display: block;"
-                    [content]="'lang.emptySenders' | translate">
-                </app-maarch-message>
                 <app-mail-editor #appMailEditor
-                    *ngIf="!manualAR && realResSelected.length > 0 && !this.functions.empty(this.senders)"
+                    *ngIf="!manualAR && realResSelected.length > 0"
                     [availableSenders]="senders"
                     [currentSender]="senders[0]"
                     [recipientDisabled]="true"
@@ -68,12 +65,12 @@
                     [resId]="data.resIds.length === 1 ? data.resIds[0] : null"
                 ></app-mail-editor>
 
-                <div *ngIf="arMode == 'both' && !this.functions.empty(this.senders)">
+                <div *ngIf="arMode == 'both'">
                     <mat-slide-toggle [(ngModel)]="manualAR" color="primary" (change)="toggleArManual($event.checked)">
                         {{'lang.editAcknowledgementReceipt' | translate}}</mat-slide-toggle>
                 </div>
                 <app-mail-editor #appMailEditor
-                    *ngIf="manualAR && realResSelected.length > 0 && !this.functions.empty(this.senders)"
+                    *ngIf="manualAR && realResSelected.length > 0"
                     [availableSenders]="senders"
                     [currentSender]="senders[0]"
                     [recipientDisabled]="true"
@@ -86,7 +83,7 @@
                     [subjectPrefix]="'[AR]'"
                 ></app-mail-editor>
             </div>
-            <div class="col-md-12" *ngIf="(acknowledgement.sendEmail || acknowledgement.sendPaper) && !this.functions.empty(this.senders)">
+            <div class="col-md-12" *ngIf="acknowledgement.sendEmail || acknowledgement.sendPaper">
                 <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
             </div>
         </div>
@@ -94,7 +91,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
-            [disabled]="loading || (!acknowledgement.sendEmail && !acknowledgement.sendPaper) || this.functions.empty(this.senders)"
+            [disabled]="loading || (!acknowledgement.sendEmail && !acknowledgement.sendPaper)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>

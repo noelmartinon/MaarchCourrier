@@ -990,10 +990,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             }
         });
 
-        const formatSender = {
+        const formatSender = !this.functions.empty(this.currentSender) ? {
             email: this.currentSender.email,
             entityId: !this.functions.empty(this.currentSender.entityId) ? this.currentSender.entityId : null
-        };
+        } : null;
 
         return {
             document: objAttach,

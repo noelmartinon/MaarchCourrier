@@ -2581,6 +2581,5 @@
     "fileNotConvertible": "Only convertible files are allowed",
     "warningNote": "Please note that your comment must be neutral, factual, objective and respectful of the people concerned, never excessive or insulting.",
     "emptyEmails": "The correspondents of the group do not contain email addresses",
-    "correspondentEmptyEmails": "<b>Warning ! Only correspondents with e-mail addresses are included.</b> <br><br><ul><li>Number of correspondents without an email address : {{nbr}}</li></ul>",
-    "emptySenders": "The sender linked to the mail does not have an email address"
+    "correspondentEmptyEmails": "<b>Warning ! Only correspondents with e-mail addresses are included.</b> <br><br><ul><li>Number of correspondents without an email address : {{nbr}}</li></ul>"
 }
