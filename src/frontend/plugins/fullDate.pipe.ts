@@ -14,8 +14,17 @@ export class FullDatePipe implements PipeTransform {
     transform(value: string) {
         if (!this.functions.empty(value)) {
             const date = new Date(value);
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-            return this.translate.instant('lang.onRange')[0].toUpperCase() + this.translate.instant('lang.onRange').substr(1).toLowerCase() + ' ' + date.toLocaleDateString(this.translate.instant('lang.langISO'), options);
+            const options: Intl.DateTimeFormatOptions = { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric'
+            };
+            return  this.translate.instant('lang.onRange')[0].toUpperCase() +
+                    this.translate.instant('lang.onRange').substr(1).toLowerCase() + ' ' +
+                    date.toLocaleDateString(this.translate.instant('lang.langISO'), options);
         } else {
             return '';
         }

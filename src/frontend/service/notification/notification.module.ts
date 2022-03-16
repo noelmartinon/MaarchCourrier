@@ -14,9 +14,6 @@ import { CustomSnackbarComponent, NotificationService } from './notification.ser
         CustomSnackbarComponent,
     ],
     exports: [],
-    entryComponents: [
-        CustomSnackbarComponent,
-    ],
     providers: [NotificationService]
 })
 export class NotificationModule { }

@@ -30,7 +30,6 @@ import { TranslateService } from '@ngx-translate/core';
         CustomizationComponent,
         UseradminComponent,
     ],
-    entryComponents: [InstallActionComponent],
     providers: [InstallerService]
 })
 export class InstallerModule {

@@ -39,10 +39,8 @@ import { SplitLoginPwdPipe } from '@plugins/splitLoginPwd.pipe';
         HighlightPipe,
         SplitLoginPwdPipe
     ],
-    entryComponents: [
-    ],
     providers: [
         LatinisePipe
-    ],
+    ]
 })
 export class AppServiceModule {}

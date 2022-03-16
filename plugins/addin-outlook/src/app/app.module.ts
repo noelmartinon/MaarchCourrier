@@ -15,29 +15,26 @@ import { PanelComponent } from './panel/panel.component';
 import { LatinisePipe } from 'ngx-pipes';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MessageBoxComponent,
-    CustomSnackbarComponent,
-    PanelComponent,
-  ],
-  imports: [
-    HttpClientModule,
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    AppMaterialModule,
-    InternationalizationModule
-  ],
-  entryComponents: [
-    CustomSnackbarComponent,
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    LatinisePipe
-],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        MessageBoxComponent,
+        CustomSnackbarComponent,
+        PanelComponent,
+    ],
+    imports: [
+        HttpClientModule,
+        BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        AppRoutingModule,
+        ReactiveFormsModule,
+        AppMaterialModule,
+        InternationalizationModule
+    ],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        LatinisePipe
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {}

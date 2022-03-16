@@ -1,9 +1,10 @@
 // import all mixins and utils to create a theme
+@use '@angular/material' as mat;
 @import './node_modules/@angular/material/theming';
 
 // Include the base styles for Angular Material core. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
-@include mat-core();
+@include mat.core();
 
 // theme colors
 // @function mat-palette($base-palette, $default: 500, $lighter: 100, $darker: 700)
@@ -40,15 +41,15 @@ $mat-maarch-accent: (
   )
 );
 
-$primary: mat-palette($mat-maarch-primary, 500);
-$accent: mat-palette($mat-maarch-accent, 500);
-$warn: mat-palette($mat-maarch-warn, 500);
+$primary: mat.define-palette($mat-maarch-primary, 500);
+$accent: mat.define-palette($mat-maarch-accent, 500);
+$warn: mat.define-palette($mat-maarch-warn, 500);
 
 // create theme from palettes
-$theme: mat-light-theme($primary, $accent, $warn);
+$theme: mat.define-light-theme($primary, $accent, $warn);
 
 // apply theme
-@include angular-material-theme($theme);
+@include mat.all-component-themes($theme);
 
 .mat-calendar-body-in-range .mat-calendar-body-cell-content {
   color: white;

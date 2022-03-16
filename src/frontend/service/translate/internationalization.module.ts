@@ -15,11 +15,8 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
             }
         }),
     ],
-    declarations: [
-    ],
+    declarations: [],
     exports: [TranslateModule],
-    entryComponents: [
-    ],
     providers: []
 })
 export class InternationalizationModule { }

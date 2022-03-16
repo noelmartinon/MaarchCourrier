@@ -33,9 +33,6 @@ import { Office365SharepointViewerComponent } from '@plugins/office365-sharepoin
         DocumentViewerComponent,
         CollaboraOnlineViewerComponent,
         Office365SharepointViewerComponent
-    ],
-    entryComponents: [
-        DocumentViewerModalComponent
     ]
 })
 export class DocumentViewerModule {

@@ -23,7 +23,12 @@ export class AppDateAdapter extends NativeDateAdapter {
             const year = date.getFullYear();
             return this._to2digit(day) + '/' + this._to2digit(month) + '/' + year;
         } else {
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            const options: Intl.DateTimeFormatOptions = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            };
             return date.toLocaleDateString(this.locale, options);
         }
     }
