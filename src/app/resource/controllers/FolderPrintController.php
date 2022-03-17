@@ -609,7 +609,9 @@ class FolderPrintController
                 $folderPrintPaths[] = $filePathOnTmp;
             }
         }
-
+        if (count($folderPrintPaths) == 0) {
+            return $response->withStatus(400)->withJson(['errors' => 'No document to merge']);
+        }
         if (count($folderPrintPaths) == 1) {
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
 

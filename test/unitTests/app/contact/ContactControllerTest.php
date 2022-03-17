@@ -103,7 +103,9 @@ class ContactControllerTest extends TestCase
             'addressCountry'     => 'USA',
             'phone'              => '5705551212',
             'notes'              => 'Assistant to the regional manager',
-            'communicationMeans' => 'dschrute@dundermifflin.com',
+            'communicationMeans' => [
+                'email'         => 'dschrute@dundermifflin.com'
+            ],
             'externalId'         => [
                 'schruteFarmId' => 1,
                 'm2m'           => '45239273100025/PJS'
