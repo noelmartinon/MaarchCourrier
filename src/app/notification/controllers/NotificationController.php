@@ -132,7 +132,7 @@ class NotificationController
         if (NotificationModel::create($data)) {
             if (PHP_OS == 'Linux') {
                 $notificationAdded = NotificationModel::getByNotificationId(['notificationId' => $data['notification_id'], 'select' => ['notification_sid']]);
-                NotificationScheduleModel::createScriptNotification(['notification_sid' => $notificationAdded['notification_sid'], 'notification_id' => $data['notification_id']]);
+                NotificationScheduleModel::createScriptNotification(['notification_sid' => $notificationAdded['notification_sid'], 'event_id' => $data['event_id'], 'notification_id' => $data['notification_id']]);
             }
 
             HistoryController::add([
@@ -173,7 +173,7 @@ class NotificationController
         $notification = NotificationModel::getById(['notification_sid' => $data['notification_sid']]);
 
         if (PHP_OS == 'Linux') {
-            NotificationScheduleModel::createScriptNotification(['notification_sid' => $data['notification_sid'], 'notification_id' => $notification['notification_id']]);
+            NotificationScheduleModel::createScriptNotification(['notification_sid' => $data['notification_sid'], 'event_id' => $data['event_id'], 'notification_id' => $notification['notification_id']]);
         }
 
         HistoryController::add([
