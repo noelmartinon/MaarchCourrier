@@ -378,7 +378,8 @@ class StoreController
             'in_signature_book'     => $inSignatureBook ? 'true' : 'false',
             'external_id'           => $externalId,
             'creation_date'         => 'CURRENT_TIMESTAMP',
-            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null
+            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null,
+            'doctype'               => $args['doctype']
         ];
 
         return $preparedData;
@@ -400,6 +401,7 @@ class StoreController
             'attachment_type'       => $args['type'],
             'validation_date'       => $args['validationDate'] ?? null,
             'effective_date'        => $args['effectiveDate'] ?? null,
+            'doctype'               => $args['doctype'] ?? null,
             'modified_by'           => $GLOBALS['id'],
             'modification_date'     => 'CURRENT_TIMESTAMP'
         ];

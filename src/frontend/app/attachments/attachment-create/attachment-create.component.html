@@ -38,6 +38,7 @@
                                     *ngIf="attachment['type'].valid && !isEmptyField(attachment['type'])"></i>
                             </div>
                         </div>
+                        
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
                                 <input matInput placeholder="{{lang.subject}}" [formControl]="attachment['title']">
@@ -51,6 +52,26 @@
                                     *ngIf="attachment['title'].valid && !isEmptyField(attachment['title'])"></i>
                             </div>
                         </div>
+                        <!-- Doctype field -->
+                        <div class="attachment-form-item">
+                            <plugin-select-search
+                                [showLabel]="true"
+                                [label]="lang.doctype"
+                                [placeholderLabel]="lang.doctype"
+                                [datas]="doctypeField"
+                                [formControlSelect]="attachment['doctype']"
+                                style="width:100%;">
+                            </plugin-select-search>
+                            <div class="fieldState">
+                                <i class="fas fa-asterisk fieldRequired"
+                                    *ngIf="attachment['doctype'].hasError('required') && attachment['doctype'].untouched"></i>
+                                <i class="fas fa-exclamation-triangle fieldError"
+                                    *ngIf="attachment['doctype'].touched && attachment['doctype'].hasError('required')"></i>
+                                <i class="fas fa-check fieldFull"
+                                    *ngIf="attachment['doctype'].valid && !isEmptyField(attachment['doctype'])"></i>
+                            </div>
+                        </div>
+                        <!-- / -->
                         <div class="attachment-form-item" *ngIf="resourceContacts.length > 1">
                             <plugin-select-search [label]="lang.selectContact"
                                 [placeholderLabel]="lang.selectContact" [datas]="resourceContacts"
