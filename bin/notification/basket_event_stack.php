@@ -180,7 +180,7 @@ foreach ($baskets as $basket) {
             }
         }
         
-    } elseif ($notification['diffusion_type'] == 'group') {
+    } else {
         $groups = \Basket\models\GroupBasketModel::get(['select' => ['group_id'], 'where' => ['basket_id = ?'], 'data' => [$basket['basket_id']]]);
         $nbGroups = count($groups);
 
