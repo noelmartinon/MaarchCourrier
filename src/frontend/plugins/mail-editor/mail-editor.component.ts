@@ -34,6 +34,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     @Input() recipientDisabled: boolean = false;
 
     @Input() recipientHide: boolean = false;
+    @Input() senderHide: boolean = false;
     @Input() attachmentsHide: boolean = false;
     @Input() bodyHide: boolean = false;
     @Input() subjectHide: boolean = false;
