@@ -85,7 +85,7 @@ foreach ($baskets as $basket) {
         $groupInfo = \Group\models\GroupModel::getByGroupId(['groupId' => $group['group_id'], 'select' => ['id']]);
         $users = \Group\models\GroupModel::getUsersById(['select' => ['users.user_id', 'users.id'], 'id' => $groupInfo['id']]);
 
-        if ($notification['diffusion_type'] == 'entity' && !empty($notification['diffusion_properties'])) {
+        if ($notification['diffusion_type'] == 'entity' && !empty($diffusionParams)) {
 
             $usersOfEntities = \Entity\models\EntityModel::getWithUserEntities([
                 'select'    => ['user_id as id'], 
@@ -93,7 +93,11 @@ foreach ($baskets as $basket) {
                 'data'      => [$diffusionParams]
             ]);
 
-            $users = array_unique($usersOfEntities);
+            $users = array_filter(array_unique($usersOfEntities), function ($userOfEntities) use ($users){
+                foreach ($users as $user) {
+                    return ($user['id'] === $userOfEntities['id']);
+                }
+            });
         }
 
         $countUsersToNotify = count($users);
