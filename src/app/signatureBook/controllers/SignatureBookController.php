@@ -447,7 +447,7 @@ class SignatureBookController
         }
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
         if (!file_exists($pathToDocument)) {
-            SignatureBookController::deleteTMPFile($document['format'], $pathToDocument, $args['resId']);
+            SignatureBookController::deleteTMPFile($document['format'], '', $args['resId']);
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
         $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
@@ -634,7 +634,7 @@ class SignatureBookController
         }
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
         if (!file_exists($pathToDocument)) {
-            SignatureBookController::deleteTMPAttachment($attachment['format'], $pathToDocument, $args['id']);
+            SignatureBookController::deleteTMPAttachment($attachment['format'], '', $args['id']);
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
@@ -843,7 +843,7 @@ class SignatureBookController
     private static function deleteTMPFile(string $format, string $path, int $resId)
     {
         if (in_array($format, MergeController::OFFICE_EXTENSIONS)) {
-            if (empty($path)) {
+            if (!empty($path)) {
                 unlink($path);
             }
             AdrModel::deleteDocumentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$resId, 'TMP']]);
@@ -853,7 +853,7 @@ class SignatureBookController
     private static function deleteTMPAttachment(string $format, string $path, int $id)
     {
         if (in_array($format, MergeController::OFFICE_EXTENSIONS)) {
-            if (empty($path)) {
+            if (!empty($path)) {
                 unlink($path);
             }
             AdrModel::deleteAttachmentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$id, 'TMP']]);
