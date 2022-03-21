@@ -95,7 +95,9 @@ foreach ($baskets as $basket) {
 
             $users = array_filter(array_unique($usersOfEntities), function ($userOfEntities) use ($users){
                 foreach ($users as $user) {
-                    return ($user['id'] === $userOfEntities['id']);
+                    if ($user['id'] == $userOfEntities['id']) {
+                        return $user;
+                    }
                 }
             });
         }
