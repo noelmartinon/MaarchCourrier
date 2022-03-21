@@ -275,7 +275,7 @@ if ($mode == 'add') {
             $externalId = (array)json_decode($contactInfo['external_id']);
             if (!empty($communicationTypeModel) && !empty($externalId['m2m'])) {
                 $adress_mail = \Contact\models\ContactModel::getContactFullLabel(['addressId' => $address_id]);
-                $adress_mail .= '. ('._COMMUNICATION_TYPE.' : '.$communicationTypeModel['value'].')';
+                // $adress_mail .= '. ('._COMMUNICATION_TYPE.' : '.$communicationTypeModel['value'].')';
             }
         }
     }

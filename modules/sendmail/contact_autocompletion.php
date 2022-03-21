@@ -90,7 +90,13 @@ for ($i=0; $i<$l; $i++) {
     } else {
         $color = 'white';
     }
-    echo "<li style='font-size: 8pt; background-color:$color;' title='confiance:".$score."%' id='".$res->ca_id."'>". $res->result ."</li>";
+
+    if (strpos($res->result, "(Moyen de communication :") !== false) {
+        echo "<li style='font-size: 8pt; background-color:$color;' title='confiance:".$score."%' id='".$res->ca_id."'>". explode("(Moyen de communication :", $res->result)[0] ."</li>";
+    } else {
+        echo "<li style='font-size: 8pt; background-color:$color;' title='confiance:".$score."%' id='".$res->ca_id."'>". $res->result ."</li>";
+    }
+    
 }
 if ($nb == 0) {
     echo "<li></li>";
