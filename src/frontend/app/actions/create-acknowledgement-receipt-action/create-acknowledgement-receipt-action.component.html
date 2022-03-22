@@ -49,13 +49,13 @@
                 <app-maarch-message *ngIf="acknowledgement.sendPaper" mode="success"
                     [content]="'lang.readyToGeneratePaperAr' | translate : {nb : acknowledgement.sendPaper}">
                 </app-maarch-message>
-
                 <app-mail-editor #appMailEditor
                     *ngIf="!manualAR && realResSelected.length > 0"
                     [availableSenders]="senders"
                     [currentSender]="senders[0]"
                     [recipientDisabled]="true"
-                    [recipientHide]="data.resIds.length > 1"
+                    [recipientHide]="data.resIds.length > 1 || !acknowledgement.sendEmail"
+                    [senderHide]="!acknowledgement.sendEmail"
                     [recipientDisabled]="true"
                     [senderDisabled]="senders.length === 1"
                     [cCDisabled]="!canAddCopies"
@@ -75,7 +75,8 @@
                     [availableSenders]="senders"
                     [currentSender]="senders[0]"
                     [recipientDisabled]="true"
-                    [recipientHide]="data.resIds.length > 1"
+                    [recipientHide]="data.resIds.length > 1 || !acknowledgement.sendEmail"
+                    [senderHide]="!acknowledgement.sendEmail"
                     [senderDisabled]="senders.length === 1"
                     [cCDisabled]="!canAddCopies"
                     [cCIDisabled]="!canAddCopies"

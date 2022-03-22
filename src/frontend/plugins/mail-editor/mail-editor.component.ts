@@ -34,6 +34,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     @Input() recipientDisabled: boolean = false;
 
     @Input() recipientHide: boolean = false;
+    @Input() senderHide: boolean = false;
     @Input() attachmentsHide: boolean = false;
     @Input() bodyHide: boolean = false;
     @Input() subjectHide: boolean = false;
@@ -990,10 +991,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             }
         });
 
-        const formatSender = {
+        const formatSender = !this.functions.empty(this.currentSender) ? {
             email: this.currentSender.email,
             entityId: !this.functions.empty(this.currentSender.entityId) ? this.currentSender.entityId : null
-        };
+        } : null;
 
         return {
             document: objAttach,
