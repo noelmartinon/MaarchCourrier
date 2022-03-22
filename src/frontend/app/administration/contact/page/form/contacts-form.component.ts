@@ -810,13 +810,17 @@ export class ContactsFormComponent implements OnInit {
             id: item.id,
             value: item.control.value
         }));
-        const communicationMeans = {
+        let communicationMeans = {
             url: m2mData.find((item: any) => item.id === 'url').value,
             externalId_m2m: m2mData.find((item: any) => item.id === 'externalId_m2m').value,
             login: m2mData.find((item: any) => item.id === 'login').value,
             password: m2mData.find((item: any) => item.id === 'password').value,
             email: m2mData.find((item: any) => item.id === 'email_m2m').value,
         };
+
+        if (Object.keys(communicationMeans).every((item: any) => this.functions.empty(communicationMeans[item]))) {
+            communicationMeans = null;
+        }
         return { ... contact, communicationMeans};
     }
 
