@@ -2646,5 +2646,7 @@
     "chooseValues": "Choose the values",
     "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
     "allDoctypes": "Add all doctypes",
-    "allDoctypesDesc": "This option enabled automatically adds new types to the list below"
+    "allDoctypesDesc": "This option enabled automatically adds new types to the list below",
+    "notifTargetDesc": "The <i>[res_letterbox.linktodetail], [res_letterbox.linktodoc]</i> and <i>[res_letterbox.linktoprocess]</i> merge variables require the <br> application URL to be filled in : <b>Administration -> Settings -> Personalization -> Application URL</b>"
+
 }
