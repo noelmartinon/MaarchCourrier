@@ -392,7 +392,7 @@ class FastParapheurController
         }
 
         // check if circuidId is an email
-        if (Validator::email()->notEmpty()->validate($user['user_id'])) {
+        if (Validator::email()->notEmpty()->validate($user['user_id'] ?? null)) {
             $user['user_id'] = explode("@", $user['user_id'])[0];
         }
 
