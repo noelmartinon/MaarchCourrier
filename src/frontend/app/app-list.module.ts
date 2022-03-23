@@ -36,12 +36,7 @@ import { TranslateService } from '@ngx-translate/core';
         PrintedFolderModalComponent,
         ActionsListComponent,
         FollowedActionListComponent,
-    ],
-    entryComponents: [
-        SummarySheetComponent,
-        ExportComponent,
-        PrintedFolderModalComponent,
-    ],
+    ]
 })
 export class AppListModule {
     constructor(translate: TranslateService) {

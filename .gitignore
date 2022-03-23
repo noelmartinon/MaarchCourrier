@@ -1,3 +1,4 @@
+/.angular/cache
 composer.lock
 installed.lck
 config/config.json

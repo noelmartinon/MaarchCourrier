@@ -76,7 +76,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
             exhaustMap(() => this.dialogRef.afterClosed()),
             tap(() => {
                 this.dialogRef = null;
-                window.location.reload(true);
+                window.location.reload();
             }),
             catchError(err => {
                 this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.updateKO'), msg: this.translate.instant('lang.saveInDocserversInfo') } });

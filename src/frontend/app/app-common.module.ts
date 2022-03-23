@@ -227,16 +227,7 @@ import { FilterComponent } from '@plugins/select-with-filter/filter/filter.compo
         SelectWithFilterComponent,
         FilterComponent
     ],
-    providers: [],
-    entryComponents: [
-        IndexingGroupModalComponent,
-        RegisteredMailImportComponent,
-        AlertComponent,
-        ConfirmComponent,
-        ContactsGroupFormModalComponent,
-        ContactsGroupMergeModalComponent,
-        ContactsFormModalComponent
-    ],
+    providers: []
 })
 export class SharedModule {
     constructor(translate: TranslateService) {

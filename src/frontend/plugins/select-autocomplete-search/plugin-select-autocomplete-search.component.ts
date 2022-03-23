@@ -405,7 +405,7 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
         }
         const overlayClass = 'cdk-overlay-pane-select-search';
 
-        this.matSelect.overlayDir.attach
+        this.matSelect.stateChanges
             .pipe(takeUntil(this._onDestroy))
             .subscribe(() => {
                 // note: this is hacky, but currently there is no better way to do this

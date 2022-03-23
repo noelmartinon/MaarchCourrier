@@ -183,29 +183,9 @@ import { MultigestListAdministrationComponent } from './multigest/multigest-list
         MultigestAdministrationComponent,
         MultigestListAdministrationComponent
     ],
-    entryComponents: [
-        AccountLinkComponent,
-        BasketAdministrationGroupListModalComponent,
-        BasketAdministrationSettingsModalComponent,
-        ContactExportComponent,
-        ContactImportComponent,
-        ContactsListAdministrationRedirectModalComponent,
-        DoctypesAdministrationRedirectModalComponent,
-        EntitiesAdministrationRedirectModalComponent,
-        GroupsAdministrationRedirectModalComponent,
-        ManageDuplicateComponent,
-        TemplateAdministrationCheckEntitiesModalComponent,
-        TemplateFileEditorModalComponent,
-        UserAdministrationRedirectModalComponent,
-        UsersAdministrationRedirectModalComponent,
-        UsersImportComponent,
-        UsersExportComponent,
-        EntitiesExportComponent,
-        CheckMailServerModalComponent
-    ],
     providers: [
         AdministrationService
-    ],
+    ]
 })
 export class AdministrationModule {
     constructor(translate: TranslateService) {
