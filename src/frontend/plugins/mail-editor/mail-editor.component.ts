@@ -697,14 +697,15 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
             setTimeout(() => {
                 this.recipientsInput.setValue(null);
-
-                this[type + 'Field'].nativeElement.value = '';
+                if (!this.functions.empty(this[type + 'Field'])) {
+                    this[type + 'Field'].nativeElement.value = '';
+                }
             }, 0);
 
             arrRawAdd.forEach((rawAddress: any) => {
                 rawAddress = rawAddress.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi);
 
-                if (!this.functions.empty(rawAddress)) {
+                if (!this.functions.empty(rawAddress) && !this.functions.empty(this[type + 'Field'])) {
                     this[type].push({ label: rawAddress[0], email: rawAddress[0] });
                 }
             });
