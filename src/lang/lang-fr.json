@@ -2644,5 +2644,6 @@
     "chooseValues": "Choisir les valeurs",
     "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisées pour ce champ",
     "allDoctypes": "Ajouter tous les types",
-    "allDoctypesDesc": "Cette option activée permet d'ajouter automatiquement les nouveaux types à la liste ci-dessous"
+    "allDoctypesDesc": "Cette option activée permet d'ajouter automatiquement les nouveaux types à la liste ci-dessous",
+    "separatorsEmail": "Les séparateurs entre les adresses e-mails sont : , et ;"
 }

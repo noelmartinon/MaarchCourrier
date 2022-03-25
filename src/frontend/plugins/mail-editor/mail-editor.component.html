@@ -40,6 +40,7 @@
                     ({{option.email}})</span>
             </mat-option>
         </mat-autocomplete>
+        <mat-hint [innerText]="'lang.separatorsEmail' | translate"></mat-hint>
     </mat-form-field>
     <mat-form-field *ngIf="showCopies">
         <span matPrefix class="mailLabel">{{'lang.copieShort' | translate}}&nbsp;:&nbsp;</span>
