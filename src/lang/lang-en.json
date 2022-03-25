@@ -2647,5 +2647,5 @@
     "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
     "allDoctypes": "Add all doctypes",
     "allDoctypesDesc": "This option enabled automatically adds new types to the list below",
-    "separatorsEmail": "The separators between email addresses are : , and ;"
+    "separatorsEmail": "To separate email addresses, use \",\" or \";\""
 }
