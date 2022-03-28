@@ -315,6 +315,12 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                         this.loadingResult.emit(true);
                         return this.resultListDatabase!.getRepoIssues(
                             this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, this.listProperties, this.paginator.pageSize, this.criteria, this.dataFilters);
+                    } else {
+                        /**
+                         * To resolve the error :
+                         * You provided 'undefined' where a stream was expected. You can provide an Observable, Promise, Array, or Iterable
+                         */
+                        return new Observable<BasketList>();
                     }
                 }),
                 map((data: any) => {
