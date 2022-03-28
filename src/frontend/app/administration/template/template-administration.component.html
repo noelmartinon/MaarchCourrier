@@ -78,6 +78,9 @@
                                         </mat-select>
                                     </mat-form-field>
                                 </div>
+                                <div *ngIf="template.target === 'notifications' && !loading" class="col-sm-12">
+                                    <app-maarch-message [mode]="'info'" [content]="'lang.notifTargetDesc' | translate"></app-maarch-message>
+                                </div>
                             </div>
                             <div class="form-group" *ngIf="template.target == 'attachments'">
                                 <div class="col-sm-12">
