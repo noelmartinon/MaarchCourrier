@@ -99,6 +99,7 @@ foreach ($baskets as $basket) {
                         return $user;
                     }
                 }
+                return false;
             });
         }
 
