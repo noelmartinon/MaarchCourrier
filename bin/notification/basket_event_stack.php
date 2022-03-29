@@ -85,12 +85,13 @@ foreach ($baskets as $basket) {
                 'data'      => [$diffusionParams]
             ]);
 
-            $users = array_filter(array_unique($usersOfEntities, SORT_REGULAR), function ($userOfEntities) use ($users){
+            $users = array_filter (array_unique ($usersOfEntities, SORT_REGULAR), function ($userOfEntities) use ($users) {
                 foreach ($users as $user) {
                     if ($user['id'] == $userOfEntities['id']) {
                         return $user;
                     }
                 }
+                return false;
             });
         }
 
