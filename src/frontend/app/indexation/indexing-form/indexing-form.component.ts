@@ -804,13 +804,12 @@ export class IndexingFormComponent implements OnInit {
         if (!this.functions.empty(this.resId) && !afterSaveEvent) {
             this.http.get(`../rest/resources/${this.resId}`).pipe(
                 tap ((data: any) => {
-                    if (!this.functions.empty(data['doctype']) && field.allowedValues.indexOf(data['doctype']) === -1) {
+                    if (!this.functions.empty(data['doctype']) && field.allowedValues?.indexOf(data['doctype']) === -1) {
                         field.values.find((item: any) => item.id === data['doctype']).disabled = false;
                     }
                 }),
                 finalize(() => {
                     this.formatData(field);
-    
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -1069,6 +1068,12 @@ export class IndexingFormComponent implements OnInit {
         this.http.get(`../rest/indexingModels/${id}`).pipe(
             tap((data: any) => {
                 this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+                if (this.functions.empty(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues)) {
+                    this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype').allowedValues = this.allowedValues;
+                    if (this.allowedValues?.length > 0) {
+                        this.setAllowedValues(this['indexingModels_mail'].find((item: any) => item.identifier === 'doctype'));
+                    }
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -1194,14 +1199,8 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-        if (field.identifier === 'doctype') {
-            if (this.functions.empty(field.allowedValues)) {
-                field.allowedValues = this.allowedValues;
-                this.setAllowedValues(field);
-            }
-        } else if (this.arrFormControl[field.identifier].value === null) {
+        if (this.arrFormControl[field.identifier].value === null) {
             return true;
-
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {
             if (this.arrFormControl[field.identifier].value.length > 0) {
                 return false;
