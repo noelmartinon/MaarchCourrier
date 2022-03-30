@@ -1,7 +1,7 @@
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { COMMA, FF_SEMICOLON, SEMICOLON } from '@angular/cdk/keycodes';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -25,6 +25,10 @@ declare let tinymce: any;
     providers: [ContactService]
 })
 export class MailEditorComponent implements OnInit, OnDestroy {
+
+    @ViewChild('recipientsField', {static: false}) recipientsField: ElementRef;
+    @ViewChild('copiesField', {static: false}) copiesField: ElementRef;
+    @ViewChild('invisibleCopiesField', {static: false}) invisibleCopiesField: ElementRef;
 
     @Input() resId: number = null;
     @Input() emailId: any = null;
@@ -697,7 +701,6 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
             setTimeout(() => {
                 this.recipientsInput.setValue(null);
-
                 this[type + 'Field'].nativeElement.value = '';
             }, 0);
 
