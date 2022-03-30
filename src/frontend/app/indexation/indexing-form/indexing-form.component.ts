@@ -778,6 +778,9 @@ export class IndexingFormComponent implements OnInit {
                     elem.startDate = '_TODAY';
                     elem.endDate = '';
                     elem.event = 'setPriorityColorByLimitDate';
+                    if (elem.enabled) {
+                        this.arrFormControl[elem.identifier].enable();
+                    }
 
                 } else if (elem.identifier === 'departureDate') {
                     elem.startDate = 'documentDate';
