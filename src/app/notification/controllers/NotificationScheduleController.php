@@ -144,7 +144,8 @@ class NotificationScheduleController
             $errors[] = 'notification_sid is not a numeric';
         }
         if (!Validator::notEmpty()->validate($data['notification_sid']) ||
-            !Validator::notEmpty()->validate($data['notification_id'])) {
+            !Validator::notEmpty()->validate($data['notification_id'])  ||
+            !Validator::notEmpty()->validate($data['event_id'])) {
             $errors[] = 'one of arguments is empty';
         }
 
@@ -155,7 +156,7 @@ class NotificationScheduleController
         $notification_sid = $data['notification_sid'];
         $notification_id  = $data['notification_id'];
 
-        NotificationScheduleModel::createScriptNotification(['notification_sid' => $notification_sid, 'notification_id' => $notification_id]);
+        NotificationScheduleModel::createScriptNotification(['notification_sid' => $notification_sid, 'event_id' => $event_id, 'notification_id' => $notification_id]);
 
         return $response->withJson(true);
     }

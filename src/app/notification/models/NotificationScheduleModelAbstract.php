@@ -131,10 +131,11 @@ abstract class NotificationScheduleModelAbstract
 
     public static function createScriptNotification(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['notification_sid', 'notification_id']);
+        ValidatorModel::notEmpty($aArgs, ['notification_sid', 'notification_id', 'event_id']);
         ValidatorModel::intVal($aArgs, ['notification_sid']);
 
         $notification_id = $aArgs['notification_id'];
+        $event_id = $aArgs['event_id'];
 
         //Creer le script sh pour les notifications
         $filename = 'notification';
@@ -166,9 +167,9 @@ abstract class NotificationScheduleModelAbstract
         fwrite($file_open, "\n");
         fwrite($file_open, 'cd $path');
         fwrite($file_open, "\n");
-        if ($notification_id == 'BASKETS') {
+        if ($event_id == 'baskets') {
             fwrite($file_open, 'php \'basket_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);
-        } elseif ($notification_id == 'RELANCE1' || $notification_id == 'RELANCE2' || $notification_id == 'RET1' || $notification_id == 'RET2') {
+        } elseif ($notification_id == 'RELANCE1' || $notification_id == 'RELANCE2' || $event_id == 'alert1' || $event_id == 'alert2') {
             fwrite($file_open, 'php \'stack_letterbox_alerts.php\' -c '.$ConfigNotif);
             fwrite($file_open, "\n");
             fwrite($file_open, 'php \'process_event_stack.php\' -c '.$ConfigNotif.' -n '.$notification_id);

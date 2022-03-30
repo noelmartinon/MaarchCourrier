@@ -69,16 +69,41 @@ foreach ($baskets as $basket) {
     $nbGroups = count($groups);
 
     foreach ($groups as $group) {
-        if ($notification['diffusion_type'] == 'group' && !in_array($group['group_id'], explode(",", $notification['diffusion_properties']))) {
+        $diffusionParams = explode(",", $notification['diffusion_properties']);
+        
+        if ($notification['diffusion_type'] == 'group' && !in_array($group['group_id'], explode(",", $diffusionParams))) {
             continue;
         }
         $groupInfo = \Group\models\GroupModel::getByGroupId(['groupId' => $group['group_id'], 'select' => ['id']]);
         $users = \Group\models\GroupModel::getUsersById(['select' => ['users.user_id', 'users.id'], 'id' => $groupInfo['id']]);
 
+        if ($notification['diffusion_type'] == 'entity' && !empty($diffusionParams)) {
+
+            $usersOfEntities = \Entity\models\EntityModel::getWithUserEntities([
+                'select'    => ['user_id as id'], 
+                'where'     => ['entities.entity_id in (?)'], 
+                'data'      => [$diffusionParams]
+            ]);
+
+            $users = array_filter (array_unique ($usersOfEntities, SORT_REGULAR), function ($userOfEntities) use ($users) {
+                foreach ($users as $user) {
+                    if ($user['id'] == $userOfEntities['id']) {
+                        return $user;
+                    }
+                }
+                return false;
+            });
+        }
+
         $countUsersToNotify = count($users);
         writeLog(['message' => "Group {$group['group_id']} : {$countUsersToNotify} user(s) to notify", 'level' => 'INFO']);
 
         foreach ($users as $userToNotify) {
+
+            if ($notification['diffusion_type'] == 'users' && !in_array($userToNotify['id'], $diffusionParams)) {
+                continue;
+            }
+            
             $realUserId     = null;
             $userId         = $userToNotify['id'];
             $whereClause    = \SrcCore\controllers\PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $userToNotify['id']]);
