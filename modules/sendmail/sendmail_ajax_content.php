@@ -574,9 +574,6 @@ switch ($mode) {
 
                 if ($_REQUEST['for'] == 'add') {
                     $contactLabel         = \Contact\models\ContactModel::getContactFullLabel(['addressId' => $contactAddress]);
-                    $contactInfo          = \Contact\models\ContactModel::getFullAddressById(['addressId' => $contactAddress]);
-                    // $contactCommunication = \Contact\models\ContactModel::getContactCommunication(['contactId' => $contactInfo[0]['contact_id']]);
-                    // $_SESSION['adresses'][$_REQUEST['field']][$contactAddress] = $contactLabel.'. ('._COMMUNICATION_TYPE.' : '.$contactCommunication['value'].'))';
                     $_SESSION['adresses'][$_REQUEST['field']][$contactAddress] = $contactLabel;
                 } elseif ($_REQUEST['for'] == 'del') {
                     unset($_SESSION['adresses'][$_REQUEST['field']][$_REQUEST['index']]);

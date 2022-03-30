@@ -275,7 +275,6 @@ if ($mode == 'add') {
             $externalId = (array)json_decode($contactInfo['external_id']);
             if (!empty($communicationTypeModel) && !empty($externalId['m2m'])) {
                 $adress_mail = \Contact\models\ContactModel::getContactFullLabel(['addressId' => $address_id]);
-                // $adress_mail .= '. ('._COMMUNICATION_TYPE.' : '.$communicationTypeModel['value'].')';
             }
         }
     }
@@ -1058,9 +1057,7 @@ if ($mode == 'add') {
             }
             $content .= '</div></td>';
             $content .= '</tr>';
-            if ($formContent == 'messageExchange') {
-                $content .= '<tr><td align="right" nowrap width="10%"></td><td width="90%">'._COMMUNICATION_TYPE.' : '.$emailArray['communicationType'].'</td></tr>';
-            } else {
+            if ($formContent != 'messageExchange') {
                 //CC
                 if (!empty($emailArray['cc']) && count($emailArray['cc']) > 0) {
                     $_SESSION['adresses']['cc'] = array();
