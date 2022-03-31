@@ -410,7 +410,8 @@ class SummarySheetController
                             $value = $customFieldsValues[$customFieldsId] ? '<b>' . $customFieldsValues[$customFieldsId] . '</b>' : '<i>' . _UNDEFINED . '</i>';
                         }
 
-                        $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, 1, '', '', true, 0, true);
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes*2, 30, $label . " : {$value}", 1, 'L', false, 1, '', '', true, 0, true, true);
                         $pdf->SetFont('', '', 10);
                     }
                 }
