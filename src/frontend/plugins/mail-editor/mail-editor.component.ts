@@ -27,6 +27,8 @@ declare let tinymce: any;
 export class MailEditorComponent implements OnInit, OnDestroy {
 
     @ViewChild('recipientsField', {static: false}) recipientsField: ElementRef;
+    @ViewChild('copiesField', {static: false}) copiesField: ElementRef;
+    @ViewChild('invisibleCopiesField', {static: false}) invisibleCopiesField: ElementRef;
 
     @Input() resId: number = null;
     @Input() emailId: any = null;

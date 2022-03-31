@@ -68,7 +68,7 @@
                 ></app-mail-editor>
 
                 <div *ngIf="arMode == 'both'">
-                    <mat-slide-toggle [(ngModel)]="manualAR" color="primary" (change)="toggleArManual($event.checked)">
+                    <mat-slide-toggle [(ngModel)]="manualAR" color="primary" (change)="toggleArManual($event.checked)" style="margin-top: 12px;">
                         {{'lang.editAcknowledgementReceipt' | translate}}</mat-slide-toggle>
                 </div>
                 <app-mail-editor #appMailEditor

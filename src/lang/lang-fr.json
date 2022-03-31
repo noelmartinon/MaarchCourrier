@@ -2646,5 +2646,5 @@
     "allDoctypes": "Ajouter tous les types",
     "allDoctypesDesc": "Cette option activée permet d'ajouter automatiquement les nouveaux types à la liste ci-dessous",
     "notifTargetDesc": "Les champs de fusion <i>[res_letterbox.linktodetail], [res_letterbox.linktodoc]</i> et <i>[res_letterbox.linktoprocess]</i> requièrent que l’URL de l’application <br> soit renseignée dans : <b>Administration -> Paramètres -> Personnalisation -> URL de l'application</b>",
-    "separatorsEmail": "Pour séparer les adresses e-mails, utilisez les \",\" ou \";\""
+    "separatorsEmail": "Pour séparer les adresses courriels, utiliser les \",\" ou \";\""
 }
