@@ -27,6 +27,7 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
 use User\models\UserModel;
+use Respect\Validation\Validator;
 
 /**
     * @codeCoverageIgnore
@@ -388,6 +389,11 @@ class FastParapheurController
 
         if (!empty($signatory['user_id'])) {
             $user = UserModel::getById(['id' => $signatory['user_id'], 'select' => ['user_id']]);
+        }
+
+        // check if circuidId is an email
+        if (Validator::email()->notEmpty()->validate($user['user_id'] ?? null)) {
+            $user['user_id'] = explode("@", $user['user_id'])[0];
         }
 
         return FastParapheurController::upload(['config' => $config, 'resIdMaster' => $aArgs['resIdMaster'], 'businessId' => $signatory['business_id'], 'circuitId' => $user['user_id'], 'label' => $redactor['short_label']]);
