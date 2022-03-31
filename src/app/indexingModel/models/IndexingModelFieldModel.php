@@ -29,7 +29,7 @@ class IndexingModelFieldModel
             'table'     => ['indexing_models_fields'],
             'where'     => empty($args['where']) ? [] : $args['where'],
             'data'      => empty($args['data']) ? [] : $args['data'],
-            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
+            'order_by'  => empty($args['orderBy']) ? ['id asc'] : $args['orderBy'],
             'limit'     => empty($args['limit']) ? 0 : $args['limit']
         ]);
 
